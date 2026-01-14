@@ -1,0 +1,34 @@
+#
+# {prefix} {primary} {secondary} {tertiary} {danger} {grey}
+# Minimessage Format Support
+
+# Basic
+prefix: '{grey}[<gradient:#f90036:#f90011><b>System</b>{grey}]'
+only-player: '{danger}Nur Spieler können diesen Command ausführen'
+no-permission: '{danger}Du hast keine Rechte dazu'
+
+# Server Sends
+send-to-lobby: '{grey}Du wirst zur {primary}Lobby{grey} gesendet...'
+already-on-lobby: '{grey}Du befindest dich bereits in der {danger}Lobby'
+server-not-found: '{grey}Der Server {danger}{server-name}{grey} wurde nicht gefunden'
+already-on-server: '{grey}Du befindest dich schon auf {danger}{server-name}'
+connection-failed: '{grey}Verbindung zu {danger}{server-name} {grey}fehlgeschlagen'
+
+# Commands
+network-help:
+  - '{grey}Alle Netzwerk Commands:'
+  - '{grey}- {primary}/net help {grey}Zeigt diese Nachricht'
+  - '{grey}- {primary}/net reload {grey}Lädt das gesamte Netzwerk neu'
+  - '{grey}- {primary}/find <Spieler> {grey}Sieh auf welchem Server sind ein Spieler befindet'
+  - '{grey}- {primary}/clearchat {grey}Lehre den Chat'
+network-reload-success: '{primary}Das Netzwerk wurde erfolgreich neu geladen'
+network-reload-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat das Netzwerk neu geladen'
+chat-cleared:
+  - '{grey}Der Chat wurde von {primary}{player-name}{grey} gelehrt'
+chat-cleared-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat den Chat gelehrt'
+chat-cleared-success: '{primary}Der Chat wurde gelehrt'
+
+command-find-not-found: '{danger}{player-name} {grey}konnte nicht gefunden werden'
+command-find-success: '{primary}{player-name} {grey}befindet sich auf {primary}{server-name}'
+command-find-missing-argument: '{danger}/find <Spieler>'
+command-find-connecting: '{danger}{player-name} {grey}verbindet sich gerade zu einem Server'

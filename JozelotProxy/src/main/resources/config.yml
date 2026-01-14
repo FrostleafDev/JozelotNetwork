@@ -1,0 +1,36 @@
+#
+# JozelotNetwork
+#
+
+network-name: 'jozelot.de'
+
+color-settings:
+  primary: '#00A4FC'
+  secondary: '#00FC00'
+  tertiary: '#FCE300'
+  danger: '#f90036'
+  grey:  '#A8A8A8'
+
+lobby-server: 'lobby'
+
+# Setup MySQL and Redis Databases
+mysql:
+  host: 'localhost'
+  port: '3306'
+  database: 'JozelotNetwork'
+  user: 'JozelotNetwork'
+  password: '12345678'
+
+redis:
+  host: 'localhost'
+  port: '6379'
+  password: ''
+
+# Permissions:
+# network.command
+# network.command.reload
+# network.command.lobby
+# network.command.clearchat
+# network.command.find
+# network.get.logs
+# network.clearchat.bypass

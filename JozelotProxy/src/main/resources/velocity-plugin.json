@@ -1,0 +1,6 @@
+{
+  "id": "jozelotproxy",
+  "name": "JozelotProxy",
+  "version": "1.0.0",
+  "main": "de.jozelot.jozelotproxy.JozelotProxy"
+}
