@@ -61,7 +61,7 @@ public class ClearChatCommand implements SimpleCommand {
                 player.sendMessage(mm.deserialize(lang.format("chat-cleared-admin", Map.of("player-name", name))));
             }
         }
-        source.sendMessage(mm.deserialize(lang.getString("chat-cleared-success")));
+        source.sendMessage(mm.deserialize(lang.format("chat-cleared-success", null)));
     }
 
     @Override

@@ -13,6 +13,8 @@ import de.jozelot.jozelotProxy.commands.ClearChatCommand;
 import de.jozelot.jozelotProxy.commands.FindCommand;
 import de.jozelot.jozelotProxy.commands.LobbyCommand;
 import de.jozelot.jozelotProxy.commands.NetworkCommand;
+import de.jozelot.jozelotProxy.database.MySQLManager;
+import de.jozelot.jozelotProxy.database.MySQLSetup;
 import de.jozelot.jozelotProxy.database.RedisSetup;
 import de.jozelot.jozelotProxy.listener.JoinListeners;
 import de.jozelot.jozelotProxy.storage.ConfigManager;
@@ -44,7 +46,10 @@ public class JozelotProxy {
     private PlayerSends playerSends;
     private PluginReload pluginReload;
     private ConsoleLogger consoleLogger;
+
     private RedisSetup redisSetup;
+    private MySQLSetup mySQLSetup;
+    private MySQLManager mySQLManager;
 
     private MiniMessage mm = MiniMessage.miniMessage();
 
@@ -81,8 +86,13 @@ public class JozelotProxy {
         this.consoleLogger = new ConsoleLogger(this);
         logger.info("Utils geladen");
         consoleLogger.broadCastToConsole("Plugin Logger gestartet");
+
         this.redisSetup = new RedisSetup(this);
         redisSetup.setup();
+        this.mySQLSetup = new MySQLSetup(this);
+        mySQLSetup.setup();
+        this.mySQLManager = new MySQLManager(this);
+        mySQLManager.createTables();
 
         // Commands
         CommandManager cm = server.getCommandManager();
@@ -98,7 +108,7 @@ public class JozelotProxy {
         consoleLogger.broadCastToConsole("Commands erstellt");
 
         // Listener
-        server.getEventManager().register(this, new JoinListeners());
+        server.getEventManager().register(this, new JoinListeners(this));
         consoleLogger.broadCastToConsole("Listener erstellt");
 
         consoleLogger.broadCastToConsole( "<" + config.getColorPrimary() + ">----------------------------------------------");
@@ -142,6 +152,19 @@ public class JozelotProxy {
 
     public ConsoleLogger getConsoleLogger() {
         return consoleLogger;
+    }
+
+    public RedisSetup getRedisSetup() {
+        return redisSetup;
+    }
+
+    public MySQLSetup getMySQLSetup() {
+        return mySQLSetup;
+    }
+
+
+    public MySQLManager getMySQLManager() {
+        return mySQLManager;
     }
 
     public String getVersion() {
