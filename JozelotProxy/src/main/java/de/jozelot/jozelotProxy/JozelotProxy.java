@@ -13,6 +13,7 @@ import de.jozelot.jozelotProxy.commands.ClearChatCommand;
 import de.jozelot.jozelotProxy.commands.FindCommand;
 import de.jozelot.jozelotProxy.commands.LobbyCommand;
 import de.jozelot.jozelotProxy.commands.NetworkCommand;
+import de.jozelot.jozelotProxy.database.RedisSetup;
 import de.jozelot.jozelotProxy.listener.JoinListeners;
 import de.jozelot.jozelotProxy.storage.ConfigManager;
 import de.jozelot.jozelotProxy.storage.LangManager;
@@ -43,6 +44,7 @@ public class JozelotProxy {
     private PlayerSends playerSends;
     private PluginReload pluginReload;
     private ConsoleLogger consoleLogger;
+    private RedisSetup redisSetup;
 
     private MiniMessage mm = MiniMessage.miniMessage();
 
@@ -79,6 +81,8 @@ public class JozelotProxy {
         this.consoleLogger = new ConsoleLogger(this);
         logger.info("Utils geladen");
         consoleLogger.broadCastToConsole("Plugin Logger gestartet");
+        this.redisSetup = new RedisSetup(this);
+        redisSetup.setup();
 
         // Commands
         CommandManager cm = server.getCommandManager();

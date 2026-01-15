@@ -16,14 +16,14 @@ lobby-server: 'lobby'
 # Setup MySQL and Redis Databases
 mysql:
   host: 'localhost'
-  port: '3306'
-  database: 'JozelotNetwork'
-  user: 'JozelotNetwork'
-  password: '12345678'
+  port: 3306
+  database: 'jozelot_network'
+  user: ''
+  password: ''
 
 redis:
   host: 'localhost'
-  port: '6379'
+  port: 6379
   password: ''
 
 # Permissions:

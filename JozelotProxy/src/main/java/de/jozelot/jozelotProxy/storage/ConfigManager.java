@@ -19,9 +19,16 @@ public class ConfigManager {
     private String colorGrey;
 
     private String lobbyServer;
+
+    private String mysqlHost;
+    private String mysqlDatabase;
+    private String mysqlUser;
+    private String mysqlPassword;
+    private int mysqlPort;
+
     private String redisHost;
-    private String redisPort;
     private String redisPassword;
+    private int redisPort;
 
     public ConfigManager(Path directory, String fileName) {
         this.file = new File(directory.toFile(), fileName);
@@ -71,12 +78,32 @@ public class ConfigManager {
         return redisHost;
     }
 
-    public String getRedisPort() {
+    public int getRedisPort() {
         return redisPort;
     }
 
     public String getRedisPassword() {
         return redisPassword;
+    }
+
+    public String getMysqlHost() {
+        return mysqlHost;
+    }
+
+    public String getMysqlDatabase() {
+        return mysqlDatabase;
+    }
+
+    public String getMysqlUser() {
+        return mysqlUser;
+    }
+
+    public String getMysqlPassword() {
+        return mysqlPassword;
+    }
+
+    public int getMysqlPort() {
+        return mysqlPort;
     }
 
     public void reload() {
@@ -89,8 +116,14 @@ public class ConfigManager {
         lobbyServer = getString("lobby-server");
 
         redisHost = getString("redis.host");
-        redisPort = getString("redis.port");
+        redisPort = getInt("redis.port");
         redisPassword = getString("redis.password");
+
+        mysqlHost = getString("mysql.host");
+        mysqlDatabase = getString("mysql.database");
+        mysqlUser = getString("mysql.user");
+        mysqlPassword = getString("mysql.password");
+        mysqlPort = getInt("mysql.port");
 
         colorPrimary = getString("color-settings.primary");
         colorSecondary = getString("color-settings.secondary");
