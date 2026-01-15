@@ -1,59 +1,56 @@
 package de.jozelot.jozelotProxy.database;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import de.jozelot.jozelotProxy.JozelotProxy;
-import de.jozelot.jozelotProxy.storage.ConfigManager;
-import de.jozelot.jozelotProxy.utils.ConsoleLogger;
-import redis.clients.jedis.JedisPooled;
-
 import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 public class MySQLSetup {
 
-    private final ConfigManager config;
-    private final ConsoleLogger consoleLogger;
-    private Connection connection;
-
+    private HikariDataSource dataSource;
     private final String url;
     private final String user;
     private final String password;
 
     public MySQLSetup(JozelotProxy plugin) {
-        this.config = plugin.getConfig();
-        this.consoleLogger = plugin.getConsoleLogger();
-
-        url = "jdbc:mariadb://" + config.getMysqlHost() + ":" + config.getMysqlPort() + "/" + config.getMysqlDatabase();
-        user = config.getMysqlUser();
-        password = config.getMysqlPassword();
+        var config = plugin.getConfig();
+        this.url = "jdbc:mariadb://" + config.getMysqlHost() + ":" + config.getMysqlPort() + "/" + config.getMysqlDatabase();
+        this.user = config.getMysqlUser();
+        this.password = config.getMysqlPassword();
     }
 
     public void setup() {
-        try {
-            Class.forName("org.mariadb.jdbc.Driver");
+        HikariConfig hikariConfig = new HikariConfig();
 
-            this.connection = DriverManager.getConnection(url, user, password);
-            consoleLogger.broadCastToConsole("MariaDB: Leitung steht.");
+        hikariConfig.setDriverClassName("org.mariadb.jdbc.Driver");
+        hikariConfig.setJdbcUrl(url);
+        hikariConfig.setUsername(user);
+        hikariConfig.setPassword(password);
 
-            consoleLogger.broadCastToConsole("MariaDB: Tabellen erfolgreich initialisiert.");
+        hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
+        hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
+        hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+        hikariConfig.addDataSourceProperty("useServerPrepStmts", "true");
 
-        } catch (SQLException e) {
-            consoleLogger.broadCastToConsole("MariaDB: Setup fehlgeschlagen: " + e.getMessage());
-        } catch (ClassNotFoundException e) {
-            consoleLogger.broadCastToConsole("MariaDB: Treiber nicht gefunden!");
-        }
+        hikariConfig.setMaximumPoolSize(10);
+        hikariConfig.setMinimumIdle(2);
+        hikariConfig.setMaxLifetime(1800000);
+        hikariConfig.setConnectionTimeout(5000);
+
+        this.dataSource = new HikariDataSource(hikariConfig);
     }
 
-    public Connection getConnection() {
-        try {
-            if (connection == null || connection.isClosed()) {
-                setup();
-            }
-        } catch (SQLException e) {
+    public Connection getConnection() throws SQLException {
+        if (dataSource == null) {
             setup();
         }
-        return connection;
+        return dataSource.getConnection();
+    }
+
+    public void close() {
+        if (dataSource != null) {
+            dataSource.close();
+        }
     }
 }

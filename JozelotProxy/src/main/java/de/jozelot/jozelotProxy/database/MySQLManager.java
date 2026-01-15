@@ -1,14 +1,12 @@
 package de.jozelot.jozelotProxy.database;
 
+import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.jozelot.jozelotProxy.JozelotProxy;
 import de.jozelot.jozelotProxy.storage.ConfigManager;
 import de.jozelot.jozelotProxy.utils.ConsoleLogger;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.UUID;
+import java.sql.*;
+import java.util.*;
 
 public class MySQLManager {
 
@@ -121,22 +119,111 @@ public class MySQLManager {
         }
     }
 
-    public void addToPlayerList(UUID uuid, String username) {
-        String sql = "INSERT INTO player (uuid, username, last_join) VALUES (?, ?, CURRENT_TIMESTAMP) " +
+    public boolean addToPlayerList(UUID uuid, String username) {
+        String sqlPlayer = "INSERT INTO player (uuid, username, last_join) VALUES (?, ?, CURRENT_TIMESTAMP) " +
                 "ON DUPLICATE KEY UPDATE username = ?, last_join = CURRENT_TIMESTAMP;";
+
+        String sqlState = "INSERT IGNORE INTO player_state (uuid) VALUES (?);";
+
+        try (Connection conn = mySQLSetup.getConnection()) {
+            int affectedRows;
+            try (PreparedStatement pstmt = conn.prepareStatement(sqlPlayer)) {
+                pstmt.setString(1, uuid.toString());
+                pstmt.setString(2, username);
+                pstmt.setString(3, username);
+                affectedRows = pstmt.executeUpdate();
+            }
+
+            try (PreparedStatement pstmtState = conn.prepareStatement(sqlState)) {
+                pstmtState.setString(1, uuid.toString());
+                pstmtState.executeUpdate();
+            }
+
+            return (affectedRows == 1);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    public void registerAllServers(Collection<RegisteredServer> servers) {
+        String sql = "INSERT IGNORE INTO server (identifier, display_name) VALUES (?, ?);";
 
         try (Connection conn = mySQLSetup.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setString(1, uuid.toString());
-            pstmt.setString(2, username);
-            pstmt.setString(3, username);
+            for (RegisteredServer server : servers) {
+                String identifier = server.getServerInfo().getName();
 
-            pstmt.executeUpdate();
-            consoleLogger.broadCastToConsole("MariaDB: Spieler " + username + " wurde aktualisiert.");
+                pstmt.setString(1, identifier);
+                pstmt.setString(2, identifier);
+
+                pstmt.addBatch();
+            }
+
+            pstmt.executeBatch();
+            consoleLogger.broadCastToConsole("MariaDB: Server-Synchronisation abgeschlossen (Neue Server wurden hinzugefügt).");
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public void updatePlayerServer(UUID uuid, String serverIdentifier) {
+        String sql = "UPDATE player SET server_id = (SELECT id FROM server WHERE identifier = ?) WHERE uuid = ?;";
+
+        try (Connection conn = mySQLSetup.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, serverIdentifier);
+            pstmt.setString(2, uuid.toString());
+
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Map<String, String> getOfflinePlayerInfo(String username) {
+        String sql = "SELECT p.username, s.display_name " +
+                "FROM player p " +
+                "LEFT JOIN server s ON p.server_id = s.id " +
+                "WHERE p.username = ? LIMIT 1;";
+
+        try (Connection conn = mySQLSetup.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, username);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    String foundName = rs.getString("username");
+                    String lastServer = rs.getString("display_name");
+
+                    if (lastServer == null) lastServer = "Unbekannt";
+
+                    return Map.of("name", foundName, "server", lastServer);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null; // Spieler war noch nie da
+    }
+    public List<String> getSimilarOfflinePlayers(String search) {
+        List<String> names = new ArrayList<>();
+        String sql = "SELECT username FROM player WHERE username LIKE ? LIMIT 10;";
+
+        try (Connection conn = mySQLSetup.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, search + "%");
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    names.add(rs.getString("username"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return names;
     }
 }

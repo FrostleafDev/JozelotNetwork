@@ -6,6 +6,9 @@
 prefix: '{grey}[<gradient:#f90036:#f90011><b>System</b>{grey}]'
 only-player: '{danger}Nur Spieler können diesen Command ausführen'
 no-permission: '{danger}Du hast keine Rechte dazu'
+first-join:
+  - '{primary}Willkommen {player-name} auf {secondary}jozelot.de{primary}!'
+  - '{grey}Schau dich gerne um!'
 
 # Server Sends
 send-to-lobby: '{grey}Du wirst zur {primary}Lobby{grey} gesendet...'
@@ -30,5 +33,8 @@ chat-cleared-success: '{primary}Der Chat wurde gelehrt'
 
 command-find-not-found: '{danger}{player-name} {grey}konnte nicht gefunden werden'
 command-find-success: '{primary}{player-name} {grey}befindet sich auf {primary}{server-name}'
+command-find-offline: '{primary}{player-name} {grey}war zuletzt auf {primary}{server-name}'
 command-find-missing-argument: '{danger}/find <Spieler>'
 command-find-connecting: '{danger}{player-name} {grey}verbindet sich gerade zu einem Server'
+command-find-use-online: '{danger}{player-name} {grey} ist online. Bitte Nutze: {danger}/find online:{player-name}'
+command-find-use-offline: '{danger}{player-name} {grey} ist offline. Bitte Nutze: {danger}/find offline:{player-name}'

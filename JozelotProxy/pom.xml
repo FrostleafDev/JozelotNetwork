@@ -116,6 +116,10 @@
                                     <pattern>org.apache.commons</pattern>
                                     <shadedPattern>de.jozelot.jozelotProxy.libs.commons</shadedPattern>
                                 </relocation>
+                                <relocation>
+                                    <pattern>com.zaxxer.hikari</pattern>
+                                    <shadedPattern>de.jozelot.jozelotProxy.libs.hikari</shadedPattern>
+                                </relocation>
                             </relocations>
                         </configuration>
                     </execution>
@@ -176,6 +180,11 @@
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
             <version>7.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>5.1.0</version>
         </dependency>
     </dependencies>
 </project>

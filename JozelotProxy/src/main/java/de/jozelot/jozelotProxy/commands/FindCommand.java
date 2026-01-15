@@ -40,44 +40,81 @@ public class FindCommand implements SimpleCommand {
             return;
         }
 
-        String targetName = args[0];
+        String rawTarget = args[0];
+        boolean forceOnline = rawTarget.startsWith("online:");
+        boolean forceOffline = rawTarget.startsWith("offline:");
 
-        Optional<Player> target = server.getPlayer(targetName);
+        final String targetName = rawTarget.replace("online:", "").replace("offline:", "");
+        Optional<Player> onlineTarget = server.getPlayer(targetName);
 
-        if (target.isEmpty()) {
-            source.sendMessage(mm.deserialize(lang.format("command-find-not-found", Map.of("player-name", targetName))));
+        if (forceOnline && onlineTarget.isEmpty()) {
+            source.sendMessage(mm.deserialize(lang.format("command-find-use-offline", Map.of("player-name", targetName))));
             return;
         }
 
-        Player player = target.get();
+        if (forceOffline && onlineTarget.isPresent()) {
+            source.sendMessage(mm.deserialize(lang.format("command-find-use-online", Map.of("player-name", targetName))));
+            return;
+        }
 
-        player.getCurrentServer().ifPresentOrElse(connection -> {
-            String serverName = connection.getServerInfo().getName();
-            source.sendMessage(mm.deserialize(lang.format("command-find-success",
-                    Map.of("player-name", player.getUsername(), "server-name", serverName))));
-        }, () -> {
-            source.sendMessage(mm.deserialize(lang.format("command-find-connecting", Map.of("player-name", targetName))));
-        });
+        plugin.getServer().getScheduler().buildTask(plugin, () -> {
+            Map<String, String> data = plugin.getMySQLManager().getOfflinePlayerInfo(targetName);
+
+            if (data == null) {
+                source.sendMessage(mm.deserialize(lang.format("command-find-not-found", Map.of("player-name", targetName))));
+                return;
+            }
+
+            String playerName = data.get("name");
+            String serverDisplayName = data.get("server");
+
+            if (onlineTarget.isPresent()) {
+                onlineTarget.get().getCurrentServer().ifPresentOrElse(connection -> {
+                    source.sendMessage(mm.deserialize(lang.format("command-find-success",
+                            Map.of("player-name", playerName, "server-name", serverDisplayName))));
+                }, () -> source.sendMessage(mm.deserialize(lang.format("command-find-connecting", Map.of("player-name", playerName)))));
+            } else {
+                source.sendMessage(mm.deserialize(lang.format("command-find-offline",
+                        Map.of("player-name", playerName, "server-name", serverDisplayName))));
+            }
+        }).schedule();
     }
 
     @Override
     public List<String> suggest(final Invocation invocation) {
         String[] args = invocation.arguments();
-        if (!invocation.source().hasPermission("network.command.find")) {
-            return List.of();
+        if (args.length > 1) return List.of();
+
+        String input = args.length == 1 ? args[0].toLowerCase() : "";
+        List<String> suggestions = new ArrayList<>();
+
+        if (input.startsWith("offline:")) {
+            String search = input.substring(8);
+            if (search.length() >= 1) {
+                suggestions.addAll(plugin.getMySQLManager().getSimilarOfflinePlayers(search)
+                        .stream()
+                        .map(name -> "offline:" + name)
+                        .toList());
+            }
         }
+        else if (input.startsWith("online:")) {
+            String search = input.substring(7);
+            server.getAllPlayers().stream()
+                    .map(Player::getUsername)
+                    .filter(name -> name.toLowerCase().startsWith(search))
+                    .forEach(name -> suggestions.add("online:" + name));
+        }
+        else {
+            if ("online:".startsWith(input)) suggestions.add("online:");
+            if ("offline:".startsWith(input)) suggestions.add("offline:");
 
-        if (args.length <= 1) {
-            String input = args.length == 1 ? args[0].toLowerCase() : "";
-
-            return plugin.getServer().getAllPlayers().stream()
+            server.getAllPlayers().stream()
                     .map(Player::getUsername)
                     .filter(name -> name.toLowerCase().startsWith(input))
-                    .sorted()
-                    .toList();
+                    .forEach(suggestions::add);
         }
 
-        return List.of();
+        return suggestions;
     }
 
     @Override

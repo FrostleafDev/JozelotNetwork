@@ -17,6 +17,7 @@ import de.jozelot.jozelotProxy.database.MySQLManager;
 import de.jozelot.jozelotProxy.database.MySQLSetup;
 import de.jozelot.jozelotProxy.database.RedisSetup;
 import de.jozelot.jozelotProxy.listener.JoinListeners;
+import de.jozelot.jozelotProxy.listener.ServerSwitchListener;
 import de.jozelot.jozelotProxy.storage.ConfigManager;
 import de.jozelot.jozelotProxy.storage.LangManager;
 import de.jozelot.jozelotProxy.utils.ConsoleLogger;
@@ -93,6 +94,7 @@ public class JozelotProxy {
         mySQLSetup.setup();
         this.mySQLManager = new MySQLManager(this);
         mySQLManager.createTables();
+        mySQLManager.registerAllServers(server.getAllServers());
 
         // Commands
         CommandManager cm = server.getCommandManager();
@@ -109,6 +111,7 @@ public class JozelotProxy {
 
         // Listener
         server.getEventManager().register(this, new JoinListeners(this));
+        server.getEventManager().register(this, new ServerSwitchListener(this));
         consoleLogger.broadCastToConsole("Listener erstellt");
 
         consoleLogger.broadCastToConsole( "<" + config.getColorPrimary() + ">----------------------------------------------");
@@ -128,6 +131,7 @@ public class JozelotProxy {
     @Subscribe
     public void onProxyShutdown(ProxyShutdownEvent event) {
         consoleLogger.broadCastToConsole("Proxy wird beendet, schließe Verbindungen...");
+        mySQLSetup.close();
     }
 
     public ProxyServer getServer() {
