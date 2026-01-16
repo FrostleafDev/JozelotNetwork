@@ -14,6 +14,8 @@ public class MySQLManager {
     private final MySQLSetup mySQLSetup;
     private final ConsoleLogger consoleLogger;
 
+    private final Set<String> registeredServerCache = new HashSet<>();
+
     public MySQLManager(JozelotProxy plugin) {
         this.config = plugin.getConfig();
         this.mySQLSetup = plugin.getMySQLSetup();
@@ -26,7 +28,10 @@ public class MySQLManager {
                 "CREATE TABLE IF NOT EXISTS server (" +
                         "id INT AUTO_INCREMENT PRIMARY KEY," +
                         "identifier VARCHAR(32) UNIQUE," +
-                        "display_name VARCHAR(32)" +
+                        "display_name VARCHAR(32)," +
+                        "motd VARCHAR(255) DEFAULT 'Backend not setup'," +
+                        "max_players INT DEFAULT 20," +
+                        "maintenance BOOLEAN DEFAULT FALSE" +
                         ");",
 
                 // 2. Player Tabelle
@@ -65,7 +70,8 @@ public class MySQLManager {
                 // 5. Server Groups
                 "CREATE TABLE IF NOT EXISTS server_group (" +
                         "id INT AUTO_INCREMENT PRIMARY KEY," +
-                        "identifier VARCHAR(32) UNIQUE" +
+                        "identifier VARCHAR(32) UNIQUE," +
+                        "display_name VARCHAR(32)" +
                         ");",
 
                 // 6. Server in Group (Mapping Tabelle)
@@ -152,6 +158,13 @@ public class MySQLManager {
         try (Connection conn = mySQLSetup.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
+            String identifierProxy = "proxy";
+
+            pstmt.setString(1, identifierProxy);
+            pstmt.setString(2, identifierProxy);
+
+            pstmt.addBatch();
+
             for (RegisteredServer server : servers) {
                 String identifier = server.getServerInfo().getName();
 
@@ -163,6 +176,7 @@ public class MySQLManager {
 
             pstmt.executeBatch();
             consoleLogger.broadCastToConsole("MariaDB: Server-Synchronisation abgeschlossen (Neue Server wurden hinzugefügt).");
+            updateServerCache();
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -209,21 +223,61 @@ public class MySQLManager {
         }
         return null; // Spieler war noch nie da
     }
-    public List<String> getSimilarOfflinePlayers(String search) {
-        List<String> names = new ArrayList<>();
-        String sql = "SELECT username FROM player WHERE username LIKE ? LIMIT 10;";
+
+    public void updateServerCache() {
+        registeredServerCache.clear();
+        String sql = "SELECT identifier FROM server;";
+        try (Connection conn = mySQLSetup.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                registeredServerCache.add(rs.getString("identifier").toLowerCase());
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String getServerDisplayName(String identifier) {
+        String sql = "SELECT display_name FROM server WHERE identifier = ? LIMIT 1;";
 
         try (Connection conn = mySQLSetup.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, search + "%");
+
+            pstmt.setString(1, identifier);
+
             try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    names.add(rs.getString("username"));
+                if (rs.next()) {
+                    return rs.getString("display_name");
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return names;
+        return identifier;
+    }
+
+    public void setServerDisplayName(String identifier, String display_name) {
+        String sql = "UPDATE server SET display_name = ? WHERE identifier = ? LIMIT 1;";
+
+        try (Connection conn = mySQLSetup.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql);){
+
+            pstmt.setString(1, display_name);
+            pstmt.setString(2, identifier);
+
+            pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean existsInDatabase(String identifier) {
+        return registeredServerCache.contains(identifier.toLowerCase());
+    }
+
+    public Set<String> getRegisteredServerCache() {
+        return registeredServerCache;
     }
 }

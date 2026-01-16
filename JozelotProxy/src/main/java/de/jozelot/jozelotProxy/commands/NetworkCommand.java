@@ -4,6 +4,7 @@ import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
+import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.jozelot.jozelotProxy.JozelotProxy;
 import de.jozelot.jozelotProxy.storage.ConfigManager;
 import de.jozelot.jozelotProxy.storage.LangManager;
@@ -11,9 +12,7 @@ import de.jozelot.jozelotProxy.utils.ConsoleLogger;
 import de.jozelot.jozelotProxy.utils.PlayerSends;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class NetworkCommand implements SimpleCommand {
 
@@ -45,6 +44,8 @@ public class NetworkCommand implements SimpleCommand {
             // RELOAD
             if (args[0].equalsIgnoreCase("reload") && source.hasPermission("network.command.reload")) {
                 plugin.getPluginReload().reload();
+
+                // LOGS
                 source.sendMessage(mm.deserialize(lang.getNetworkReloadSuccess()));
 
                 String senderName = (source instanceof Player player)
@@ -56,6 +57,7 @@ public class NetworkCommand implements SimpleCommand {
                         player.sendMessage(mm.deserialize(lang.format("network-reload-success-admin", Map.of("player-name", senderName))));
                     }
                 }
+                // LOGS
                 return;
             }
 
@@ -64,7 +66,61 @@ public class NetworkCommand implements SimpleCommand {
                 showHelp(source);
                 return;
             }
-            return;
+
+            // MANAGE
+            if (args[0].equalsIgnoreCase("manage") && source.hasPermission("network.command.manage")) {
+                if (args.length < 4) {
+                    showHelp(source);
+                    return;
+                }
+
+                if (args[3].equalsIgnoreCase("set") && args.length < 5) {
+                    showHelp(source);
+                    return;
+                }
+
+                if (args[1].equalsIgnoreCase("display_name")) {
+                    String serverName = args[2];
+
+                    if (!plugin.getMySQLManager().existsInDatabase(serverName)) {
+                        source.sendMessage(mm.deserialize("Server " + serverName + " existiert nicht"));
+                        return;
+                    }
+                    plugin.getServer().getScheduler().buildTask(plugin, () -> {
+                        if (args[3].equalsIgnoreCase("get")) {
+                           String displayName = plugin.getMySQLManager().getServerDisplayName(serverName);
+
+                           source.sendMessage(mm.deserialize(lang.format("command-manage-display-name-get", Map.of("server-name", serverName, "display-name", displayName))));
+
+                           return;
+                        }
+                        if (args[3].equalsIgnoreCase("set")) {
+                            StringJoiner joiner = new StringJoiner(" ");
+                            for (int i = 4; i < args.length; i++) {
+                                joiner.add(args[i]);
+                            }
+                            String fullDisplayName = joiner.toString();
+
+                            plugin.getMySQLManager().setServerDisplayName(serverName, fullDisplayName);
+
+                            // LOGS
+                            source.sendMessage(mm.deserialize(lang.format("command-manage-display-name-success", Map.of("server-name", serverName, "display-name", fullDisplayName))));
+
+                            String senderName = (source instanceof Player player)
+                                    ? player.getUsername()
+                                    : "Konsole";
+                            consoleLogger.broadCastToConsole("<" + config.getColorSecondary() + ">" + senderName + "<" + config.getColorPrimary() + "> hat " + serverName + " in " + fullDisplayName + " umbenannt");
+                            for (Player player : server.getAllPlayers()) {
+                                if (player.hasPermission("network.get.logs") && !player.equals(source)) {
+                                    source.sendMessage(mm.deserialize(lang.format("command-manage-display-name-success", Map.of("server-name", serverName, "display-name", fullDisplayName))));
+                                }
+                            }
+                            // LOGS
+                        }
+                    }).schedule();
+                    return;
+                }
+            }
         }
         showHelp(source);
     }
@@ -76,27 +132,60 @@ public class NetworkCommand implements SimpleCommand {
 
     @Override
     public List<String> suggest(final Invocation invocation) {
-        List<String> suggestions = new ArrayList<>();
         String[] args = invocation.arguments();
+        List<String> list = new ArrayList<>();
 
-        if (!invocation.source().hasPermission("network.command")) {
-            return List.of();
+        if (!invocation.source().hasPermission("network.command")) return List.of();
+
+        int argCount = args.length;
+        if (argCount == 0) {
+            argCount = 1;
         }
 
-        if (args.length <= 1) {
-            String currentInput = (args.length == 1) ? args[0].toLowerCase() : "";
+        switch (argCount) {
+            case 1:
+                if (has(invocation, "reload")) list.add("reload");
+                if (has(invocation, "manage")) list.add("manage");
+                list.add("help");
+                break;
 
-            List<String> subCommands = new ArrayList<>();
-            if (invocation.source().hasPermission("network.command.reload")) subCommands.add("reload");
-            subCommands.add("help");
-
-            for (String s : subCommands) {
-                if (s.startsWith(currentInput)) {
-                    suggestions.add(s);
+            case 2:
+                if (args[0].equalsIgnoreCase("manage") && has(invocation, "manage")) {
+                    list.addAll(List.of("display_name", "max_players", "motd", "maintenance"));
                 }
-            }
+                break;
+
+            case 3:
+                if (args[0].equalsIgnoreCase("manage") && has(invocation, "manage")) {
+                    list.addAll(plugin.getMySQLManager().getRegisteredServerCache());
+                }
+                break;
+
+            case 4:
+                if (args[0].equalsIgnoreCase("manage") && has(invocation, "manage")) {
+                    list.addAll(List.of("get", "set"));
+                }
+                break;
+
+            case 5:
+                if (args[0].equalsIgnoreCase("manage") && has(invocation, "manage") && args[3].equalsIgnoreCase("set")) {
+                    if (args[1].equalsIgnoreCase("max_players")) list.addAll(List.of("10", "20", "50", "100", "200"));
+                    else if (args[1].equalsIgnoreCase("maintenance")) list.addAll(List.of("true", "false"));
+                    else list.add("<wert>");
+                }
+                break;
         }
-        return suggestions;
+
+        String lastArg = args.length > 0 ? args[args.length - 1].toLowerCase() : "";
+
+        return list.stream()
+                .filter(s -> s.toLowerCase().startsWith(lastArg))
+                .sorted()
+                .toList();
+    }
+
+    private boolean has(Invocation inv, String sub) {
+        return inv.source().hasPermission("network.command." + sub);
     }
 
     private void showHelp(CommandSource source) {

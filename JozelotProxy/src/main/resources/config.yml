@@ -34,3 +34,4 @@ redis:
 # network.command.find
 # network.get.logs
 # network.clearchat.bypass
+# network.clearchat.manage

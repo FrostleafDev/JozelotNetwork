@@ -22,6 +22,7 @@ network-help:
   - '{grey}Alle Netzwerk Commands:'
   - '{grey}- {primary}/net help {grey}Zeigt diese Nachricht'
   - '{grey}- {primary}/net reload {grey}Lädt das gesamte Netzwerk neu'
+  - '{grey}- {primary}/net manage <display_name/motd/maintenance/max_players> {grey}Stelle die einzelnen Backend Server ein'
   - '{grey}- {primary}/find <Spieler> {grey}Sieh auf welchem Server sind ein Spieler befindet'
   - '{grey}- {primary}/clearchat {grey}Lehre den Chat'
 network-reload-success: '{primary}Das Netzwerk wurde erfolgreich neu geladen'
@@ -34,7 +35,17 @@ chat-cleared-success: '{primary}Der Chat wurde gelehrt'
 command-find-not-found: '{danger}{player-name} {grey}konnte nicht gefunden werden'
 command-find-success: '{primary}{player-name} {grey}befindet sich auf {primary}{server-name}'
 command-find-offline: '{primary}{player-name} {grey}war zuletzt auf {primary}{server-name}'
-command-find-missing-argument: '{danger}/find <Spieler>'
+command-find-missing-argument: '{tertiary}/find <Spieler>'
 command-find-connecting: '{danger}{player-name} {grey}verbindet sich gerade zu einem Server'
-command-find-use-online: '{danger}{player-name} {grey} ist online. Bitte Nutze: {danger}/find online:{player-name}'
-command-find-use-offline: '{danger}{player-name} {grey} ist offline. Bitte Nutze: {danger}/find offline:{player-name}'
+
+command-manage-display-name-success: '{primary}{server-name} {grey}wurde {primary}erfolgreich{grey} in {primary}{display-name}{grey} umbenannt'
+command-manage-display-name-get: '{greyDer Anzeige Name von {primary}{server-name} {grey}ist {primary}{display-name}{grey}'
+command-mange-display-name-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat {primary}{server-name} {grey}in {primary}{display-name} {grey}umbenannt'
+
+
+
+
+
+
+
+
