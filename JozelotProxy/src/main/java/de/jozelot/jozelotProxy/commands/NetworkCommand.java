@@ -120,6 +120,7 @@ public class NetworkCommand implements SimpleCommand {
                     }).schedule();
                     return;
                 }
+                if (args[1].equalsignorecase("motd")
             }
         }
         showHelp(source);
