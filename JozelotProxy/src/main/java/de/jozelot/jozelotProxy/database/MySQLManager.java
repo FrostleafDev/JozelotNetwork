@@ -228,15 +228,28 @@ public class MySQLManager {
 
     public void updateServerCache() {
         registeredServerCache.clear();
-        String sql = "SELECT identifier FROM server;";
+        maintenanceCache.clear();
+
+        String sql = "SELECT identifier, maintenance FROM server;";
+
         try (Connection conn = mySQLSetup.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
+
             while (rs.next()) {
-                registeredServerCache.add(rs.getString("identifier").toLowerCase());
+                String identifier = rs.getString("identifier").toLowerCase();
+                boolean isMaintenance = rs.getBoolean("maintenance");
+
+                registeredServerCache.add(identifier);
+                maintenanceCache.put(identifier, isMaintenance);
             }
+
+            consoleLogger.broadCastToConsole("MariaDB: Cache wurde aktualisiert ("
+                    + registeredServerCache.size() + " Server geladen).");
+
         } catch (SQLException e) {
             e.printStackTrace();
+            consoleLogger.broadCastToConsole("MariaDB: Fehler beim Aktualisieren des Caches!");
         }
     }
 

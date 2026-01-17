@@ -104,6 +104,8 @@ public class JozelotProxy {
         CommandMeta unbanMeta = cm.metaBuilder("unban").aliases("pardon").build();
         CommandMeta banlistMeta = cm.metaBuilder("banlist").aliases("bans").build();
         CommandMeta kickMeta = cm.metaBuilder("kick").build();
+        CommandMeta tpoMeta = cm.metaBuilder("tpo").aliases("tpto").build();
+        CommandMeta tpohereMeta = cm.metaBuilder("tpohere").build();
 
         cm.register(hubMeta, new LobbyCommand(this));
         cm.register(networkMeta, new NetworkCommand(this));
@@ -113,6 +115,8 @@ public class JozelotProxy {
         cm.register(unbanMeta, new UnbanCommand(this));
         cm.register(banlistMeta, new BanListCommand(this));
         cm.register(kickMeta, new KickCommand(this));
+        cm.register(tpoMeta, new TpoCommand(this));
+        cm.register(tpohereMeta, new TpoHereCommand(this));
         consoleLogger.broadCastToConsole("Commands erstellt");
 
         // Listener

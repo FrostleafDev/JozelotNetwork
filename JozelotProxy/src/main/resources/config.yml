@@ -45,3 +45,5 @@ redis:
 # network.command.banlist
 # network.command.kick
 # network.ban.bypass
+# network.command.tpo
+# network.command.tpohere

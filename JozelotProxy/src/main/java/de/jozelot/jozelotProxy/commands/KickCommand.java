@@ -117,4 +117,9 @@ public class KickCommand implements SimpleCommand {
         }
         return (args.length == 2) ? List.of("<reason>") : List.of();
     }
+
+    @Override
+    public boolean hasPermission(Invocation invocation) {
+        return invocation.source().hasPermission("network.command.kick");
+    }
 }

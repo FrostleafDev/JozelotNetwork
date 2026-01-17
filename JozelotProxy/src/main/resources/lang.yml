@@ -18,12 +18,14 @@ proxy-maintenance-kick:
 maintenance-version: '§4Wartungsarbeiten'
 no-forcedhost-permission: '{danger}Du kannst {server-name} nicht über einen Horced Host joinen'
 
+generic-error: '{danger}An error encoured'
 # Server Sends
 send-to-lobby: '{grey}Du wirst zur {primary}Lobby{grey} gesendet...'
 already-on-lobby: '{grey}Du befindest dich bereits in der {danger}Lobby'
 server-not-found: '{grey}Der Server {danger}{server-name}{grey} wurde nicht gefunden'
 already-on-server: '{grey}Du befindest dich schon auf {danger}{server-name}'
 connection-failed: '{grey}Verbindung zu {danger}{server-name} {grey}fehlgeschlagen'
+player-not-on-server: '{danger}{server-name}{grey} befindet sich auf keinem Server'
 
 # Commands
 network-help:
@@ -107,10 +109,14 @@ kick-screen:
   - '{danger}<bold>DU WURDEST GEKICKT<reset>'
   - '{grey}Grund: {danger}{reason}'
 
+command-tpo-player-not-found: '{danger}{player-name}{grey} konnte nicht gefunden werden'
+send-to-server-success: '{grey}Du wurdest erfolgreich zu {primary}{player-name} {grey}auf {primary}{server-name}{grey} gesendet'
+command-tpo-usage: '{tertiary}/tpo <Spieler>'
 
-
-
-
+command-tpohere-already-on-server: '{danger}{player-name}{grey} ist bereits auf diesem Server'
+command-tpohere-success: '{primary}{player-name} {grey}wurde erfolgreich zu dir teleportiert'
+command-tpohere-target-info: '{grey}Du wurdest zu {primary}{player-name} {grey}teleportiert'
+command-tpohere-usage: '{tertiary}/tpohere <Spieler> [--silent]'
 
 
 
