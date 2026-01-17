@@ -62,6 +62,64 @@ command-manage-maintenance-get: '{primary}{server-name} {grey}hat den Maintenanc
 command-manage-maintenance-success: '{grey}Maintenance Modus von {primary}{server-name}{grey} {primary}{status}'
 command-manage-maintenance-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat den Maintenance Modus von {primary}{server-name} {primary}{status}'
 
+command-ban-usage: '{tertiary}/ban <Spieler> <Zeit> <Grund>'
+command-ban-player-not-found: '{grey}Der Spieler {danger}{player-name}{grey} war noch nie auf dem Netzwerk'
+command-ban-invalid-time: '{grey}Das Format für die Banlänge ist falsch: {danger}{input}'
+command-ban-already-banned: '{danger}{player-name} {grey}ist bereits gebannt'
+command-ban-hierarchy-error: '{grey}Du kannst {danger}{player-name}{grey} nicht bannen!'
+command-ban-success: '{grey}Du hast {primary}{player-name}{grey} erfolgreich gebannt. Grund: {primary}{reason}'
+command-ban-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat {primary}{ban-name} {grey}gebannt. Länge:{primary} {duration}'
+
+ban-kick-screen:
+  - '{danger}<bold>DU WURDEST GEBANNT<reset>'
+  - '{grey}Grund: {danger}{reason}'
+  - '{grey}Länge: {danger}{duration}'
+ban-join-screen:
+  - '{danger}<bold>DU WURDEST GEBANNT<reset>'
+  - '{grey}Grund: {danger}{reason}'
+  - '{grey}Ban bis: {danger}{duration}'
+  - '{grey}Wenn das ein Fehler ist, melde dich bei einem Administrator'
+ban-bypass-info:
+  - '{secondary}<bold>INFO: Du wurdest gebannt!</bold>'
+  - '{secondary}Du kannst jedoch, wegen deinen Rechten, trotzdem joinen.'
+  - '{grey}Wenn das ein Fehler ist, mach /unban {player-name}'
+  - '{grey}Grund: {danger}{reason}'
+  - '{grey}Bis: {danger}{duration}'
+  - '{grey}Von: {danger}{admin-name}'
+
+command-unban-usage: '{tertiary}/unban <Spieler>'
+command-unban-success: '{primary}{player-name} {grey}wurde entbannt'
+command-unban-not-banned: '{danger}{player-name} {grey}ist nicht gebannt'
+command-unban-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat {primary}{ban-name} {grey}entbannt.'
+
+command-banlist-empty: '{grey}Es sind aktuell keine Spieler gebannt.'
+command-banlist-header: '{grey}--- {danger}Aktive Banns {grey}({primary}{count}{grey}) ---'
+command-banlist-entry: '{grey}• {primary}{target} {grey}| Grund: {primary}{reason} {grey}| Von: {danger}{operator} {grey}({primary}{duration}{grey})'
+command-banlist-footer: '{grey}---------------------'
+
+command-kick-usage: '{tertiary}/kick <Spieler> <Grund>'
+command-kick-player-not-online: '{danger}{player-name}{grey} ist nicht online'
+command-kick-hierarchy-error: '{grey}Du kannst {danger}{player-name} {grey}nicht bannen'
+command-kick-success: '{grey}Du hast {primary}{player-name}{grey} erfolgreich gekickt. Grund: {primary}{reason}'
+command-kick-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat {primary}{ban-name} {grey}gekickt.'
+
+kick-screen:
+  - '{danger}<bold>DU WURDEST GEKICKT<reset>'
+  - '{grey}Grund: {danger}{reason}'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -13,6 +13,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class ServerSwitchListener {
 
@@ -84,6 +85,33 @@ public class ServerSwitchListener {
     @Subscribe
     public void onLogin(LoginEvent event) {
         Player player = event.getPlayer();
+        UUID uuid = player.getUniqueId();
+
+        Map<String, String> banInfo = plugin.getMySQLManager().getActiveBan(uuid);
+
+        if (banInfo != null) {
+            if (!player.hasPermission("network.ban.bypass")) {
+                List<String> banLines = lang.formatList("ban-join-screen", Map.of(
+                        "reason", banInfo.get("reason"),
+                        "duration", banInfo.get("duration")
+                ));
+
+                event.setResult(ResultedEvent.ComponentResult.denied(
+                        mm.deserialize(String.join("<newline>", banLines))
+                ));
+                return;
+            } else {
+                plugin.getServer().getScheduler().buildTask(plugin, () -> {
+                    List<String> infoLines = lang.formatList("ban-bypass-info", Map.of(
+                            "reason", banInfo.get("reason"),
+                            "duration", banInfo.get("duration"),
+                            "player-name", player.getUsername(),
+                            "admin-name", banInfo.get("operator")
+                    ));
+                    player.sendMessage(mm.deserialize(String.join("<newline>", infoLines)));
+                }).delay(java.time.Duration.ofSeconds(2)).schedule();
+            }
+        }
 
         if (player.hasPermission("network.maintenance.bypass.all") || player.hasPermission("network.maintenance.bypass.proxy")) {
             return;
@@ -91,7 +119,6 @@ public class ServerSwitchListener {
 
         if (plugin.getMySQLManager().isServerInMaintenance("proxy")) {
             List<String> kickLines = lang.formatList("proxy-maintenance-kick", null);
-
             String kickMessage = String.join("<newline>", kickLines);
 
             event.setResult(ResultedEvent.ComponentResult.denied(

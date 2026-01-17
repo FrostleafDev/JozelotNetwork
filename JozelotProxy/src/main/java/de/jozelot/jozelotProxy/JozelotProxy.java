@@ -9,10 +9,7 @@ import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
-import de.jozelot.jozelotProxy.commands.ClearChatCommand;
-import de.jozelot.jozelotProxy.commands.FindCommand;
-import de.jozelot.jozelotProxy.commands.LobbyCommand;
-import de.jozelot.jozelotProxy.commands.NetworkCommand;
+import de.jozelot.jozelotProxy.commands.*;
 import de.jozelot.jozelotProxy.database.MySQLManager;
 import de.jozelot.jozelotProxy.database.MySQLSetup;
 import de.jozelot.jozelotProxy.database.RedisSetup;
@@ -103,11 +100,19 @@ public class JozelotProxy {
         CommandMeta networkMeta = cm.metaBuilder("network").aliases("net").build();
         CommandMeta clearchatMeta = cm.metaBuilder("clearchat").build();
         CommandMeta findMeta = cm.metaBuilder("find").build();
+        CommandMeta banMeta = cm.metaBuilder("ban").build();
+        CommandMeta unbanMeta = cm.metaBuilder("unban").aliases("pardon").build();
+        CommandMeta banlistMeta = cm.metaBuilder("banlist").aliases("bans").build();
+        CommandMeta kickMeta = cm.metaBuilder("kick").build();
 
         cm.register(hubMeta, new LobbyCommand(this));
         cm.register(networkMeta, new NetworkCommand(this));
         cm.register(clearchatMeta, new ClearChatCommand(this));
         cm.register(findMeta, new FindCommand(this));
+        cm.register(banMeta, new BanCommand(this));
+        cm.register(unbanMeta, new UnbanCommand(this));
+        cm.register(banlistMeta, new BanListCommand(this));
+        cm.register(kickMeta, new KickCommand(this));
         consoleLogger.broadCastToConsole("Commands erstellt");
 
         // Listener

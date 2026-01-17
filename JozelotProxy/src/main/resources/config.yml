@@ -40,3 +40,8 @@ redis:
 # network.maintenance.bypass.<server>
 # network.forcedhost.all
 # network.forcedhost.<server>
+# network.command.ban
+# network.command.unban
+# network.command.banlist
+# network.command.kick
+# network.ban.bypass

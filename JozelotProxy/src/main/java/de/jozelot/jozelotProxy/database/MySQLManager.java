@@ -403,6 +403,219 @@ public class MySQLManager {
         } catch (SQLException e) { e.printStackTrace(); }
     }
 
+    public boolean addPunishment(UUID playerUuid, UUID operatorUuid, String type, String timeStr, String reason) {
+        boolean isKick = type.equalsIgnoreCase("KICK");
+
+        if (!isKick) {
+            String checkSql = "SELECT id FROM punishment WHERE player_uuid = ? AND type = ? AND is_active = TRUE AND (end_at > CURRENT_TIMESTAMP OR end_at IS NULL);";
+            try (Connection conn = mySQLSetup.getConnection();
+                 PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
+                checkStmt.setString(1, playerUuid.toString());
+                checkStmt.setString(2, type);
+                try (ResultSet rs = checkStmt.executeQuery()) {
+                    if (rs.next()) return true;
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        Timestamp endAt = null;
+        if (!isKick && !timeStr.equalsIgnoreCase("permanent") && !timeStr.equalsIgnoreCase("perma") && !timeStr.equalsIgnoreCase("p")) {
+            long durationMillis = parseDuration(timeStr);
+            if (durationMillis > 0) {
+                endAt = new Timestamp(System.currentTimeMillis() + durationMillis);
+            }
+        }
+
+        String insertSql = "INSERT INTO punishment (player_uuid, operator_uuid, type, reason, end_at, is_active) VALUES (?, ?, ?, ?, ?, ?);";
+
+        try (Connection conn = mySQLSetup.getConnection();
+             PreparedStatement insertStmt = conn.prepareStatement(insertSql)) {
+
+            insertStmt.setString(1, playerUuid.toString());
+            insertStmt.setString(2, operatorUuid.toString());
+            insertStmt.setString(3, type.toUpperCase());
+            insertStmt.setString(4, reason);
+            insertStmt.setTimestamp(5, endAt);
+
+            insertStmt.setBoolean(6, !isKick);
+
+            insertStmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private long parseDuration(String input) {
+        try {
+            // Trenne Zahl und Buchstabe (z.B. "12h" -> "12" und "h")
+            String numberPart = input.replaceAll("[^0-9]", "");
+            String unitPart = input.replaceAll("[0-9]", "").toLowerCase();
+
+            if (numberPart.isEmpty()) return -1;
+            long amount = Long.parseLong(numberPart);
+
+            return switch (unitPart) {
+                case "m" -> amount * 60_000L;               // Minute
+                case "h" -> amount * 3_600_000L;            // Stunde
+                case "d" -> amount * 86_400_000L;           // Tag
+                case "w" -> amount * 604_800_000L;          // Woche
+                case "mo" -> amount * 2_592_000_000L;       // Monat (30 Tage)
+                case "y" -> amount * 31_536_000_000L;       // Jahr
+                default -> -1;
+            };
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+
+    public UUID getUUIDFromName(String username) {
+        String sql = "SELECT uuid FROM player WHERE username = ? LIMIT 1;";
+        try (Connection conn = mySQLSetup.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, username);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return UUID.fromString(rs.getString("uuid"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null; // Spieler war noch nie auf dem Netzwerk
+    }
+
+    public Map<String, String> getActiveBan(UUID uuid) {
+
+        String cleanupSql = "UPDATE punishment SET is_active = FALSE WHERE player_uuid = ? AND is_active = TRUE AND end_at <= CURRENT_TIMESTAMP;";
+
+        String selectSql = "SELECT p.reason, p.end_at, p.operator_uuid, pl.username AS operator_name " +
+                "FROM punishment p " +
+                "LEFT JOIN player pl ON p.operator_uuid = pl.uuid " +
+                "WHERE p.player_uuid = ? AND p.type = 'BAN' AND p.is_active = TRUE LIMIT 1;";
+
+        try (Connection conn = mySQLSetup.getConnection()) {
+            try (PreparedStatement cleanupStmt = conn.prepareStatement(cleanupSql)) {
+                cleanupStmt.setString(1, uuid.toString());
+                cleanupStmt.executeUpdate();
+            }
+
+            try (PreparedStatement pstmt = conn.prepareStatement(selectSql)) {
+                pstmt.setString(1, uuid.toString());
+                try (ResultSet rs = pstmt.executeQuery()) {
+                    if (rs.next()) {
+                        Map<String, String> info = new HashMap<>();
+                        info.put("reason", rs.getString("reason"));
+
+                        // Zeit-Formatierung
+                        Timestamp endAt = rs.getTimestamp("end_at");
+                        info.put("duration", (endAt == null) ? "Permanent" : new java.text.SimpleDateFormat("dd.MM.yyyy HH:mm").format(endAt));
+
+                        // Operator-Name Logik
+                        String opUuidStr = rs.getString("operator_uuid");
+                        String opName = rs.getString("operator_name");
+
+                        if (opUuidStr.equals("00000000-0000-0000-0000-000000000000")) {
+                            info.put("operator", "Konsole");
+                        } else {
+                            info.put("operator", (opName != null) ? opName : "Unbekannt");
+                        }
+
+                        return info;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean removePunishment(UUID playerUuid, String type) {
+        String checkSql = "SELECT id FROM punishment WHERE player_uuid = ? AND type = ? AND is_active = TRUE;";
+        String updateSql = "UPDATE punishment SET is_active = FALSE WHERE player_uuid = ? AND type = ? AND is_active = TRUE;";
+
+        try (Connection conn = mySQLSetup.getConnection()) {
+            boolean hasActiveBan = false;
+            try (PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
+                checkStmt.setString(1, playerUuid.toString());
+                checkStmt.setString(2, type);
+                try (ResultSet rs = checkStmt.executeQuery()) {
+                    if (rs.next()) hasActiveBan = true;
+                }
+            }
+
+            if (!hasActiveBan) return false;
+
+            try (PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
+                updateStmt.setString(1, playerUuid.toString());
+                updateStmt.setString(2, type);
+                updateStmt.executeUpdate();
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public List<String> getBannedPlayerNames() {
+        List<String> bannedPlayers = new ArrayList<>();
+        String sql = "SELECT DISTINCT p.username FROM player p " +
+                "JOIN punishment pun ON p.uuid = pun.player_uuid " +
+                "WHERE pun.is_active = TRUE AND pun.type = 'BAN' " +
+                "AND (pun.end_at > CURRENT_TIMESTAMP OR pun.end_at IS NULL);";
+
+        try (Connection conn = mySQLSetup.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                bannedPlayers.add(rs.getString("username"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return bannedPlayers;
+    }
+
+    public List<Map<String, String>> getAllActiveBans() {
+        List<Map<String, String>> bans = new ArrayList<>();
+        String sql = "SELECT p.username AS target_name, op.username AS operator_name, pun.reason, pun.end_at, pun.operator_uuid " +
+                "FROM punishment pun " +
+                "JOIN player p ON pun.player_uuid = p.uuid " +
+                "LEFT JOIN player op ON pun.operator_uuid = op.uuid " +
+                "WHERE pun.is_active = TRUE AND pun.type = 'BAN' " +
+                "AND (pun.end_at > CURRENT_TIMESTAMP OR pun.end_at IS NULL) " +
+                "ORDER BY pun.start_at DESC;";
+
+        try (Connection conn = mySQLSetup.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                Map<String, String> ban = new HashMap<>();
+                ban.put("target", rs.getString("target_name"));
+
+                String opUuid = rs.getString("operator_uuid");
+                String opName = rs.getString("operator_name");
+                ban.put("operator", opUuid.equals("00000000-0000-0000-0000-000000000000") ? "Konsole" : (opName != null ? opName : "Unbekannt"));
+
+                ban.put("reason", rs.getString("reason"));
+
+                Timestamp endAt = rs.getTimestamp("end_at");
+                ban.put("duration", endAt == null ? "Permanent" : new java.text.SimpleDateFormat("dd.MM.yyyy HH:mm").format(endAt));
+
+                bans.add(ban);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return bans;
+    }
+
     public boolean isServerInMaintenance(String serverName) {
         return maintenanceCache.getOrDefault(serverName, false);
     }
