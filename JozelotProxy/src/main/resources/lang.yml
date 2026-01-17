@@ -10,6 +10,14 @@ first-join:
   - '{primary}Willkommen {player-name} auf {secondary}jozelot.de{primary}!'
   - '{grey}Schau dich gerne um!'
 
+server-maintenance-kick: '{danger}Du wurdest wegen Wartungsarbeiten von {server-name} gekickt'
+server-maintenance-no-access: '{danger}Du kannst {server-name} nicht, wegen aktuellen Wartungsarbeiten, beitreten, '
+proxy-maintenance-kick:
+  - '{danger}Unser Netzwerk befindet sich aktuell in Wartungsarbeiten!'
+  - '{grey}Probiere es erneut'
+maintenance-version: '§4Wartungsarbeiten'
+no-forcedhost-permission: '{danger}Du kannst {server-name} nicht über einen Horced Host joinen'
+
 # Server Sends
 send-to-lobby: '{grey}Du wirst zur {primary}Lobby{grey} gesendet...'
 already-on-lobby: '{grey}Du befindest dich bereits in der {danger}Lobby'
@@ -39,8 +47,36 @@ command-find-missing-argument: '{tertiary}/find <Spieler>'
 command-find-connecting: '{danger}{player-name} {grey}verbindet sich gerade zu einem Server'
 
 command-manage-display-name-success: '{primary}{server-name} {grey}wurde {primary}erfolgreich{grey} in {primary}{display-name}{grey} umbenannt'
-command-manage-display-name-get: '{greyDer Anzeige Name von {primary}{server-name} {grey}ist {primary}{display-name}{grey}'
+command-manage-display-name-get: '{grey}Der Anzeige Name von {primary}{server-name} {grey}ist {primary}{display-name}{grey}'
 command-mange-display-name-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat {primary}{server-name} {grey}in {primary}{display-name} {grey}umbenannt'
+
+command-manage-max-players-get: '{grey}Auf {primary}{server-name} {grey}können maximal {primary}{max-players}{grey} joinen'
+command-manage-max-players-success: '{grey}Die maximale Spieler Anzahl von {primary}{server-name}{grey} auf {primary}{max-players}'
+command-manage-max-players-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat die maximale Spieler Anzahl von{primary}{server-name} {grey}auf {primary}{max-players} {grey}geändert'
+
+command-manage-motd-get: '{grey}Die aktuelle MOTD von {primary}{server-name} {grey}ist: <reset>{motd}'
+command-manage-motd-success: '{grey}Die MOTD von {primary}{server-name}{grey} wurde erfolgreich geändert'
+command-manage-motd-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat die MOTD von{primary}{server-name} {grey}geändert'
+
+command-manage-maintenance-get: '{primary}{server-name} {grey}hat den Maintenance Modus:   {primary}{status}'
+command-manage-maintenance-success: '{grey}Maintenance Modus von {primary}{server-name}{grey} {primary}{status}'
+command-manage-maintenance-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat den Maintenance Modus von {primary}{server-name} {primary}{status}'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

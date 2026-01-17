@@ -79,47 +79,107 @@ public class NetworkCommand implements SimpleCommand {
                     return;
                 }
 
-                if (args[1].equalsIgnoreCase("display_name")) {
-                    String serverName = args[2];
+                String type = args[1].toLowerCase();
+                String serverName = args[2];
+                String action = args[3].toLowerCase();
 
-                    if (!plugin.getMySQLManager().existsInDatabase(serverName)) {
-                        source.sendMessage(mm.deserialize("Server " + serverName + " existiert nicht"));
-                        return;
-                    }
-                    plugin.getServer().getScheduler().buildTask(plugin, () -> {
-                        if (args[3].equalsIgnoreCase("get")) {
-                           String displayName = plugin.getMySQLManager().getServerDisplayName(serverName);
+                if (!plugin.getMySQLManager().existsInDatabase(serverName)) {
+                    source.sendMessage(mm.deserialize(lang.format("server-not-found", Map.of("server-name", serverName))));
+                    return;
+                }
 
-                           source.sendMessage(mm.deserialize(lang.format("command-manage-display-name-get", Map.of("server-name", serverName, "display-name", displayName))));
+                plugin.getServer().getScheduler().buildTask(plugin, () -> {
+                    String senderName = (source instanceof Player player) ? player.getUsername() : "Konsole";
 
-                           return;
-                        }
-                        if (args[3].equalsIgnoreCase("set")) {
+                    // --- DISPLAY NAME ---
+                    if (type.equals("display_name")) {
+                        if (action.equals("get")) {
+                            String displayName = plugin.getMySQLManager().getServerDisplayName(serverName);
+                            source.sendMessage(mm.deserialize(lang.format("command-manage-display-name-get", Map.of("server-name", serverName, "display-name", displayName))));
+                        } else if (action.equals("set")) {
                             StringJoiner joiner = new StringJoiner(" ");
-                            for (int i = 4; i < args.length; i++) {
-                                joiner.add(args[i]);
-                            }
+                            for (int i = 4; i < args.length; i++) joiner.add(args[i]);
                             String fullDisplayName = joiner.toString();
 
                             plugin.getMySQLManager().setServerDisplayName(serverName, fullDisplayName);
-
-                            // LOGS
                             source.sendMessage(mm.deserialize(lang.format("command-manage-display-name-success", Map.of("server-name", serverName, "display-name", fullDisplayName))));
 
-                            String senderName = (source instanceof Player player)
-                                    ? player.getUsername()
-                                    : "Konsole";
-                            consoleLogger.broadCastToConsole("<" + config.getColorSecondary() + ">" + senderName + "<" + config.getColorPrimary() + "> hat " + serverName + " in " + fullDisplayName + " umbenannt");
+                            consoleLogger.broadCastToConsole("<yellow>" + senderName + " <gray>hat <white>" + serverName + " <gray>in <gold>" + fullDisplayName + " <gray>umbenannt");
                             for (Player player : server.getAllPlayers()) {
                                 if (player.hasPermission("network.get.logs") && !player.equals(source)) {
-                                    source.sendMessage(mm.deserialize(lang.format("command-manage-display-name-success", Map.of("server-name", serverName, "display-name", fullDisplayName))));
+                                    player.sendMessage(mm.deserialize(lang.format("command-manage-display-name-success-admin", Map.of("player-name", senderName, "server-name", serverName, "display-name", fullDisplayName))));
                                 }
                             }
-                            // LOGS
                         }
-                    }).schedule();
-                    return;
-                }
+                    }
+
+                    // --- MAX PLAYERS ---
+                    else if (type.equals("max_players")) {
+                        if (action.equals("get")) {
+                            int maxPlayers = plugin.getMySQLManager().getServerMaxPlayers(serverName);
+                            source.sendMessage(mm.deserialize(lang.format("command-manage-max-players-get", Map.of("server-name", serverName, "max-players", String.valueOf(maxPlayers)))));
+                        } else if (action.equals("set")) {
+                            try {
+                                int amount = Integer.parseInt(args[4]);
+                                plugin.getMySQLManager().setServerMaxPlayers(serverName, amount);
+                                source.sendMessage(mm.deserialize(lang.format("command-manage-max-players-success", Map.of("server-name", serverName, "max-players", String.valueOf(amount)))));
+
+                                consoleLogger.broadCastToConsole("<yellow>" + senderName + " <gray>hat die Slots von <white>" + serverName + " <gray>auf <gold>" + amount + " <gray>gesetzt");
+                                for (Player player : server.getAllPlayers()) {
+                                    if (player.hasPermission("network.get.logs") && !player.equals(source)) {
+                                        player.sendMessage(mm.deserialize(lang.format("command-manage-max-players-success-admin", Map.of("player-name", senderName, "server-name", serverName, "max-players", String.valueOf(amount)))));
+                                    }
+                                }
+                            } catch (NumberFormatException e) {
+                                source.sendMessage(mm.deserialize("<red>Fehler: '" + args[4] + "' ist keine Zahl!"));
+                            }
+                        }
+                    }
+
+                    // --- MOTD ---
+                    else if (type.equals("motd")) {
+                        if (action.equals("get")) {
+                            String motd = plugin.getMySQLManager().getServerMOTD(serverName);
+                            source.sendMessage(mm.deserialize(lang.format("command-manage-motd-get", Map.of("server-name", serverName, "motd", motd))));
+                        } else if (action.equals("set")) {
+                            StringJoiner joiner = new StringJoiner(" ");
+                            for (int i = 4; i < args.length; i++) joiner.add(args[i]);
+                            String fullMotd = joiner.toString();
+
+                            plugin.getMySQLManager().setServerMOTD(serverName, fullMotd);
+                            source.sendMessage(mm.deserialize(lang.format("command-manage-motd-success", Map.of("server-name", serverName, "motd", fullMotd))));
+
+                            consoleLogger.broadCastToConsole("<yellow>" + senderName + " <gray>hat die MOTD von <white>" + serverName + " <gray>geändert");
+                            for (Player player : server.getAllPlayers()) {
+                                if (player.hasPermission("network.get.logs") && !player.equals(source)) {
+                                    player.sendMessage(mm.deserialize(lang.format("command-manage-motd-success-admin", Map.of("player-name", senderName, "server-name", serverName, "motd", fullMotd))));
+                                }
+                            }
+                        }
+                    }
+
+                    // --- MAINTENANCE ---
+                    else if (type.equals("maintenance")) {
+                        if (action.equals("get")) {
+                            boolean state = plugin.getMySQLManager().getServerMaintenance(serverName);
+                            source.sendMessage(mm.deserialize(lang.format("command-manage-maintenance-get", Map.of("server-name", serverName, "status", state ? "An" : "Aus"))));
+                        } else if (action.equals("set")) {
+                            boolean newState = args[4].equalsIgnoreCase("true") || args[4].equalsIgnoreCase("on");
+                            plugin.getMySQLManager().setServerMaintenance(serverName, newState);
+
+                            String statusText = newState ? "aktiviert" : "deaktiviert";
+                            source.sendMessage(mm.deserialize(lang.format("command-manage-maintenance-success", Map.of("server-name", serverName, "status", statusText))));
+
+                            consoleLogger.broadCastToConsole("<yellow>" + senderName + " <gray>hat Wartungen für <white>" + serverName + " <gold>" + statusText);
+                            for (Player player : server.getAllPlayers()) {
+                                if (player.hasPermission("network.get.logs") && !player.equals(source)) {
+                                    player.sendMessage(mm.deserialize(lang.format("command-manage-maintenance-success-admin", Map.of("player-name", senderName, "server-name", serverName, "status", statusText))));
+                                }
+                            }
+                        }
+                    }
+                }).schedule();
+                return;
             }
         }
         showHelp(source);

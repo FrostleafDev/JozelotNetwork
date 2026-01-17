@@ -31,7 +31,7 @@ public class PlayerSends {
         Optional<RegisteredServer> targetServer = server.getServer(serverName);
         Optional<ServerConnection> currentConnection = player.getCurrentServer();
 
-        if (currentConnection.get().getServer().getServerInfo().getName().equals(serverName)) {
+        if (currentConnection.isPresent() && currentConnection.get().getServerInfo().getName().equals(serverName)) {
             player.sendMessage(mm.deserialize(lang.format("already-on-server", Map.of("server-name", serverName))));
             return;
         }
@@ -41,13 +41,19 @@ public class PlayerSends {
             return;
         }
 
-        if (targetServer.isPresent()) {
+        plugin.getServer().getScheduler().buildTask(plugin, () -> {
+
+            String displayName = plugin.getMySQLManager().getServerDisplayName(serverName);
+
+            String finalName = (displayName != null && !displayName.isEmpty()) ? displayName : serverName;
+
             player.createConnectionRequest(targetServer.get()).connect().thenAccept(result -> {
                 if (!result.isSuccessful()) {
-                    player.sendMessage(mm.deserialize(lang.format("connection-failed", Map.of("server-name", serverName))));
+                    player.sendMessage(mm.deserialize(lang.format("connection-failed",
+                            Map.of("server-name", finalName))));
                 }
             });
-        }
+        }).schedule();
     }
 
     public void sendPlayerToPlayer(Player player, Player target) {

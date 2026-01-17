@@ -10,6 +10,7 @@ public class ConfigManager {
 
     private final File file;
     private Map<String, Object> data;
+    private final Path faviconDirectory;
     private final Yaml yaml;
 
     private String colorPrimary;
@@ -32,10 +33,14 @@ public class ConfigManager {
 
     public ConfigManager(Path directory, String fileName) {
         this.file = new File(directory.toFile(), fileName);
+        this.faviconDirectory = directory.resolve("favicons");
         this.yaml = new Yaml();
 
         if (!directory.toFile().exists()) {
             directory.toFile().mkdirs();
+        }
+        if (!faviconDirectory.toFile().exists()) {
+            faviconDirectory.toFile().mkdirs();
         }
     }
 
@@ -157,6 +162,10 @@ public class ConfigManager {
     public double getDouble(String path) {
         Object o = get(path);
         return o instanceof Number ? ((Number) o).doubleValue() : 0.0;
+    }
+
+    public Path getFaviconDirectory() {
+        return faviconDirectory;
     }
 
     // Hilfsmethode für verschachtelte Pfade (Punkt-Logik)

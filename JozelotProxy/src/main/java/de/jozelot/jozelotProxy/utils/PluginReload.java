@@ -23,8 +23,5 @@ public class PluginReload {
     public void reload() {
         config.reload();
         lang.reload();
-        mySQLSetup.close();
-        mySQLSetup.setup();
-        redisSetup.setup();
     }
 }

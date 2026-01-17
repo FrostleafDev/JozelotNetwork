@@ -15,6 +15,7 @@ public class MySQLManager {
     private final ConsoleLogger consoleLogger;
 
     private final Set<String> registeredServerCache = new HashSet<>();
+    private final Map<String, Boolean> maintenanceCache = new HashMap<>();
 
     public MySQLManager(JozelotProxy plugin) {
         this.config = plugin.getConfig();
@@ -31,7 +32,8 @@ public class MySQLManager {
                         "display_name VARCHAR(32)," +
                         "motd VARCHAR(255) DEFAULT 'Backend not setup'," +
                         "max_players INT DEFAULT 20," +
-                        "maintenance BOOLEAN DEFAULT FALSE" +
+                        "maintenance BOOLEAN DEFAULT FALSE," +
+                        "favicon VARCHAR(64) DEFAULT 'favicon.png'" +
                         ");",
 
                 // 2. Player Tabelle
@@ -271,6 +273,138 @@ public class MySQLManager {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public int getServerMaxPlayers(String identifier) {
+        String sql = "SELECT max_players FROM server WHERE identifier = ? LIMIT 1;";
+
+        try (Connection conn = mySQLSetup.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, identifier);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("max_players");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public void setServerMaxPlayers(String identifier, int max_players) {
+        String sql = "UPDATE server SET max_players = ? WHERE identifier = ? LIMIT 1;";
+
+        try (Connection conn = mySQLSetup.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);){
+
+            pstmt.setInt(1, max_players);
+            pstmt.setString(2, identifier);
+
+            pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String getServerMOTD(String identifier) {
+        String sql = "SELECT motd FROM server WHERE identifier = ? LIMIT 1;";
+
+        try (Connection conn = mySQLSetup.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, identifier);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("motd");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    public void setServerMOTD(String identifier, String motd) {
+        String sql = "UPDATE server SET motd = ? WHERE identifier = ? LIMIT 1;";
+
+        try (Connection conn = mySQLSetup.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);){
+
+            pstmt.setString(1, motd);
+            pstmt.setString(2, identifier);
+
+            pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean getServerMaintenance(String identifier) {
+        String sql = "SELECT maintenance FROM server WHERE identifier = ? LIMIT 1;";
+
+        try (Connection conn = mySQLSetup.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, identifier);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getBoolean("maintenance");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public void setServerMaintenance(String identifier, boolean maintenance) {
+        maintenanceCache.put(identifier, maintenance);
+        String sql = "UPDATE server SET maintenance = ? WHERE identifier = ? LIMIT 1;";
+
+        try (Connection conn = mySQLSetup.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);){
+
+            pstmt.setBoolean(1, maintenance);
+            pstmt.setString(2, identifier);
+
+            pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String getServerFaviconName(String identifier) {
+        String sql = "SELECT favicon FROM server WHERE identifier = ? LIMIT 1;";
+        try (Connection conn = mySQLSetup.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, identifier);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) return rs.getString("favicon");
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return null;
+    }
+
+    public void setServerFaviconName(String identifier, String faviconName) {
+        String sql = "UPDATE server SET favicon = ? WHERE identifier = ?;";
+        try (Connection conn = mySQLSetup.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, faviconName);
+            pstmt.setString(2, identifier);
+            pstmt.executeUpdate();
+        } catch (SQLException e) { e.printStackTrace(); }
+    }
+
+    public boolean isServerInMaintenance(String serverName) {
+        return maintenanceCache.getOrDefault(serverName, false);
     }
 
     public boolean existsInDatabase(String identifier) {
