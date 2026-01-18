@@ -35,19 +35,26 @@ public class JoinListeners {
         UUID uuid = player.getUniqueId();
         String username = player.getUsername();
 
-        plugin.getServer().getScheduler()
-                .buildTask(plugin, () -> {
+        plugin.getServer().getScheduler().buildTask(plugin, () -> {
+            boolean isNew = mySQLManager.addToPlayerList(uuid, username);
 
-                    boolean isNew = mySQLManager.addToPlayerList(uuid, username);
+            if (isNew) {
+                List<String> welcome = lang.formatList("first-join", Map.of("player-name", username));
+                welcome.forEach(line -> player.sendMessage(mm.deserialize(line)));
+            }
 
-                    if (isNew) {
-                        List<String> welcome = lang.formatList("first-join", Map.of("player-name", username));
-                        for (String line : welcome) {
-                            player.sendMessage(mm.deserialize(line));
-                        }
-                    }
-
-                })
-                .schedule();
+            if (player.hasPermission("network.ban.bypass")) {
+                Map<String, String> banInfo = mySQLManager.getActiveBan(uuid);
+                if (banInfo != null) {
+                    List<String> infoLines = lang.formatList("ban-bypass-info", Map.of(
+                            "reason", banInfo.get("reason"),
+                            "duration", banInfo.get("duration"),
+                            "player-name", username,
+                            "admin-name", banInfo.getOrDefault("operator", "Unbekannt")
+                    ));
+                    player.sendMessage(mm.deserialize(String.join("<newline>", infoLines)));
+                }
+            }
+        }).schedule();
     }
 }

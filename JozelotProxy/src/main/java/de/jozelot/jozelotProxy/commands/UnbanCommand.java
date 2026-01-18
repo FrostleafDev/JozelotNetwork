@@ -65,6 +65,8 @@ public class UnbanCommand implements SimpleCommand {
                     player.sendMessage(mm.deserialize(lang.format("command-unban-success-admin", Map.of("player-name", name, "ban-name", args[0]))));
                 }
             }
+            UUID operatorUUID = (source instanceof Player p) ? p.getUniqueId() : new UUID(0L, 0L);
+            plugin.getMySQLManager().logAction(operatorUUID, "UNBAN", targetName, "");
         } else {
             source.sendMessage(mm.deserialize(lang.format("command-unban-not-banned", Map.of("player-name", targetName))));
         }

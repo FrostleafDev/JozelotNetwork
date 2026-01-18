@@ -106,6 +106,8 @@ public class JozelotProxy {
         CommandMeta kickMeta = cm.metaBuilder("kick").build();
         CommandMeta tpoMeta = cm.metaBuilder("tpo").aliases("tpto").build();
         CommandMeta tpohereMeta = cm.metaBuilder("tpohere").build();
+        CommandMeta serverMeta = cm.metaBuilder("server").build();
+        CommandMeta sendMeta = cm.metaBuilder("send").aliases("move").build();
 
         cm.register(hubMeta, new LobbyCommand(this));
         cm.register(networkMeta, new NetworkCommand(this));
@@ -117,6 +119,8 @@ public class JozelotProxy {
         cm.register(kickMeta, new KickCommand(this));
         cm.register(tpoMeta, new TpoCommand(this));
         cm.register(tpohereMeta, new TpoHereCommand(this));
+        cm.register(serverMeta, new ServerCommand(this));
+        cm.register(sendMeta, new SendCommand(this));
         consoleLogger.broadCastToConsole("Commands erstellt");
 
         // Listener

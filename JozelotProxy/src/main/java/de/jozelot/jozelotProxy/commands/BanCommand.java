@@ -105,6 +105,8 @@ public class BanCommand implements SimpleCommand {
                 List<String> kickLines = lang.formatList("ban-kick-screen", Map.of("reason", reason, "duration", timeArgs));
                 onlineTarget.disconnect(mm.deserialize(String.join("<newline>", kickLines)));
             }
+
+            plugin.getMySQLManager().logAction(operatorUUID, "BAN", args[0], "Grund: " + reason + " | Dauer: " + timeArgs);
         });
     }
 
@@ -140,9 +142,10 @@ public class BanCommand implements SimpleCommand {
                     .toList();
         }
 
-        if (args.length >= 3) {
-            list.add("<reason>");
-            return list;
+        if (args.length == 3) {
+            return config.getStringList("punishment-reasons").stream()
+                    .filter(reason -> reason.toLowerCase().startsWith(currentArg))
+                    .toList();
         }
 
         return List.of();

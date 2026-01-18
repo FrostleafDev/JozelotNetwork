@@ -58,6 +58,8 @@ public class NetworkCommand implements SimpleCommand {
                     }
                 }
                 // LOGS
+                UUID operatorUUID = (source instanceof Player p) ? p.getUniqueId() : new UUID(0L, 0L);
+                plugin.getMySQLManager().logAction(operatorUUID, "RELOAD", "server:proxy", "Kompletter Reload des Netzwerks");
                 return;
             }
 
@@ -110,6 +112,9 @@ public class NetworkCommand implements SimpleCommand {
                                     player.sendMessage(mm.deserialize(lang.format("command-manage-display-name-success-admin", Map.of("player-name", senderName, "server-name", serverName, "display-name", fullDisplayName))));
                                 }
                             }
+
+                            UUID operatorUUID = (source instanceof Player p) ? p.getUniqueId() : new UUID(0L, 0L);
+                            plugin.getMySQLManager().logAction(operatorUUID, "DISPLAY_NAME_CHANGE", "server:" + serverName, "Zu: " + fullDisplayName);
                         }
                     }
 
@@ -130,8 +135,10 @@ public class NetworkCommand implements SimpleCommand {
                                         player.sendMessage(mm.deserialize(lang.format("command-manage-max-players-success-admin", Map.of("player-name", senderName, "server-name", serverName, "max-players", String.valueOf(amount)))));
                                     }
                                 }
+                                UUID operatorUUID = (source instanceof Player p) ? p.getUniqueId() : new UUID(0L, 0L);
+                                plugin.getMySQLManager().logAction(operatorUUID, "MAX_PLAYERS_CHANGE", "server:" + serverName, "Zu: " + amount);
                             } catch (NumberFormatException e) {
-                                source.sendMessage(mm.deserialize("<red>Fehler: '" + args[4] + "' ist keine Zahl!"));
+                                source.sendMessage(mm.deserialize(lang.format("command-manage-max-players-not-a-number", Map.of("input", args[4]))));
                             }
                         }
                     }
@@ -155,6 +162,8 @@ public class NetworkCommand implements SimpleCommand {
                                     player.sendMessage(mm.deserialize(lang.format("command-manage-motd-success-admin", Map.of("player-name", senderName, "server-name", serverName, "motd", fullMotd))));
                                 }
                             }
+                            UUID operatorUUID = (source instanceof Player p) ? p.getUniqueId() : new UUID(0L, 0L);
+                            plugin.getMySQLManager().logAction(operatorUUID, "MOTD_CHANGE", "server:" + serverName, "Zu: " + fullMotd);
                         }
                     }
 
@@ -176,6 +185,8 @@ public class NetworkCommand implements SimpleCommand {
                                     player.sendMessage(mm.deserialize(lang.format("command-manage-maintenance-success-admin", Map.of("player-name", senderName, "server-name", serverName, "status", statusText))));
                                 }
                             }
+                            UUID operatorUUID = (source instanceof Player p) ? p.getUniqueId() : new UUID(0L, 0L);
+                            plugin.getMySQLManager().logAction(operatorUUID, "MAINTENANCE_CHANGE", "server:" + serverName, "Status: " + statusText);
                         }
                     }
                 }).schedule();

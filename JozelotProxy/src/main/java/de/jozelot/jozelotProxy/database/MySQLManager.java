@@ -7,6 +7,7 @@ import de.jozelot.jozelotProxy.utils.ConsoleLogger;
 
 import java.sql.*;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 public class MySQLManager {
 
@@ -109,6 +110,17 @@ public class MySQLManager {
                         "added_by CHAR(36)," +
                         "PRIMARY KEY (player_uuid, group_id)," +
                         "FOREIGN KEY (group_id) REFERENCES server_group(id) ON DELETE CASCADE" +
+                        ");",
+                "CREATE TABLE IF NOT EXISTS action_logs (" +
+                        "id INT AUTO_INCREMENT PRIMARY KEY," +
+                        "operator_uuid CHAR(36)," +
+                        "action_type VARCHAR(32)," +
+                        "target_info VARCHAR(255)," +
+                        "details VARCHAR(255)," +
+                        "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
+                        "INDEX idx_operator (operator_uuid)," +
+                        "INDEX idx_target (target_info)," +
+                        "INDEX idx_date (created_at)" +
                         ");"
         };
 
@@ -627,6 +639,22 @@ public class MySQLManager {
             e.printStackTrace();
         }
         return bans;
+    }
+
+    public void logAction(UUID operator, String type, String target, String details) {
+        CompletableFuture.runAsync(() -> {
+            String sql = "INSERT INTO action_logs (operator_uuid, action_type, target_info, details) VALUES (?, ?, ?, ?);";
+            try (Connection conn = mySQLSetup.getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setString(1, operator.toString());
+                pstmt.setString(2, type);
+                pstmt.setString(3, target);
+                pstmt.setString(4, details);
+                pstmt.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     public boolean isServerInMaintenance(String serverName) {

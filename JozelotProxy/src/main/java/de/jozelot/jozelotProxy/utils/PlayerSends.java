@@ -28,33 +28,33 @@ public class PlayerSends {
         this.lang = plugin.getLang();
     }
 
+    private String getDisplayName(String identifier) {
+        String displayName = plugin.getMySQLManager().getServerDisplayName(identifier);
+        return (displayName != null && !displayName.isEmpty()) ? displayName : identifier;
+    }
+
     public void connectPlayerSimple(Player player, String serverName) {
         Optional<RegisteredServer> targetServer = server.getServer(serverName);
         Optional<ServerConnection> currentConnection = player.getCurrentServer();
 
+        String finalName = getDisplayName(serverName);
+
         if (currentConnection.isPresent() && currentConnection.get().getServerInfo().getName().equals(serverName)) {
-            player.sendMessage(mm.deserialize(lang.format("already-on-server", Map.of("server-name", serverName))));
+            player.sendMessage(mm.deserialize(lang.format("already-on-server", Map.of("server-name", finalName))));
             return;
         }
 
         if (targetServer.isEmpty()) {
-            player.sendMessage(mm.deserialize(lang.format("server-not-found", Map.of("server-name", serverName))));
+            player.sendMessage(mm.deserialize(lang.format("server-not-found", Map.of("server-name", finalName))));
             return;
         }
 
-        plugin.getServer().getScheduler().buildTask(plugin, () -> {
-
-            String displayName = plugin.getMySQLManager().getServerDisplayName(serverName);
-
-            String finalName = (displayName != null && !displayName.isEmpty()) ? displayName : serverName;
-
-            player.createConnectionRequest(targetServer.get()).connect().thenAccept(result -> {
-                if (!result.isSuccessful()) {
-                    player.sendMessage(mm.deserialize(lang.format("connection-failed",
-                            Map.of("server-name", finalName))));
-                }
-            });
-        }).schedule();
+        player.createConnectionRequest(targetServer.get()).connect().thenAccept(result -> {
+            if (!result.isSuccessful()) {
+                player.sendMessage(mm.deserialize(lang.format("connection-failed",
+                        Map.of("server-name", finalName))));
+            }
+        });
     }
 
     public CompletableFuture<Boolean> sendPlayerToPlayer(Player player, Player target) {
@@ -66,35 +66,38 @@ public class PlayerSends {
         }
 
         RegisteredServer targetServer = targetConn.get().getServer();
-        String serverName = targetServer.getServerInfo().getName();
+        String identifier = targetServer.getServerInfo().getName();
+        String finalName = getDisplayName(identifier);
 
         if (player.getCurrentServer().isPresent() &&
                 player.getCurrentServer().get().getServer().equals(targetServer)) {
-            player.sendMessage(mm.deserialize(lang.format("already-on-server", Map.of("server-name", serverName))));
+            player.sendMessage(mm.deserialize(lang.format("already-on-server", Map.of("server-name", finalName))));
             return CompletableFuture.completedFuture(false);
         }
 
         return player.createConnectionRequest(targetServer).connect().thenApply(result -> {
             if (result.isSuccessful()) {
-                player.sendMessage(mm.deserialize(lang.format("send-to-server-success", Map.of("player-name", target.getUsername(),"server-name", serverName))));
+                player.sendMessage(mm.deserialize(lang.format("send-to-server-success",
+                        Map.of("player-name", target.getUsername(), "server-name", finalName))));
                 return true;
             } else {
-                player.sendMessage(mm.deserialize(lang.format("connection-failed", Map.of("server-name", serverName))));
+                player.sendMessage(mm.deserialize(lang.format("connection-failed", Map.of("server-name", finalName))));
                 return false;
             }
         });
     }
 
     public CompletableFuture<Boolean> sendPlayerToPlayer2(Player player, Player target, boolean silent) {
-        Optional<ServerConnection> targetConn = player.getCurrentServer();
+        Optional<ServerConnection> adminConn = player.getCurrentServer();
 
-        if (targetConn.isEmpty()) {
+        if (adminConn.isEmpty()) {
             player.sendMessage(mm.deserialize(lang.format("generic-error", null)));
             return CompletableFuture.completedFuture(false);
         }
 
-        RegisteredServer targetServer = targetConn.get().getServer();
-        String serverName = targetServer.getServerInfo().getName();
+        RegisteredServer targetServer = adminConn.get().getServer();
+        String identifier = targetServer.getServerInfo().getName();
+        String finalName = getDisplayName(identifier);
 
         if (target.getCurrentServer().isPresent() &&
                 target.getCurrentServer().get().getServer().equals(targetServer)) {
@@ -111,7 +114,7 @@ public class PlayerSends {
                 }
                 return true;
             } else {
-                player.sendMessage(mm.deserialize(lang.format("connection-failed", Map.of("server-name", serverName))));
+                player.sendMessage(mm.deserialize(lang.format("connection-failed", Map.of("server-name", finalName))));
                 return false;
             }
         });

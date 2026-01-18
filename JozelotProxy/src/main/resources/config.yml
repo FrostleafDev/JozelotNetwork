@@ -4,6 +4,35 @@
 
 network-name: 'jozelot.de'
 
+punishment-reasons:
+  - "101 Hacking"
+  - "102 Killaura"
+  - "103 Movement"
+  - "104 X-Ray"
+  - "105 AutoClicker"
+  - "106 Reach"
+  - "107 Unfairer Vorteil"
+  - "201 Beleidigung"
+  - "202 Schwere Beleidigung"
+  - "203 Rassismus"
+  - "204 Spamming"
+  - "205 Werbung"
+  - "206 Provokation"
+  - "207 Wortwahl"
+  - "208 Drohung"
+  - "209 Radikalismus"
+  - "301 Griefing"
+  - "302 Scamming"
+  - "303 Trolling"
+  - "304 Bug Using"
+  - "401 Unangemessener Name"
+  - "402 Unangemessener Skin"
+  - "403 Ban Umgehung"
+  - "404 Account Sicherheit"
+  - "405 Vortäuschen von Rechten"
+  - "406 Sicherheit-Bann"
+
+
 color-settings:
   primary: '#00A4FC'
   secondary: '#00FC00'
@@ -47,3 +76,10 @@ redis:
 # network.ban.bypass
 # network.command.tpo
 # network.command.tpohere
+# network.command.send
+# network.command.server
+
+# UUID operatorUUID = (source instanceof Player p) ? p.getUniqueId() : new UUID(0L, 0L);
+
+#  UUID operatorUUID = (source instanceof Player p) ? p.getUniqueId() : new UUID(0L, 0L);
+#            plugin.getMySQLManager().logAction(operatorUUID, "SEND", args[0], "Grund: " + reason + " | Dauer: " + timeArgs);

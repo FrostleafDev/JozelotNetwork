@@ -91,6 +91,8 @@ public class KickCommand implements SimpleCommand {
                             Map.of("player-name", senderName, "target-name", args[0], "reason", reason))));
                 }
             }
+
+            plugin.getMySQLManager().logAction(operatorUUID, "KICK", args[0], "Grund: " + reason);
         });
     }
 
@@ -115,7 +117,12 @@ public class KickCommand implements SimpleCommand {
                     .sorted()
                     .toList();
         }
-        return (args.length == 2) ? List.of("<reason>") : List.of();
+        if (args.length == 2) {
+            return config.getStringList("punishment-reasons").stream()
+                    .filter(reason -> reason.toLowerCase().startsWith(currentArg))
+                    .toList();
+        }
+        return List.of();
     }
 
     @Override

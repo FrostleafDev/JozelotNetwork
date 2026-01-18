@@ -100,16 +100,6 @@ public class ServerSwitchListener {
                         mm.deserialize(String.join("<newline>", banLines))
                 ));
                 return;
-            } else {
-                plugin.getServer().getScheduler().buildTask(plugin, () -> {
-                    List<String> infoLines = lang.formatList("ban-bypass-info", Map.of(
-                            "reason", banInfo.get("reason"),
-                            "duration", banInfo.get("duration"),
-                            "player-name", player.getUsername(),
-                            "admin-name", banInfo.get("operator")
-                    ));
-                    player.sendMessage(mm.deserialize(String.join("<newline>", infoLines)));
-                }).delay(java.time.Duration.ofSeconds(2)).schedule();
             }
         }
 

@@ -4,6 +4,8 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class ConfigManager {
@@ -142,6 +144,22 @@ public class ConfigManager {
     public String getString(String path) {
         Object o = get(path);
         return o != null ? o.toString() : "";
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<String> getStringList(String path) {
+        Object o = get(path);
+        if (o instanceof List) {
+            List<?> list = (List<?>) o;
+            List<String> result = new ArrayList<>();
+            for (Object item : list) {
+                if (item != null) {
+                    result.add(item.toString());
+                }
+            }
+            return result;
+        }
+        return new ArrayList<>();
     }
 
     public int getInt(String path) {

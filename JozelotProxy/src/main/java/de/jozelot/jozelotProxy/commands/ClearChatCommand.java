@@ -12,6 +12,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class ClearChatCommand implements SimpleCommand {
 
@@ -19,6 +20,7 @@ public class ClearChatCommand implements SimpleCommand {
     private final ConsoleLogger consoleLogger;
     private final ConfigManager config;
     private final ProxyServer server;
+    private final JozelotProxy plugin;
     MiniMessage mm = MiniMessage.miniMessage();
 
     public ClearChatCommand(JozelotProxy plugin) {
@@ -26,6 +28,7 @@ public class ClearChatCommand implements SimpleCommand {
         this.server = plugin.getServer();
         this.consoleLogger = plugin.getConsoleLogger();
         this.config = plugin.getConfig();
+        this.plugin = plugin;
     }
 
     @Override
@@ -62,6 +65,9 @@ public class ClearChatCommand implements SimpleCommand {
             }
         }
         source.sendMessage(mm.deserialize(lang.format("chat-cleared-success", null)));
+
+        UUID operatorUUID = (source instanceof Player p) ? p.getUniqueId() : new UUID(0L, 0L);
+        plugin.getMySQLManager().logAction(operatorUUID, "CHATCLEAR", "server:all", "");
     }
 
     @Override
