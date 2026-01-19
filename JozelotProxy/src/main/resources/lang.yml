@@ -127,19 +127,31 @@ command-send-usage: '{tertiary}/send <Spieler> <Server>'
 command-send-success-multiple: '{primary}{count}{grey} Spieler wurden zu {primary}{server-name}{grey} gesendet'
 command-send-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat {primary}{range} {grey}auf {primary}{server-name} {grey}verschoben'
 
+pterodactyl-control-no-id: '{grey}Es ist keine Pterodactyl-ID für {danger}{server-name}{grey} hinterlegt'
+pterodactyl-control-success: '{grey}Befehl für {primary}{action}{grey} wurde an {primary}{server-name}{grey} gesendet'
+pterodactyl-control-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat den Befehl für {primary}{action}{grey} an {primary}{server-name}{grey} gesendet'
+pterodactyl-control-api-error: '{grey}Die API hat mit dem Fehler Code {danger}{code}{grey} geantwortet'
 
+pterodactlyl-status-error: '{grey}Fehler beim abrufer der {danger}API Daten'
+pterodactyl-status-message:
+  - ''
+  - '<gray>» <gradient:#ffcc00:#ff8800><bold>SERVER STATUS</bold></gradient> <gray>«'
+  - '<dark_gray>Ziel: <white>{server-name} <dark_gray>(<gray>{id}...<dark_gray>)'
+  - '<gray>Status: {status}'
+  - '<gray>CPU: <white>{cpu}%'
+  - '<gray>RAM: <white>{memory} MB'
+  - '<gray>Network: <white>↓{network-in}KB <gray>| <white>↑{network-out}KB'
+  - ''
+  - '<gray>» <dark_gray>Abgefragt via Pterodactyl API'
 
+tab-header:
+  - "<gradient:#00A4FC:#00FC00><bold>jozelot.de</bold></gradient>"
+  - ""
+tab-footer:
+  - ""
+  - "{grey}{group-info} <dark_gray>| {grey}{server-name} <dark_gray>| {grey}Ping: {secondary}{ping}ms"
 
-
-
-
-
-
-
-
-
-
-
+tab-player-format: '{rank-prefix}{player-name}'
 
 
 

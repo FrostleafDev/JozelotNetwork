@@ -69,6 +69,82 @@ public class NetworkCommand implements SimpleCommand {
                 return;
             }
 
+            // START
+            if (args[0].equalsIgnoreCase("restart") || args[0].equalsIgnoreCase("start") || args[0].equalsIgnoreCase("stop")) {
+                if (args.length < 2) { showHelp(source); return; }
+
+                String action = args[0].toLowerCase();
+                String serverName = args[1];
+
+                String pteroId = plugin.getMySQLManager().getPteroIdentifier(serverName);
+
+                if (pteroId == null) {
+                    source.sendMessage(mm.deserialize(lang.format("pterodactyl-control-no-id", Map.of("server-name", serverName))));
+                    return;
+                }
+
+                plugin.getPteroManager().sendAction(pteroId, action, code -> {
+                    if (code == 204) {
+                        String senderName = (source instanceof Player player) ? player.getUsername() : "Konsole";
+                        source.sendMessage(mm.deserialize(lang.format("pterodactyl-control-success", Map.of("action", action, "server-name", serverName))));
+
+                        consoleLogger.broadCastToConsole("<yellow>" + senderName + " <gray>hat <white>" + serverName + " <gray>den Befehl zu <gold>" + action + " <gray>gesendet");
+                        for (Player player : server.getAllPlayers()) {
+                            if (player.hasPermission("network.get.logs") && !player.equals(source)) {
+                                player.sendMessage(mm.deserialize(lang.format("pterodactyl-control-success-admin", Map.of("player-name", senderName, "server-name", serverName, "action", action))));
+                            }
+                        }
+
+                        UUID operatorUUID = (source instanceof Player p) ? p.getUniqueId() : new UUID(0L, 0L);
+                        plugin.getMySQLManager().logAction(operatorUUID, "SERVER_ACTION", "server:" + serverName, "Action: " + action);
+
+                    } else {
+                        source.sendMessage(mm.deserialize(lang.format("pterodactyl-control-api-error", Map.of("code", String.valueOf(code)))));
+                    }
+                });
+                return;
+            }
+
+            if (args[0].equalsIgnoreCase("status")) {
+                if (args.length < 2) { showHelp(source); return; }
+                String serverName = args[1];
+                String pteroId = plugin.getMySQLManager().getPteroIdentifier(serverName);
+
+                if (pteroId == null) {
+                    source.sendMessage(mm.deserialize(lang.format("pterodactyl-control-no-id", Map.of("server-name", serverName))));
+                    return;
+                }
+
+                plugin.getPteroManager().getResources(pteroId, data -> {
+                    if (data == null) {
+                        source.sendMessage(mm.deserialize("<red>Fehler beim Abrufen der API-Daten."));
+                        return;
+                    }
+
+                    String state = data.get("current_state").getAsString(); // running, starting, offline
+                    long memory = data.getAsJsonObject("resources").get("memory_bytes").getAsLong();
+                    double cpu = data.getAsJsonObject("resources").get("cpu_absolute").getAsDouble();
+                    long networkIn = data.getAsJsonObject("resources").get("network_rx_bytes").getAsLong();
+                    long networkOut = data.getAsJsonObject("resources").get("network_tx_bytes").getAsLong();
+
+                    String stateColor = state.equals("running") ? "<#00FC00>" : (state.equals("starting") ? "<#FCE300>" : "<#f90036>");
+
+                    // Nachricht bauen
+                    List<String> infoLines = lang.formatList("pterodactyl-status-message", Map.of(
+                            "server-name", serverName,
+                            "id", pteroId.substring(0, 8),
+                            "status", stateColor + state.toUpperCase(),
+                            "cpu", String.format("%.2f", cpu),
+                            "memory", String.valueOf((memory / 1024 / 1024)),
+                            "network-in", String.valueOf((networkIn / 1024)),
+                            "network-out", String.valueOf((networkOut / 1024))
+                    ));
+                    source.sendMessage(mm.deserialize(String.join("<newline>", infoLines)));
+
+                });
+                return;
+            }
+
             // MANAGE
             if (args[0].equalsIgnoreCase("manage") && source.hasPermission("network.command.manage")) {
                 if (args.length < 4) {
@@ -217,11 +293,19 @@ public class NetworkCommand implements SimpleCommand {
             case 1:
                 if (has(invocation, "reload")) list.add("reload");
                 if (has(invocation, "manage")) list.add("manage");
+                if (has(invocation, "manage.server.start")) list.add("start");
+                if (has(invocation, "manage.server.stop")) list.add("stop");
+                if (has(invocation, "manage.server.restart")) list.add("restart");
+                if (has(invocation, "manage.server.status")) list.add("status");
+
                 list.add("help");
                 break;
 
             case 2:
-                if (args[0].equalsIgnoreCase("manage") && has(invocation, "manage")) {
+                String cmd = args[0].toLowerCase();
+                if (List.of("start", "stop", "restart", "status").contains(cmd)) {
+                    list.addAll(plugin.getMySQLManager().getRegisteredServerCache());
+                } else if (args[0].equalsIgnoreCase("manage") && has(invocation, "manage")) {
                     list.addAll(List.of("display_name", "max_players", "motd", "maintenance"));
                 }
                 break;

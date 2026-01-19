@@ -30,6 +30,7 @@ public class MySQLManager {
                 "CREATE TABLE IF NOT EXISTS server (" +
                         "id INT AUTO_INCREMENT PRIMARY KEY," +
                         "identifier VARCHAR(32) UNIQUE," +
+                        "ptero_identifier VARCHAR(64)," +
                         "display_name VARCHAR(32)," +
                         "motd VARCHAR(255) DEFAULT 'Backend not setup'," +
                         "max_players INT DEFAULT 20," +
@@ -74,7 +75,9 @@ public class MySQLManager {
                 "CREATE TABLE IF NOT EXISTS server_group (" +
                         "id INT AUTO_INCREMENT PRIMARY KEY," +
                         "identifier VARCHAR(32) UNIQUE," +
-                        "display_name VARCHAR(32)" +
+                        "display_name VARCHAR(32)," +
+                        "scoreboard_enabled BOOLEAN DEFAULT TRUE," +
+                        "custom_tab_enabled BOOLEAN DEFAULT TRUE" +
                         ");",
 
                 // 6. Server in Group (Mapping Tabelle)
@@ -655,6 +658,64 @@ public class MySQLManager {
                 e.printStackTrace();
             }
         });
+    }
+
+    public String getPteroIdentifier(String serverIdentifier) {
+        try (Connection conn = mySQLSetup.getConnection();
+             PreparedStatement ps = conn.prepareStatement(
+                     "SELECT ptero_identifier FROM server WHERE identifier = ?")) {
+
+            ps.setString(1, serverIdentifier);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    String id = rs.getString("ptero_identifier");
+                    return (id != null && !id.isEmpty()) ? id : null;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public void loadGroups(Map<String, Integer> serverToGroup, Map<Integer, String> groupNames) {
+        String query = "SELECT s.identifier as s_id, g.id as g_id, g.display_name as g_name " +
+                "FROM server_in_group sig " +
+                "JOIN server s ON sig.server_id = s.id " +
+                "JOIN server_group g ON sig.group_id = g.id";
+
+        try (Connection conn = mySQLSetup.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                serverToGroup.put(rs.getString("s_id"), rs.getInt("g_id"));
+                groupNames.put(rs.getInt("g_id"), rs.getString("g_name"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean isGroupTabEnabled(int groupId) {
+        if (groupId == -1) return false;
+
+        String query = "SELECT custom_tab_enabled FROM server_group WHERE id = ?";
+
+        try (Connection conn = mySQLSetup.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setInt(1, groupId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getBoolean("custom_tab_enabled");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return true;
     }
 
     public boolean isServerInMaintenance(String serverName) {

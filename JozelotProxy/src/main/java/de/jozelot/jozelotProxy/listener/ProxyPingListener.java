@@ -6,6 +6,7 @@ import com.velocitypowered.api.proxy.server.ServerPing;
 import com.velocitypowered.api.util.Favicon;
 import de.jozelot.jozelotProxy.JozelotProxy;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import java.util.concurrent.ConcurrentHashMap;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,7 +19,7 @@ public class ProxyPingListener {
     private final JozelotProxy plugin;
     private final MiniMessage mm = MiniMessage.miniMessage();
 
-    private final Map<String, Favicon> faviconCache = new HashMap<>();
+    private final Map<String, Favicon> faviconCache = new ConcurrentHashMap<>();
 
     public ProxyPingListener(JozelotProxy plugin) {
         this.plugin = plugin;

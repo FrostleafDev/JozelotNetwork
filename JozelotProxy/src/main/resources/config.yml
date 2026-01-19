@@ -32,6 +32,10 @@ punishment-reasons:
   - "405 Vortäuschen von Rechten"
   - "406 Sicherheit-Bann"
 
+pterodactyl:
+  url: "https://panel.jozelot.de"
+  api-key: "KEY"
+
 
 color-settings:
   primary: '#00A4FC'
@@ -64,6 +68,7 @@ redis:
 # network.get.logs
 # network.clearchat.bypass
 # network.network.manage
+# network.network.manage.server.start/stop/restart/status
 
 # network.maintenance.bypass.all
 # network.maintenance.bypass.<server>

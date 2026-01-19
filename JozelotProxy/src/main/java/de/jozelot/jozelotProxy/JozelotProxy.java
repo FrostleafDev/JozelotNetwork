@@ -9,6 +9,8 @@ import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
+import de.jozelot.jozelotProxy.apis.GroupManager;
+import de.jozelot.jozelotProxy.apis.PteroManager;
 import de.jozelot.jozelotProxy.commands.*;
 import de.jozelot.jozelotProxy.database.MySQLManager;
 import de.jozelot.jozelotProxy.database.MySQLSetup;
@@ -19,9 +21,12 @@ import de.jozelot.jozelotProxy.listener.ServerSwitchListener;
 import de.jozelot.jozelotProxy.storage.ConfigManager;
 import de.jozelot.jozelotProxy.storage.LangManager;
 import de.jozelot.jozelotProxy.utils.ConsoleLogger;
+import de.jozelot.jozelotProxy.utils.LuckpermsUtils;
 import de.jozelot.jozelotProxy.utils.PlayerSends;
 import de.jozelot.jozelotProxy.utils.PluginReload;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.luckperms.api.LuckPerms;
+import net.luckperms.api.LuckPermsProvider;
 import org.slf4j.Logger;
 
 import java.nio.file.Path;
@@ -45,6 +50,10 @@ public class JozelotProxy {
     private PlayerSends playerSends;
     private PluginReload pluginReload;
     private ConsoleLogger consoleLogger;
+    private PteroManager pteroManager;
+    private GroupManager groupManager;
+    private LuckPerms luckPerms;
+    private LuckpermsUtils luckpermsUtils;
 
     private RedisSetup redisSetup;
     private MySQLSetup mySQLSetup;
@@ -81,8 +90,8 @@ public class JozelotProxy {
         logger.info("Sprachdatei geladen");
 
         this.playerSends = new PlayerSends(this);
-        this.pluginReload = new PluginReload(this);
         this.consoleLogger = new ConsoleLogger(this);
+        this.pteroManager = new PteroManager(this);
         logger.info("Utils geladen");
         consoleLogger.broadCastToConsole("Plugin Logger gestartet");
 
@@ -93,6 +102,14 @@ public class JozelotProxy {
         this.mySQLManager = new MySQLManager(this);
         mySQLManager.createTables();
         mySQLManager.registerAllServers(server.getAllServers());
+        this.groupManager = new GroupManager(this);
+        groupManager.load();
+        this.pluginReload = new PluginReload(this);
+
+        if (server.getPluginManager().getPlugin("luckperms").isPresent()) {
+            this.luckPerms = LuckPermsProvider.get();
+        }
+        this.luckpermsUtils = new LuckpermsUtils(this);
 
         // Commands
         CommandManager cm = server.getCommandManager();
@@ -146,7 +163,6 @@ public class JozelotProxy {
     @Subscribe
     public void onProxyShutdown(ProxyShutdownEvent event) {
         consoleLogger.broadCastToConsole("Proxy wird beendet, schließe Verbindungen...");
-        mySQLSetup.close();
     }
 
     public ProxyServer getServer() {
@@ -183,6 +199,22 @@ public class JozelotProxy {
 
     public MySQLManager getMySQLManager() {
         return mySQLManager;
+    }
+
+    public PteroManager getPteroManager() {
+        return pteroManager;
+    }
+
+    public GroupManager getGroupManager() {
+        return groupManager;
+    }
+
+    public LuckPerms getLuckPerms() {
+        return luckPerms;
+    }
+
+    public LuckpermsUtils getLuckpermsUtils() {
+        return luckpermsUtils;
     }
 
     public String getVersion() {

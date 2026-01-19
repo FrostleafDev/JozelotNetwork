@@ -2,18 +2,20 @@ package de.jozelot.jozelotProxy.listener;
 
 import com.velocitypowered.api.event.ResultedEvent;
 import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.player.ServerConnectedEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.api.proxy.player.TabListEntry;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.jozelot.jozelotProxy.JozelotProxy;
 import de.jozelot.jozelotProxy.storage.LangManager;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.lang.reflect.Method;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ServerSwitchListener {
 
@@ -24,16 +26,52 @@ public class ServerSwitchListener {
     public ServerSwitchListener(JozelotProxy plugin) {
         this.plugin = plugin;
         this.lang = plugin.getLang();
+
+        plugin.getServer().getScheduler().buildTask(plugin, () -> {
+            for (Player player : plugin.getServer().getAllPlayers()) {
+                player.getCurrentServer().ifPresent(conn -> {
+                    int groupId = plugin.getGroupManager().getGroupId(conn.getServerInfo().getName());
+                    if (groupId != -1) {
+                        if (plugin.getGroupManager().isTabEnabled(groupId)) {
+                            updateTabHeaderForPlayer(player, groupId);
+                        }
+                        updateTabEntryPings(player, groupId);
+                    }
+                });
+            }
+        }).repeat(java.time.Duration.ofSeconds(3)).schedule();
     }
 
     @Subscribe
     public void onServerConnected(ServerConnectedEvent event) {
         Player player = event.getPlayer();
         String serverName = event.getServer().getServerInfo().getName();
+        RegisteredServer connectedServer = event.getServer();
 
         plugin.getServer().getScheduler().buildTask(plugin, () -> {
-            plugin.getMySQLManager().updatePlayerServer(player.getUniqueId(), serverName);
-        }).schedule();
+            plugin.getMySQLManager().updatePlayerServer(player.getUniqueId(), connectedServer.getServerInfo().getName());
+            updateTabForGroup(player, connectedServer);
+        }).delay(java.time.Duration.ofMillis(250)).schedule();
+
+    }
+
+    @Subscribe
+    public void onDisconnect(DisconnectEvent event) {
+        Player player = event.getPlayer();
+        removeFromAllTabs(player);
+    }
+
+    @Subscribe
+    public void onServerPreConnect(ServerPreConnectEvent event) {
+        if (event.getPlayer().getCurrentServer().isPresent()) {
+            removeFromAllTabs(event.getPlayer());
+        }
+    }
+
+    private void removeFromAllTabs(Player playerToRemove) {
+        for (Player all : plugin.getServer().getAllPlayers()) {
+            all.getTabList().removeEntry(playerToRemove.getUniqueId());
+        }
     }
 
     @Subscribe
@@ -115,5 +153,91 @@ public class ServerSwitchListener {
                     mm.deserialize(kickMessage)
             ));
         }
+    }
+
+    public void updateTabForGroup(Player player, RegisteredServer connectedServer) {
+        int groupId = plugin.getGroupManager().getGroupId(connectedServer.getServerInfo().getName());
+        if (groupId == -1) return;
+
+        List<Player> groupPlayers = plugin.getServer().getAllPlayers().stream()
+                .filter(p -> p.getCurrentServer().isPresent())
+                .filter(p -> plugin.getGroupManager().getGroupId(p.getCurrentServer().get().getServerInfo().getName()) == groupId)
+                .collect(Collectors.toList());
+
+        for (Player member : groupPlayers) {
+            // WICHTIG: Nicht jedes Mal leeren, wenn möglich, sonst flackert der Tab.
+            // Aber für die Sortierung ist es am sichersten:
+            member.getTabList().clearAll();
+
+            for (Player networkPlayer : groupPlayers) {
+                String prefix = plugin.getLuckpermsUtils().getPlayerPrefix(networkPlayer);
+                int weight = plugin.getLuckpermsUtils().getWeight(networkPlayer);
+
+                // Wir erstellen einen Sortier-String.
+                // 10000 - weight sorgt dafür, dass hohe Gewichte (Owner) kleine Zahlen werden (0001).
+                // Das sorgt für die Sortierung von oben nach unten.
+                String sortKey = String.format("%04d", 10000 - weight);
+
+                // Der DisplayName ist das, was man sieht.
+                String displayNameRaw = lang.format("tab-player-format", Map.of(
+                        "rank-prefix", prefix != null ? prefix : "",
+                        "player-name", networkPlayer.getUsername()
+                ));
+
+                TabListEntry entry = TabListEntry.builder()
+                        .profile(networkPlayer.getGameProfile())
+                        .tabList(member.getTabList())
+                        // Der Trick: Minecraft sortiert nach dem Namen im GameProfile,
+                        // wenn kein Team gesetzt ist. In Velocity nutzen wir meist den DisplayName.
+                        .displayName(mm.deserialize(displayNameRaw))
+                        .latency((int) networkPlayer.getPing())
+                        .build();
+
+                member.getTabList().addEntry(entry);
+            }
+        }
+    }
+
+
+    private void updateTabEntryPings(Player viewer, int groupId) {
+        for (TabListEntry entry : viewer.getTabList().getEntries()) {
+            plugin.getServer().getPlayer(entry.getProfile().getId()).ifPresent(target -> {
+                // Nur aktualisieren, wenn der Ping sich wirklich geändert hat
+                if (entry.getLatency() != (int) target.getPing()) {
+                    entry.setLatency((int) target.getPing());
+                }
+            });
+        }
+    }
+
+    public void updateTabHeaderForPlayer(Player p, int groupId) {
+        String groupName = plugin.getGroupManager().getGroupName(groupId);
+        List<String> serversInGroup = plugin.getGroupManager().getServersInGroup(groupId);
+
+        String currentServerInternal = p.getCurrentServer()
+                .map(conn -> conn.getServerInfo().getName())
+                .orElse("Unbekannt");
+
+        String currentServerDisplay = plugin.getMySQLManager().getServerDisplayName(currentServerInternal);
+        String serverNameToShow = (currentServerDisplay != null) ? currentServerDisplay : currentServerInternal;
+
+        String infoLine = (serversInGroup.size() <= 1)
+                ? "(Lokal)"
+                : groupName + " (Netzwerk)";
+
+        Map<String, String> placeholders = Map.of(
+                "group-info", infoLine,
+                "group-name", groupName,
+                "server-name", serverNameToShow,
+                "ping", String.valueOf(p.getPing())
+        );
+
+        List<String> headerLines = lang.formatList("tab-header", placeholders);
+        List<String> footerLines = lang.formatList("tab-footer", placeholders);
+
+        p.sendPlayerListHeaderAndFooter(
+                mm.deserialize(String.join("\n", headerLines)),
+                mm.deserialize(String.join("\n", footerLines))
+        );
     }
 }
