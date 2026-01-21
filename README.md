@@ -22,12 +22,6 @@ _A more detailed breakdown will be added as the project evolves._
 > Backends: Paper / Purpur `1.21.1`  
 > Java: `22-lts`
 
-## Architecture (planned)
-
-![Network architecture](./docs/architecture.png)
-
-_The architecture diagram will be added once the structure is finalized._
-
 ## Credits
 > Currently developed by me alone (`jozelot_`).  
 > Please don’t steal 😄
