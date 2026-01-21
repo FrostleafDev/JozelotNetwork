@@ -145,14 +145,18 @@ pterodactyl-status-message:
   - '<gray>» <dark_gray>Abgefragt via Pterodactyl API'
 
 tab-header:
-  - "<gradient:#00A4FC:#00FC00><bold>jozelot.de</bold></gradient>"
-  - ""
+  - ''
+  - '<gradient:#00A4FC:#00FC00><bold>jozelot.de</bold></gradient>'
+  - ''
+  - '{grey}<strikethrough>                                                          </strikethrough>'
+
 tab-footer:
-  - ""
-  - "{grey}{group-info} <dark_gray>| {grey}{server-name} <dark_gray>| {grey}Ping: {secondary}{ping}ms"
+  - '{grey}<strikethrough>                                                          </strikethrough>'
+  - ''
+  - '{grey}{group-info} <dark_gray>| {grey}{server-name} <dark_gray>| {grey}Ping: {secondary}{ping}ms'
 
 tab-player-format: '{rank-prefix}{player-name}'
-
+chat-format: '{rank-prefix}{player-name} {grey}» <white>{message}'
 
 
 

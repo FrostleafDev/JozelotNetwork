@@ -33,6 +33,8 @@ public class ConfigManager {
     private String redisPassword;
     private int redisPort;
 
+    private String brandName;
+
     public ConfigManager(Path directory, String fileName) {
         this.file = new File(directory.toFile(), fileName);
         this.faviconDirectory = directory.resolve("favicons");
@@ -113,6 +115,10 @@ public class ConfigManager {
         return mysqlPort;
     }
 
+    public String getBrandName() {
+        return brandName;
+    }
+
     public void reload() {
         try (InputStream in = new FileInputStream(file)) {
             this.data = yaml.load(in);
@@ -137,6 +143,8 @@ public class ConfigManager {
         colorTertiary = getString("color-settings.tertiary");
         colorDanger = getString("color-settings.danger");
         colorGrey = getString("color-settings.grey");
+
+        brandName = getString("brand-name");
     }
 
     // Die Methode für config.getString("pfad.zum.wert")

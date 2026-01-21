@@ -1,5 +1,6 @@
 package de.jozelot.jozelotProxy.utils;
 
+import com.velocitypowered.api.proxy.Player;
 import de.jozelot.jozelotProxy.JozelotProxy;
 import de.jozelot.jozelotProxy.apis.GroupManager;
 import de.jozelot.jozelotProxy.database.MySQLSetup;
@@ -14,6 +15,7 @@ public class PluginReload {
     private final MySQLSetup mySQLSetup;
     private final RedisSetup redisSetup;
     private final GroupManager groupManager;
+    private final JozelotProxy plugin;
 
     public PluginReload(JozelotProxy plugin) {
         this.config = plugin.getConfig();
@@ -21,6 +23,7 @@ public class PluginReload {
         this.redisSetup = plugin.getRedisSetup();
         this.mySQLSetup = plugin.getMySQLSetup();
         this.groupManager = plugin.getGroupManager();
+        this.plugin = plugin;
     }
 
     public void reload() {
@@ -29,5 +32,9 @@ public class PluginReload {
         groupManager.load();
         redisSetup.setup();
         mySQLSetup.setup();
+        for (Player player : plugin.getServer().getAllPlayers()) {
+            plugin.getBrandNameChanger().sendBrandName(player, config.getBrandName());
+        }
+
     }
 }

@@ -4,16 +4,21 @@ import com.velocitypowered.api.event.ResultedEvent;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.LoginEvent;
+import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.event.player.ServerConnectedEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.player.TabListEntry;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.jozelot.jozelotProxy.JozelotProxy;
+import de.jozelot.jozelotProxy.storage.ConfigManager;
 import de.jozelot.jozelotProxy.storage.LangManager;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -21,11 +26,13 @@ public class ServerSwitchListener {
 
     private final JozelotProxy plugin;
     private final LangManager lang;
+    private final ConfigManager config;
     private MiniMessage mm = MiniMessage.miniMessage();
 
     public ServerSwitchListener(JozelotProxy plugin) {
         this.plugin = plugin;
         this.lang = plugin.getLang();
+        this.config = plugin.getConfig();
 
         plugin.getServer().getScheduler().buildTask(plugin, () -> {
             for (Player player : plugin.getServer().getAllPlayers()) {
@@ -43,6 +50,12 @@ public class ServerSwitchListener {
     }
 
     @Subscribe
+    public void onPostLogin(PostLoginEvent event) {
+        Player player = event.getPlayer();
+        plugin.getBrandNameChanger().sendBrandName(player, config.getBrandName());
+    }
+
+    @Subscribe
     public void onServerConnected(ServerConnectedEvent event) {
         Player player = event.getPlayer();
         String serverName = event.getServer().getServerInfo().getName();
@@ -50,9 +63,9 @@ public class ServerSwitchListener {
 
         plugin.getServer().getScheduler().buildTask(plugin, () -> {
             plugin.getMySQLManager().updatePlayerServer(player.getUniqueId(), connectedServer.getServerInfo().getName());
+            plugin.getBrandNameChanger().sendBrandName(player, config.getBrandName());
             updateTabForGroup(player, connectedServer);
         }).delay(java.time.Duration.ofMillis(250)).schedule();
-
     }
 
     @Subscribe
@@ -165,20 +178,14 @@ public class ServerSwitchListener {
                 .collect(Collectors.toList());
 
         for (Player member : groupPlayers) {
-            // WICHTIG: Nicht jedes Mal leeren, wenn möglich, sonst flackert der Tab.
-            // Aber für die Sortierung ist es am sichersten:
             member.getTabList().clearAll();
 
             for (Player networkPlayer : groupPlayers) {
                 String prefix = plugin.getLuckpermsUtils().getPlayerPrefix(networkPlayer);
                 int weight = plugin.getLuckpermsUtils().getWeight(networkPlayer);
 
-                // Wir erstellen einen Sortier-String.
-                // 10000 - weight sorgt dafür, dass hohe Gewichte (Owner) kleine Zahlen werden (0001).
-                // Das sorgt für die Sortierung von oben nach unten.
-                String sortKey = String.format("%04d", 10000 - weight);
+                int priority = weight;
 
-                // Der DisplayName ist das, was man sieht.
                 String displayNameRaw = lang.format("tab-player-format", Map.of(
                         "rank-prefix", prefix != null ? prefix : "",
                         "player-name", networkPlayer.getUsername()
@@ -187,10 +194,9 @@ public class ServerSwitchListener {
                 TabListEntry entry = TabListEntry.builder()
                         .profile(networkPlayer.getGameProfile())
                         .tabList(member.getTabList())
-                        // Der Trick: Minecraft sortiert nach dem Namen im GameProfile,
-                        // wenn kein Team gesetzt ist. In Velocity nutzen wir meist den DisplayName.
                         .displayName(mm.deserialize(displayNameRaw))
                         .latency((int) networkPlayer.getPing())
+                        .listOrder(priority)
                         .build();
 
                 member.getTabList().addEntry(entry);
@@ -198,11 +204,9 @@ public class ServerSwitchListener {
         }
     }
 
-
     private void updateTabEntryPings(Player viewer, int groupId) {
         for (TabListEntry entry : viewer.getTabList().getEntries()) {
             plugin.getServer().getPlayer(entry.getProfile().getId()).ifPresent(target -> {
-                // Nur aktualisieren, wenn der Ping sich wirklich geändert hat
                 if (entry.getLatency() != (int) target.getPing()) {
                     entry.setLatency((int) target.getPing());
                 }

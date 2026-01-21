@@ -15,15 +15,13 @@ import de.jozelot.jozelotProxy.commands.*;
 import de.jozelot.jozelotProxy.database.MySQLManager;
 import de.jozelot.jozelotProxy.database.MySQLSetup;
 import de.jozelot.jozelotProxy.database.RedisSetup;
+import de.jozelot.jozelotProxy.listener.GroupChatListener;
 import de.jozelot.jozelotProxy.listener.JoinListeners;
 import de.jozelot.jozelotProxy.listener.ProxyPingListener;
 import de.jozelot.jozelotProxy.listener.ServerSwitchListener;
 import de.jozelot.jozelotProxy.storage.ConfigManager;
 import de.jozelot.jozelotProxy.storage.LangManager;
-import de.jozelot.jozelotProxy.utils.ConsoleLogger;
-import de.jozelot.jozelotProxy.utils.LuckpermsUtils;
-import de.jozelot.jozelotProxy.utils.PlayerSends;
-import de.jozelot.jozelotProxy.utils.PluginReload;
+import de.jozelot.jozelotProxy.utils.*;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
@@ -54,6 +52,7 @@ public class JozelotProxy {
     private GroupManager groupManager;
     private LuckPerms luckPerms;
     private LuckpermsUtils luckpermsUtils;
+    private BrandNameChanger brandNameChanger;
 
     private RedisSetup redisSetup;
     private MySQLSetup mySQLSetup;
@@ -110,6 +109,7 @@ public class JozelotProxy {
             this.luckPerms = LuckPermsProvider.get();
         }
         this.luckpermsUtils = new LuckpermsUtils(this);
+        brandNameChanger = new BrandNameChanger();
 
         // Commands
         CommandManager cm = server.getCommandManager();
@@ -144,6 +144,7 @@ public class JozelotProxy {
         server.getEventManager().register(this, new JoinListeners(this));
         server.getEventManager().register(this, new ServerSwitchListener(this));
         server.getEventManager().register(this, new ProxyPingListener(this));
+        server.getEventManager().register(this, new GroupChatListener(this));
         consoleLogger.broadCastToConsole("Listener erstellt");
 
         consoleLogger.broadCastToConsole( "<" + config.getColorPrimary() + ">----------------------------------------------");
@@ -215,6 +216,10 @@ public class JozelotProxy {
 
     public LuckpermsUtils getLuckpermsUtils() {
         return luckpermsUtils;
+    }
+
+    public BrandNameChanger getBrandNameChanger() {
+        return brandNameChanger;
     }
 
     public String getVersion() {
