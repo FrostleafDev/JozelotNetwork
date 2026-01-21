@@ -1,11 +1,14 @@
 # My whole network is and will be open source
 
-![GitHub Repo stars](https://img.shields.io/github/stars/FrostleafDev/JozelotNetwork?style=for-the-badge)
-![GitHub forks](https://img.shields.io/github/forks/FrostleafDev/JozelotNetwork?style=for-the-badge)
-![GitHub issues](https://img.shields.io/github/issues/FrostleafDev/JozelotNetwork?style=for-the-badge)
-![GitHub license](https://img.shields.io/github/license/FrostleafDev/JozelotNetwork?style=for-the-badge)
-![Java](https://img.shields.io/badge/Java-22--LTS-orange?style=for-the-badge)
-![Velocity](https://img.shields.io/badge/Velocity-3.4.0--SNAPSHOT-blue?style=for-the-badge)
+![Build](https://img.shields.io/badge/build-passing-brightgreen?style=for-the-badge)
+![Status](https://img.shields.io/badge/status-active-success?style=for-the-badge)
+![Open Source](https://img.shields.io/badge/open--source-yes-blue?style=for-the-badge)
+![Stars](https://img.shields.io/github/stars/FrostleafDev/JozelotNetwork?style=for-the-badge)
+![Forks](https://img.shields.io/github/forks/FrostleafDev/JozelotNetwork?style=for-the-badge)
+![Issues](https://img.shields.io/github/issues/FrostleafDev/JozelotNetwork?style=for-the-badge)
+![License](https://img.shields.io/github/license/FrostleafDev/JozelotNetwork?style=for-the-badge)
+![Java](https://img.shields.io/badge/java-22--lts-orange?style=for-the-badge)
+![Velocity](https://img.shields.io/badge/velocity-3.4.0--SNAPSHOT-blue?style=for-the-badge)
 
 ---
 
