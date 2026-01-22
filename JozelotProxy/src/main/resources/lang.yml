@@ -157,14 +157,24 @@ tab-footer:
 
 tab-player-format: '{rank-prefix}{player-name}'
 chat-format: '{rank-prefix}{player-name} {grey}» <white>{message}'
+global-chat-format: '<yellow>[Global] <reset>{rank-prefix}{player-name} {grey}» <white>{message}'
 
+command-gmsg-usage: '{tertiary}/gmsg <Spieler> <Nachricht>'
+command-gmsg-target-not-found: '{danger}{player-name} {grey}konnte nicht gefunden werden'
+command-gmsg-self-msg: '{danger}Du kannst dir selbst keine Nachrichten schreiben'
 
+gmsg-format-send: '<yellow>[Global] <reset>{grey}[{primary}Ich {grey}-> {primary}{target-name}{grey}] {grey}{message}'
+gmsg-format-receive: '<yellow>[Global] <reset>{grey}[{primary}{player-name} {grey}-> {primary}Ich{grey}] {grey}{message}'
 
+command-msg-not-in-group: '{danger}{player-name} {grey}konnte nicht gefunden werden'
+command-msg-usage: '{tertiary}/msg <Spieler> <Nachricht>'
 
+msg-format-send: '{grey}[{primary}Ich {grey}-> {primary}{target-name}{grey}] {grey}{message}'
+msg-format-receive: '{grey}[{primary}{player-name} {grey}-> {primary}Ich{grey}] {grey}{message}'
 
-
-
-
+command-reply-usage: '{tertiary}/reply <Nachricht>'
+command-reply-no-target: '{danger}Du hast niemanden, dem du antworten kannst'
+command-reply-target-offline: '{danger}Der Spieler, dem du antworten möchtest, ist nicht mehr online'
 
 
 

@@ -28,6 +28,9 @@ import net.luckperms.api.LuckPermsProvider;
 import org.slf4j.Logger;
 
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 @Plugin(
         id = "jozelotproxy",
@@ -59,6 +62,9 @@ public class JozelotProxy {
     private MySQLManager mySQLManager;
 
     private MiniMessage mm = MiniMessage.miniMessage();
+    public record ReplyData(UUID partnerId, boolean isGlobal) {}
+
+    private final Map<UUID, ReplyData> replyMap = new HashMap<>();
 
     /***
      * Plugin start
@@ -125,6 +131,9 @@ public class JozelotProxy {
         CommandMeta tpohereMeta = cm.metaBuilder("tpohere").build();
         CommandMeta serverMeta = cm.metaBuilder("server").build();
         CommandMeta sendMeta = cm.metaBuilder("send").aliases("move").build();
+        CommandMeta gmsgMeta = cm.metaBuilder("gmsg").aliases("globalmsg").build();
+        CommandMeta msgMeta = cm.metaBuilder("msg").aliases("tell").build();
+        CommandMeta replyMeta = cm.metaBuilder("reply").aliases("r").build();
 
         cm.register(hubMeta, new LobbyCommand(this));
         cm.register(networkMeta, new NetworkCommand(this));
@@ -138,6 +147,9 @@ public class JozelotProxy {
         cm.register(tpohereMeta, new TpoHereCommand(this));
         cm.register(serverMeta, new ServerCommand(this));
         cm.register(sendMeta, new SendCommand(this));
+        cm.register(gmsgMeta, new GMsgCommand(this));
+        cm.register(msgMeta, new MsgCommand(this));
+        cm.register(replyMeta, new ReplyCommand(this));
         consoleLogger.broadCastToConsole("Commands erstellt");
 
         // Listener
@@ -220,6 +232,10 @@ public class JozelotProxy {
 
     public BrandNameChanger getBrandNameChanger() {
         return brandNameChanger;
+    }
+
+    public Map<UUID, ReplyData> getReplyMap() {
+        return replyMap;
     }
 
     public String getVersion() {

@@ -19,6 +19,6 @@ public class GroupChatListener {
 
     @Subscribe
     public void onPlayerChat(PlayerChatEvent event) {
-        event.setCancelt();
+
     }
 }

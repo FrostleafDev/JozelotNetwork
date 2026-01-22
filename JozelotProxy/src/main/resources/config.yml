@@ -84,6 +84,11 @@ redis:
 # network.command.tpohere
 # network.command.send
 # network.command.server
+# network.command.msg
+# network.command.gmsg
+# network.command.global
+# network.command.reply
+# network.chat.minimessage
 
 # UUID operatorUUID = (source instanceof Player p) ? p.getUniqueId() : new UUID(0L, 0L);
 
