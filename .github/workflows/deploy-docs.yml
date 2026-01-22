@@ -8,7 +8,6 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
-    # HIER DIE ÄNDERUNG: Gib den Pfad zu deinem Plugin-Ordner an
     defaults:
       run:
         working-directory: ./JozelotProxy
@@ -34,5 +33,5 @@ jobs:
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
           SOURCE: "JozelotProxy/docs/"
-          TARGET: "/var/www/docs.jozelot.de/pages/main/projects"
+          TARGET: "/var/www/docs.jozelot.de/pages/main/jd"
           ARGS: "-rlgoDzvc -i --delete"
