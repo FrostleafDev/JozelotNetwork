@@ -29,25 +29,31 @@ player-not-on-server: '{danger}{server-name}{grey} befindet sich auf keinem Serv
 
 # Commands
 network-help:
-  - '{grey}Alle Netzwerk Commands:'
+  - ''
+  - ''
+  - '{grey}<bold>Alle Netzwerk Commands:</bold>'
   - '{grey}- {primary}/net help {grey}Zeigt diese Nachricht'
   - '{grey}- {primary}/net reload {grey}Lädt das gesamte Netzwerk neu'
-  - '{grey}- {primary}/net manage <display_name/motd/maintenance/max_players> {grey}Stelle die einzelnen Backend Server ein'
+  - '{grey}- {primary}/net manage {grey}Stelle die einzelnen Backend Server ein'
   - '{grey}- {primary}/net start/stop/restart/status {grey}Du hast die volle Kontrolle über jeden Server'
-  - '{grey}- {primary}/find <Spieler> {grey}Sieh auf welchem Server sind ein Spieler befindet'
+  - '{grey}- {primary}/find {grey}Sieh auf welchem Server sind ein Spieler befindet'
   - '{grey}- {primary}/clearchat {grey}Lehre den Chat'
-  - '{grey}- {primary}/ban <Spieler> <Länge> <Grund> {grey}Banne Spieler vom Netzwerk'
+  - '{grey}- {primary}/ban {grey}Banne Spieler vom Netzwerk'
   - '{grey}- {primary}/banlist {grey}Zeigt dir alle gebannten Spieler an'
-  - '{grey}- {primary}/unban <Spieler> {grey}Entbannt einen Spieler'
-  - '{grey}- {primary}/kick <Spieler> <Grund> {grey}Kickt einen Spieler vom Netzwerk'
-  - '{grey}- {primary}/server <Server> {grey}Gelange zu einem beliebigen Unterserver'
-  - '{grey}- {primary}/send <Ziel> <Server> {grey}Sende eine Gruppe von Spielern auf einen bestimmen Server'
-  - '{grey}- {primary}/tpo <Spieler> {grey}Gelange auf den Server eines anderen Spielers'
+  - '{grey}- {primary}/unban {grey}Entbannt einen Spieler'
+  - '{grey}- {primary}/kick {grey}Kickt einen Spieler vom Netzwerk'
+  - '{grey}- {primary}/server {grey}Gelange zu einem beliebigen Unterserver'
+  - '{grey}- {primary}/send {grey}Sende eine Gruppe von Spielern auf einen bestimmen Server'
+  - '{grey}- {primary}/tpo {grey}Gelange auf den Server eines anderen Spielers'
   - '{grey}- {primary}/tpohere {grey}Hole einen Spieler auf deinen Server'
   - '{grey}- {primary}/lobby {grey}Geh zur Lobby'
-  - '{grey}- {primary}/msg <Spieler> <Nachricht> {grey}Schreibe einem Spieler in der Gruppe eine Nachricht'
-  - '{grey}- {primary}/gmsg <Spieler> <Nachricht> {grey}Schreibe einem Spieler eine Nachricht'
+  - '{grey}- {primary}/msg {grey}Schreibe einem Spieler in der Gruppe eine Nachricht'
+  - '{grey}- {primary}/gmsg {grey}Schreibe einem Spieler eine Nachricht'
   - '{grey}- {primary}/reply {grey}Antworte einem Spieler'
+  - '{grey}- {primary}/g {grey}Schreibe in den globalen Chat'
+  - '{grey}- {primary}/whitelist {grey}Verwalte die Netzwerk weite Whitelist'
+  - '{grey}- {primary}/playtime {grey}Schau dir die Spielzeiten anderer Spieler an'
+  - '{grey}- {primary}/broadcast {grey}Sende Nachrichten an alle Spieler auf dem Netzwerk'
 network-reload-success: '{primary}Das Netzwerk wurde erfolgreich neu geladen'
 network-reload-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat das Netzwerk neu geladen'
 chat-cleared:
@@ -207,6 +213,39 @@ command-playtime-no-playtime: '{grey}Der Spieler {danger}{player-name}{grey} war
 command-playtime-total: '{grey}Spielzeit von {primary}{player-name} {grey}auf {primary}{type}{grey}   : {secondary}{days}d {hours}h {minutes}m {seconds}s'
 command-playtime-syntax-error: '{grey}Bitte nutze: {danger}server: / group:'
 
-
-
-
+command-broadcast-usage: '{tertiary}/broadcast <Ziel> <Typ> <Nachricht>'
+command-broadcast-invalid: '{danger}Keine Spierler gefunden oder der Bereich ist ungültig'
+command-broadcast-send: '{grey}Broadcast wurde an {primary}{size} Spieler gesendet'
+command-broadcast-send-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat einen Broadcast an {primary}{size} Spieler gesendet'
+broadcast-announcement:
+  - ""
+  - "<dark_gray> ------- « <gold><b>ANKÜNDIGUNG</b> <dark_gray>» -------"
+  - ""
+  - "<gray>{message}"
+  - ""
+  - "<dark_gray> ----------------------------------"
+  - ""
+broadcast-message:
+  - ""
+  - "<dark_gray> --------- « <blue><b>NACHRICHT</b> <dark_gray>» ---------"
+  - ""
+  - "<gray>{message}"
+  - ""
+  - "<dark_gray> ---------------------------------"
+  - ""
+broadcast-information:
+  - ""
+  - "<dark_gray> ------------ « <aqua><b>INFO</b> <dark_gray>» ------------"
+  - ""
+  - "<gray>{message}"
+  - ""
+  - "<dark_gray> ---------------------------------"
+  - ""
+broadcast-warning:
+  - ""
+  - "<dark_gray> ---------- « <red><b>WARNUNG</b> <dark_gray>» ----------"
+  - ""
+  - "<gray>{message}"
+  - ""
+  - "<dark_gray> ---------------------------------"
+  - ""

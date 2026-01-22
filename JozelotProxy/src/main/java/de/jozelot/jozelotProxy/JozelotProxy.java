@@ -136,6 +136,7 @@ public class JozelotProxy {
         CommandMeta globalMeta = cm.metaBuilder("global").aliases("g").build();
         CommandMeta whitelistMeta = cm.metaBuilder("whitelist").build();
         CommandMeta playtimeMeta = cm.metaBuilder("playtime").build();
+        CommandMeta broadcastMeta = cm.metaBuilder("broadcast").build();
 
         cm.register(hubMeta, new LobbyCommand(this));
         cm.register(networkMeta, new NetworkCommand(this));
@@ -155,6 +156,7 @@ public class JozelotProxy {
         cm.register(globalMeta, new GlobalCommand(this));
         cm.register(whitelistMeta, new WhitelistCommand(this));
         cm.register(playtimeMeta, new PlaytimeCommand(this));
+        cm.register(broadcastMeta, new BroadcastCommand(this));
         consoleLogger.broadCastToConsole("Commands erstellt");
 
         this.playtimeListener = new PlaytimeListener(this);
