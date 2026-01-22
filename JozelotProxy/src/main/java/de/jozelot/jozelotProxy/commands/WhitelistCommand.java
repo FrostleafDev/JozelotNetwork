@@ -35,6 +35,11 @@ public class WhitelistCommand implements SimpleCommand {
         CommandSource source = invocation.source();
         String[] args = invocation.arguments();
 
+        if (!invocation.source().hasPermission("network.command.reply")) {
+            invocation.source().sendMessage(mm.deserialize(lang.getNoPermission()));
+            return;
+        }
+
         if (args.length < 2) {
             source.sendMessage(mm.deserialize(lang.format("command-whitelist-usage", Map.of())));
             return;
@@ -80,13 +85,6 @@ public class WhitelistCommand implements SimpleCommand {
                     return;
                 }
 
-                plugin.getMySQLManager().logAction(
-                        operatorUUID,
-                        "WHITELIST_ADD",
-                        targetName,
-                        "Added to group: " + groupName
-                );
-
                 plugin.getMySQLManager().addToWhitelist(targetUUID, groupId, operatorUUID);
                 source.sendMessage(mm.deserialize(lang.format("command-whitelist-added",
                         Map.of("player", targetName, "group", groupName))));
@@ -102,12 +100,6 @@ public class WhitelistCommand implements SimpleCommand {
                 String targetName = args[2];
                 UUID targetUUID = plugin.getMySQLManager().getUUIDByUsername(targetName);
                 if (targetUUID != null) {
-                    plugin.getMySQLManager().logAction(
-                            operatorUUID,
-                            "WHITELIST_REMOVE",
-                            targetName,
-                            "Removed from group: " + groupName
-                    );
 
                     plugin.getMySQLManager().removeFromWhitelist(targetUUID, groupId);
                     source.sendMessage(mm.deserialize(lang.format("command-whitelist-removed",
@@ -140,6 +132,10 @@ public class WhitelistCommand implements SimpleCommand {
         String[] args = invocation.arguments();
         String currentArg = args.length > 0 ? args[args.length - 1].toLowerCase() : "";
 
+        if (!invocation.source().hasPermission("network.command.reply")) {
+            return List.of();
+        }
+
         if (args.length <= 1) {
             return List.of("add", "remove", "list", "on", "off").stream()
                     .filter(s -> s.startsWith(currentArg)).toList();
@@ -159,5 +155,9 @@ public class WhitelistCommand implements SimpleCommand {
         }
 
         return List.of();
+    }
+    @Override
+    public boolean hasPermission(Invocation invocation) {
+        return invocation.source().hasPermission("network.command.whitelist");
     }
 }

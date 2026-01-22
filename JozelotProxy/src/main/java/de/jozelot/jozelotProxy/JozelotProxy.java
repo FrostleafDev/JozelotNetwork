@@ -15,10 +15,7 @@ import de.jozelot.jozelotProxy.commands.*;
 import de.jozelot.jozelotProxy.database.MySQLManager;
 import de.jozelot.jozelotProxy.database.MySQLSetup;
 import de.jozelot.jozelotProxy.database.RedisSetup;
-import de.jozelot.jozelotProxy.listener.GroupChatListener;
-import de.jozelot.jozelotProxy.listener.JoinListeners;
-import de.jozelot.jozelotProxy.listener.ProxyPingListener;
-import de.jozelot.jozelotProxy.listener.ServerSwitchListener;
+import de.jozelot.jozelotProxy.listener.*;
 import de.jozelot.jozelotProxy.storage.ConfigManager;
 import de.jozelot.jozelotProxy.storage.LangManager;
 import de.jozelot.jozelotProxy.utils.*;
@@ -56,6 +53,8 @@ public class JozelotProxy {
     private LuckPerms luckPerms;
     private LuckpermsUtils luckpermsUtils;
     private BrandNameChanger brandNameChanger;
+
+    private PlaytimeListener playtimeListener;
 
     private RedisSetup redisSetup;
     private MySQLSetup mySQLSetup;
@@ -136,6 +135,7 @@ public class JozelotProxy {
         CommandMeta replyMeta = cm.metaBuilder("reply").aliases("r").build();
         CommandMeta globalMeta = cm.metaBuilder("global").aliases("g").build();
         CommandMeta whitelistMeta = cm.metaBuilder("whitelist").build();
+        CommandMeta playtimeMeta = cm.metaBuilder("playtime").build();
 
         cm.register(hubMeta, new LobbyCommand(this));
         cm.register(networkMeta, new NetworkCommand(this));
@@ -154,13 +154,17 @@ public class JozelotProxy {
         cm.register(replyMeta, new ReplyCommand(this));
         cm.register(globalMeta, new GlobalCommand(this));
         cm.register(whitelistMeta, new WhitelistCommand(this));
+        cm.register(playtimeMeta, new PlaytimeCommand(this));
         consoleLogger.broadCastToConsole("Commands erstellt");
+
+        this.playtimeListener = new PlaytimeListener(this);
 
         // Listener
         server.getEventManager().register(this, new JoinListeners(this));
         server.getEventManager().register(this, new ServerSwitchListener(this));
         server.getEventManager().register(this, new ProxyPingListener(this));
         server.getEventManager().register(this, new GroupChatListener(this));
+        server.getEventManager().register(this, playtimeListener);
         consoleLogger.broadCastToConsole("Listener erstellt");
 
         consoleLogger.broadCastToConsole( "<" + config.getColorPrimary() + ">----------------------------------------------");
@@ -180,6 +184,7 @@ public class JozelotProxy {
     @Subscribe
     public void onProxyShutdown(ProxyShutdownEvent event) {
         consoleLogger.broadCastToConsole("Proxy wird beendet, schließe Verbindungen...");
+        server.getAllPlayers().forEach(p -> playtimeListener.saveAndRemoveSession(p));
     }
 
     public ProxyServer getServer() {
@@ -240,6 +245,10 @@ public class JozelotProxy {
 
     public Map<UUID, ReplyData> getReplyMap() {
         return replyMap;
+    }
+
+    public PlaytimeListener getPlaytimeListener() {
+        return playtimeListener;
     }
 
     public String getVersion() {

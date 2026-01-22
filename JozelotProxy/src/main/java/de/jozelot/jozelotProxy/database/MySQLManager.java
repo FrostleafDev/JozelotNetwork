@@ -14,11 +14,13 @@ public class MySQLManager {
     private final ConfigManager config;
     private final MySQLSetup mySQLSetup;
     private final ConsoleLogger consoleLogger;
+    private final JozelotProxy plugin;
 
     private final Set<String> registeredServerCache = new HashSet<>();
     private final Map<String, Boolean> maintenanceCache = new HashMap<>();
 
     public MySQLManager(JozelotProxy plugin) {
+        this.plugin = plugin;
         this.config = plugin.getConfig();
         this.mySQLSetup = plugin.getMySQLSetup();
         this.consoleLogger = plugin.getConsoleLogger();
@@ -126,6 +128,24 @@ public class MySQLManager {
                         "INDEX idx_operator (operator_uuid)," +
                         "INDEX idx_target (target_info)," +
                         "INDEX idx_date (created_at)" +
+                        ");",
+
+                "CREATE TABLE IF NOT EXISTS playtime_group (" +
+                        "player_uuid CHAR(36)," +
+                        "group_id INT," +
+                        "total_playtime BIGINT DEFAULT 0," +
+                        "PRIMARY KEY (player_uuid, group_id)," +
+                        "FOREIGN KEY (player_uuid) REFERENCES player(uuid) ON DELETE CASCADE," +
+                        "FOREIGN KEY (group_id) REFERENCES server_group(id) ON DELETE CASCADE" +
+                        ");",
+
+                "CREATE TABLE IF NOT EXISTS playtime_server (" +
+                        "player_uuid CHAR(36)," +
+                        "server_id INT," +
+                        "total_playtime BIGINT DEFAULT 0," +
+                        "PRIMARY KEY (player_uuid, server_id)," +
+                        "FOREIGN KEY (player_uuid) REFERENCES player(uuid) ON DELETE CASCADE," +
+                        "FOREIGN KEY (server_id) REFERENCES server(id) ON DELETE CASCADE" +
                         ");"
         };
 
@@ -723,14 +743,14 @@ public class MySQLManager {
     // --- Whitelist Management ---
 
     public void setWhitelistState(String identifier, boolean active) {
-        String query = identifier.equals("proxy")
-                ? "UPDATE server_group SET whitelist_active = ? WHERE identifier = 'proxy'"
-                : "UPDATE server_group SET whitelist_active = ? WHERE identifier = ?";
+        String query = "UPDATE server_group SET whitelist_active = ? WHERE identifier = ?";
 
         try (Connection conn = mySQLSetup.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
-            ps.setBoolean(1, active);
+
+            ps.setInt(1, active ? 1 : 0);
             ps.setString(2, identifier);
+
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -856,6 +876,116 @@ public class MySQLManager {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public void addPlaytime(UUID uuid, String serverName, long durationMillis) {
+        if (durationMillis <= 0) return;
+
+        int serverId = getServerIdByName(serverName);
+        int groupId = plugin.getGroupManager().getGroupId(serverName);
+
+        if (serverId == -1 || groupId == -1) {
+            plugin.getConsoleLogger().broadCastToConsole("Konnte Playtime für " + serverName + " nicht speichern (ID nicht gefunden)");
+            return;
+        }
+
+        String sqlServer = "INSERT INTO playtime_server (player_uuid, server_id, total_playtime) VALUES (?, ?, ?) " +
+                "ON DUPLICATE KEY UPDATE total_playtime = total_playtime + VALUES(total_playtime);";
+
+        String sqlGroup = "INSERT INTO playtime_group (player_uuid, group_id, total_playtime) VALUES (?, ?, ?) " +
+                "ON DUPLICATE KEY UPDATE total_playtime = total_playtime + VALUES(total_playtime);";
+
+        try (Connection conn = mySQLSetup.getConnection()) {
+            conn.setAutoCommit(false);
+
+            try (PreparedStatement psServer = conn.prepareStatement(sqlServer);
+                 PreparedStatement psGroup = conn.prepareStatement(sqlGroup)) {
+
+                psServer.setString(1, uuid.toString());
+                psServer.setInt(2, serverId);
+                psServer.setLong(3, durationMillis);
+                psServer.executeUpdate();
+
+                psGroup.setString(1, uuid.toString());
+                psGroup.setInt(2, groupId);
+                psGroup.setLong(3, durationMillis);
+                psGroup.executeUpdate();
+
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                e.printStackTrace();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public int getServerIdByName(String identifier) {
+        try (Connection conn = mySQLSetup.getConnection();
+             PreparedStatement ps = conn.prepareStatement("SELECT id FROM server WHERE identifier = ?")) {
+            ps.setString(1, identifier);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getInt("id");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    public long getTotalNetworkPlaytime(UUID uuid) {
+        String sql = "SELECT SUM(total_playtime) FROM playtime_group WHERE player_uuid = ?";
+        try (Connection conn = mySQLSetup.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, uuid.toString());
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getLong(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public long getTotalNetworkPlaytimeByName(String username) {
+        UUID uuid = getUUIDByUsername(username);
+        return (uuid != null) ? getTotalNetworkPlaytime(uuid) : 0;
+    }
+
+    public long getServerPlaytime(UUID uuid, String serverIdentifier) {
+        int serverId = getServerIdByName(serverIdentifier);
+        if (serverId == -1) return 0;
+
+        String sql = "SELECT total_playtime FROM playtime_server WHERE player_uuid = ? AND server_id = ?";
+        try (Connection conn = mySQLSetup.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, uuid.toString());
+            ps.setInt(2, serverId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getLong("total_playtime");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public long getGroupPlaytime(UUID uuid, String groupIdentifier) {
+        int groupId = getGroupIdByIdentifier(groupIdentifier);
+        if (groupId == -1) return 0;
+
+        String sql = "SELECT total_playtime FROM playtime_group WHERE player_uuid = ? AND group_id = ?";
+        try (Connection conn = mySQLSetup.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, uuid.toString());
+            ps.setInt(2, groupId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getLong("total_playtime");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
     public boolean isServerInMaintenance(String serverName) {

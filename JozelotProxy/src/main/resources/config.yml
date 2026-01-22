@@ -86,6 +86,8 @@ redis:
 # network.command.server
 # network.command.whitelist
 # network.whitelist.bypass
+# network.command.playtime
+# network.command.playtime.admin
 
 # network.command.msg
 # network.command.gmsg

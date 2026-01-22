@@ -198,16 +198,14 @@ command-whitelist-removed: '{primary}{player} {grey}wurde von der Whitelist von 
 command-whitelist-state: '{primary}Whitelist{grey} für {primary}{group}{grey} ist nun {secondary}{state}'
 command-whitelist-list-header: '{primary}Whitelist für {group}:'
 command-whitelist-kick: '{danger}Du bist nicht auf der Whitelist für diesen Server-Bereich!'
-
-# Whitelist Admin Logs
 command-whitelist-state-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat die Whitelist für {primary}{group} {primary}{state}'
 command-whitelist-added-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat {primary}{target} {grey}zur Whitelist von {primary}{group} {grey}hinzugefügt'
 command-whitelist-removed-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat {primary}{target} {grey}von der Whitelist von {primary}{group} {grey}entfernt'
 
-
-
-
-
+command-playtime-usage: '{tertiary}/playtime <Spieler>'
+command-playtime-no-playtime: '{grey}Der Spieler {danger}{player-name}{grey} war noch nie auf dieser Region'
+command-playtime-total: '{grey}Spielzeit von {primary}{player-name} {grey}auf {primary}{type}{grey}   : {secondary}{days}d {hours}h {minutes}m {seconds}s'
+command-playtime-syntax-error: '{grey}Bitte nutze: {danger}server: / group:'
 
 
 
