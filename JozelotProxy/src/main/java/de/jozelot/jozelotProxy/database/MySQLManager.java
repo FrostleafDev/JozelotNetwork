@@ -988,11 +988,11 @@ public class MySQLManager {
         return 0;
     }
 
-    public int getMaxPlayers(String serverName) {
-        String sql = "SELECT max_players FROM registered_servers WHERE server_name = ?";
+    public int getMaxPlayers(String identifier) {
+        String sql = "SELECT max_players FROM server WHERE identifier = ?";
         try (Connection conn = mySQLSetup.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, serverName);
+            ps.setString(1, identifier);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return rs.getInt("max_players");
             }

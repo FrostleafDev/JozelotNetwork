@@ -136,4 +136,9 @@ public class BroadcastCommand implements SimpleCommand {
 
         return List.of();
     }
+
+    @Override
+    public boolean hasPermission(Invocation invocation) {
+        return invocation.source().hasPermission("network.command.broadcast");
+    }
 }

@@ -34,6 +34,8 @@ public class ConfigManager {
     private int redisPort;
 
     private String brandName;
+    private List<String> hardBlocked;
+    private Map<String, List<String>> commandGroups;
 
     public ConfigManager(Path directory, String fileName) {
         this.file = new File(directory.toFile(), fileName);
@@ -119,6 +121,10 @@ public class ConfigManager {
         return brandName;
     }
 
+    public List<String> getHardBlocked() {
+        return hardBlocked;
+    }
+
     public void reload() {
         try (InputStream in = new FileInputStream(file)) {
             this.data = yaml.load(in);
@@ -145,6 +151,9 @@ public class ConfigManager {
         colorGrey = getString("color-settings.grey");
 
         brandName = getString("brand-name");
+        hardBlocked = getStringList("blocked-commands.hard-blocked");
+
+        loadCommandGroups();
     }
 
     // Die Methode für config.getString("pfad.zum.wert")
@@ -207,5 +216,23 @@ public class ConfigManager {
         return current;
     }
 
+    private void loadCommandGroups() {
+        this.commandGroups = new java.util.HashMap<>();
+        Object groupsObj = get("blocked-commands.groups");
+
+        if (groupsObj instanceof Map) {
+            Map<String, Object> groupsMap = (Map<String, Object>) groupsObj;
+            for (String groupName : groupsMap.keySet()) {
+                // Wir nutzen deine vorhandene getStringList Methode für den Pfad
+                List<String> commands = getStringList("blocked-commands.groups." + groupName + ".commands");
+                commandGroups.put(groupName, commands);
+            }
+        }
+    }
+
+    // Getter für die Gruppen
+    public Map<String, List<String>> getCommandGroups() {
+        return commandGroups;
+    }
 
 }

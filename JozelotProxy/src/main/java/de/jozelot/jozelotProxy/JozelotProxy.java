@@ -133,17 +133,17 @@ public class JozelotProxy {
         CommandMeta clearchatMeta = cm.metaBuilder("clearchat").build();
         CommandMeta findMeta = cm.metaBuilder("find").build();
         CommandMeta banMeta = cm.metaBuilder("ban").build();
-        CommandMeta unbanMeta = cm.metaBuilder("unban").aliases("pardon").build();
-        CommandMeta banlistMeta = cm.metaBuilder("banlist").aliases("bans").build();
+        CommandMeta unbanMeta = cm.metaBuilder("unban").build();
+        CommandMeta banlistMeta = cm.metaBuilder("banlist").build();
         CommandMeta kickMeta = cm.metaBuilder("kick").build();
-        CommandMeta tpoMeta = cm.metaBuilder("tpo").aliases("tpto").build();
+        CommandMeta tpoMeta = cm.metaBuilder("tpo").build();
         CommandMeta tpohereMeta = cm.metaBuilder("tpohere").build();
         CommandMeta serverMeta = cm.metaBuilder("server").build();
         CommandMeta sendMeta = cm.metaBuilder("send").aliases("move").build();
-        CommandMeta gmsgMeta = cm.metaBuilder("gmsg").aliases("globalmsg").build();
-        CommandMeta msgMeta = cm.metaBuilder("msg").aliases("tell").build();
+        CommandMeta gmsgMeta = cm.metaBuilder("gmsg").build();
+        CommandMeta msgMeta = cm.metaBuilder("msg").build();
         CommandMeta replyMeta = cm.metaBuilder("reply").aliases("r").build();
-        CommandMeta globalMeta = cm.metaBuilder("global").aliases("g").build();
+        CommandMeta globalMeta = cm.metaBuilder("g").build();
         CommandMeta whitelistMeta = cm.metaBuilder("whitelist").build();
         CommandMeta playtimeMeta = cm.metaBuilder("playtime").build();
         CommandMeta broadcastMeta = cm.metaBuilder("broadcast").build();
@@ -176,6 +176,7 @@ public class JozelotProxy {
         server.getEventManager().register(this, new ProxyPingListener(this));
         server.getEventManager().register(this, new GroupChatListener(this));
         server.getEventManager().register(this, playtimeListener);
+        server.getEventManager().register(this, new CommandBlockListener(this));
         consoleLogger.broadCastToConsole("Listener erstellt");
 
         consoleLogger.broadCastToConsole( "<" + config.getColorPrimary() + ">----------------------------------------------");

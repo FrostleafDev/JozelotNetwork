@@ -33,6 +33,45 @@ punishment-reasons:
   - "405 Vortäuschen von Rechten"
   - "406 Sicherheit-Bann"
 
+blocked-commands:
+  hard-blocked:
+    - "/op"
+    - "/deop"
+    - "/stop"
+    - "/reload"
+    - "/rl"
+    - "/ban-ip"
+    - "/pardon"
+    - "/pardon-ip"
+    - "/?"
+    - "/help"
+    - "/ver"
+    - "/version"
+    - "/about"
+    - "/icanhasbukkit"
+    - "/luckperms"
+    - "/perm"
+    - "/permission"
+    - "/perms"
+    - "/permissions"
+    - "/luckpermsvelocity"
+    - "/teammsg"
+    - "/w"
+    - "/me"
+  # Permission: network.commands.bypass.<gruppenname>
+  groups:
+    worldedit:
+      commands:
+        - "/worldedit"
+        - "/fawe"
+    admin:
+      commands:
+        - "/lp"
+        - "/lpv"
+        - "/plugins"
+        - "/pl"
+        - "/trigger"
+
 pterodactyl:
   url: "https://panel.jozelot.de"
   api-key: "KEY"
@@ -91,6 +130,8 @@ redis:
 # network.command.broadcast
 # network.maxplayers.bypass.all
 # network.maxplayers.bypass.<server>
+
+# network.commands.bypass.<group>
 
 # network.command.msg
 # network.command.gmsg

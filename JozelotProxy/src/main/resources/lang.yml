@@ -27,6 +27,7 @@ already-on-server: '{grey}Du befindest dich schon auf {danger}{server-name}'
 connection-failed: '{grey}Verbindung zu {danger}{server-name} {grey}fehlgeschlagen'
 player-not-on-server: '{danger}{server-name}{grey} befindet sich auf keinem Server'
 
+blocked-command: '<red>Unknown or incomplete command, see below for error<newline><red><u>{command}</u><italic><--[HERE]</italic>'
 # Commands
 network-help:
   - ''
