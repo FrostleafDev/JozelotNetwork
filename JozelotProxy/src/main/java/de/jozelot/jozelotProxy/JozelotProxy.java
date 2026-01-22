@@ -164,6 +164,7 @@ public class JozelotProxy {
         cm.register(broadcastMeta, new BroadcastCommand(this));
         consoleLogger.broadCastToConsole("Commands erstellt");
 
+
         this.playtimeListener = new PlaytimeListener(this);
 
         // Listener
