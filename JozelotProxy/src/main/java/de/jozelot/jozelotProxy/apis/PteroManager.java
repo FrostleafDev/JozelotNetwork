@@ -18,6 +18,7 @@ public class PteroManager {
      * For the /net restart/start/stop commands
      * @param pteroId The ID from the db in the pterodactyl panel.
      * @param action Start/Stop/Restart
+     * @param callback
      */
     public void sendAction(String pteroId, String action, java.util.function.Consumer<Integer> callback) {
         if (pteroId == null || pteroId.isEmpty()) {

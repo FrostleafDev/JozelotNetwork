@@ -27,7 +27,7 @@ public class PluginReload {
     }
 
     /**
-     * Reloads the config & lang and databases
+     * Reloads the config and lang and databases
      * Later will reload all backend server plugins via Redis
      */
     public void reload() {

@@ -20,6 +20,7 @@ public class GroupChatListener {
     /**
      * Will get finished when I start with the backend plugins.
      * You cant cancel the PlayerChatEvent on the proxy :(
+     * @param event
      */
     @Subscribe
     public void onPlayerChat(PlayerChatEvent event) {

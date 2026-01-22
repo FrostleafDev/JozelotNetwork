@@ -88,6 +88,7 @@ public class JozelotProxy {
     /**
      * Server start
      * Loads all Object Classes and registers all Commands and Listeners
+     * @param event
      */
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
@@ -191,6 +192,7 @@ public class JozelotProxy {
     /***
      * Plugin shutdown
      * Important to save all the players playtime, because if an error encounters it could break the playtime and-or session
+     * @param event
      */
     @Subscribe
     public void onProxyShutdown(ProxyShutdownEvent event) {

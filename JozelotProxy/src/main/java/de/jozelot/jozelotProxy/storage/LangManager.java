@@ -101,6 +101,10 @@ public class LangManager {
 
     /**
      * This is the place where the whole thing gets replaced
+     * @param isPrefix
+     * @param text
+     * @param variables
+     * @return
      */
     private String applyReplacements(String text, boolean isPrefix, Map<String, String> variables) {
         if (text == null || text.isEmpty()) return "";

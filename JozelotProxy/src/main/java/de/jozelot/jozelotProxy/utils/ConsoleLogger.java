@@ -18,6 +18,7 @@ public class ConsoleLogger {
     /**
      * Just a generell logger for my plugin, so you can see in the console
      * when my plugin sends a message
+     * @param message
      */
     public void broadCastToConsole(String message) {
         server.getConsoleCommandSource().sendMessage(
