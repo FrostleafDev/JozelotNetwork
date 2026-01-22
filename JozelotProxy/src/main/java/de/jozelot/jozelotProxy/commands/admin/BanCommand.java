@@ -1,4 +1,4 @@
-package de.jozelot.jozelotProxy.commands;
+package de.jozelot.jozelotProxy.commands.admin;
 
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
@@ -8,7 +8,6 @@ import de.jozelot.jozelotProxy.JozelotProxy;
 import de.jozelot.jozelotProxy.storage.ConfigManager;
 import de.jozelot.jozelotProxy.storage.LangManager;
 import de.jozelot.jozelotProxy.utils.ConsoleLogger;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;

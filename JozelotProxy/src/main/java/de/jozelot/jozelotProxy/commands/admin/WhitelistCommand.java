@@ -1,4 +1,4 @@
-package de.jozelot.jozelotProxy.commands;
+package de.jozelot.jozelotProxy.commands.admin;
 
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
@@ -16,7 +16,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.regex.Pattern;
 
 public class WhitelistCommand implements SimpleCommand {
 

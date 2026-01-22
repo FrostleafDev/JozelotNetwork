@@ -1,15 +1,13 @@
-package de.jozelot.jozelotProxy.commands;
+package de.jozelot.jozelotProxy.commands.admin;
 
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
-import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.jozelot.jozelotProxy.JozelotProxy;
 import de.jozelot.jozelotProxy.storage.ConfigManager;
 import de.jozelot.jozelotProxy.storage.LangManager;
 import de.jozelot.jozelotProxy.utils.ConsoleLogger;
-import de.jozelot.jozelotProxy.utils.PlayerSends;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
 import java.util.*;

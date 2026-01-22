@@ -1,4 +1,4 @@
-package de.jozelot.jozelotProxy.commands;
+package de.jozelot.jozelotProxy.commands.messaging;
 
 import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.Player;

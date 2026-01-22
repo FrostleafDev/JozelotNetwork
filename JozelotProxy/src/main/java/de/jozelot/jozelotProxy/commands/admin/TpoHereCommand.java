@@ -1,4 +1,4 @@
-package de.jozelot.jozelotProxy.commands;
+package de.jozelot.jozelotProxy.commands.admin;
 
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;

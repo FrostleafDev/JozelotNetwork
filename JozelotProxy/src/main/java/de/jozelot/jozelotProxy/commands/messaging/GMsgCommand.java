@@ -1,4 +1,4 @@
-package de.jozelot.jozelotProxy.commands;
+package de.jozelot.jozelotProxy.commands.messaging;
 
 import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.Player;
@@ -9,7 +9,6 @@ import de.jozelot.jozelotProxy.storage.LangManager;
 import de.jozelot.jozelotProxy.utils.ConsoleLogger;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
