@@ -167,7 +167,6 @@ public class JozelotProxy {
         this.playtimeListener = new PlaytimeListener(this);
 
         // Listener
-
         server.getEventManager().register(this, new ServerSwitchListener(this));
         server.getEventManager().register(this, new ProxyPingListener(this));
         server.getEventManager().register(this, new GroupChatListener(this));
