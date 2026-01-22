@@ -19,7 +19,7 @@ _A more detailed breakdown will be added as the project evolves._
 
 ## Details
 > Proxy: Velocity `3.4.0-SNAPSHOT`  
-> Backends: Paper / Purpur `1.21.1`  
+> Backends: Paper / Purpur `1.21.11`  
 > Java: `22-lts`
 
 ## Credits
