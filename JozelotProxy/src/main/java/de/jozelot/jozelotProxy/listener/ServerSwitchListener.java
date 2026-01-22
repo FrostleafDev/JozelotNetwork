@@ -34,6 +34,19 @@ public class ServerSwitchListener {
         this.lang = plugin.getLang();
         this.config = plugin.getConfig();
 
+        if (plugin.getLuckPerms() != null) {
+            plugin.getLuckPerms().getEventBus().subscribe(plugin, net.luckperms.api.event.user.UserDataRecalculateEvent.class, event -> {
+                UUID uuid = event.getUser().getUniqueId();
+                plugin.getServer().getPlayer(uuid).ifPresent(player -> {
+                    player.getCurrentServer().ifPresent(serverConn -> {
+                        plugin.getServer().getScheduler().buildTask(plugin, () -> {
+                            updateTabForGroup(player, serverConn.getServer());
+                        }).schedule();
+                    });
+                });
+            });
+        }
+
         plugin.getServer().getScheduler().buildTask(plugin, () -> {
             for (Player player : plugin.getServer().getAllPlayers()) {
                 player.getCurrentServer().ifPresent(conn -> {
@@ -58,13 +71,20 @@ public class ServerSwitchListener {
     @Subscribe
     public void onServerConnected(ServerConnectedEvent event) {
         Player player = event.getPlayer();
-        String serverName = event.getServer().getServerInfo().getName();
         RegisteredServer connectedServer = event.getServer();
 
         plugin.getServer().getScheduler().buildTask(plugin, () -> {
             plugin.getMySQLManager().updatePlayerServer(player.getUniqueId(), connectedServer.getServerInfo().getName());
             plugin.getBrandNameChanger().sendBrandName(player, config.getBrandName());
+
             updateTabForGroup(player, connectedServer);
+
+            int groupId = plugin.getGroupManager().getGroupId(connectedServer.getServerInfo().getName());
+            if (groupId != -1) {
+                if (plugin.getGroupManager().isTabEnabled(groupId)) {
+                    updateTabHeaderForPlayer(player, groupId);
+                }
+            }
         }).delay(java.time.Duration.ofMillis(250)).schedule();
     }
 
@@ -72,6 +92,8 @@ public class ServerSwitchListener {
     public void onDisconnect(DisconnectEvent event) {
         Player player = event.getPlayer();
         removeFromAllTabs(player);
+        plugin.getReplyMap().remove(player.getUniqueId());
+        plugin.getReplyMap().values().removeIf(data -> data.partnerId().equals(player.getUniqueId()));
     }
 
     @Subscribe
@@ -93,16 +115,15 @@ public class ServerSwitchListener {
         RegisteredServer targetServer = event.getOriginalServer();
         String serverName = targetServer.getServerInfo().getName();
 
+
         if (player.getCurrentServer().isEmpty()) {
             player.getVirtualHost().ifPresent(host -> {
                 String domain = host.getHostName().toLowerCase();
-
                 if (domain.contains(".")) {
                     if (!player.hasPermission("network.forcedhost.all") &&
                             !player.hasPermission("network.forcedhost." + serverName)) {
 
                         event.setResult(ServerPreConnectEvent.ServerResult.denied());
-
                         player.disconnect(mm.deserialize(lang.format("no-forcedhost-permission",
                                 Map.of("server-name", serverName))));
                     }
@@ -110,6 +131,37 @@ public class ServerSwitchListener {
             });
 
             if (event.getResult().isAllowed() == false) return;
+        }
+        if (plugin.getMySQLManager().isWhitelistActive("proxy")) {
+            int proxyGroupId = plugin.getMySQLManager().getGroupIdByIdentifier("proxy");
+
+            if (!plugin.getMySQLManager().isWhitelisted(player.getUniqueId(), proxyGroupId)) {
+                if (!player.hasPermission("network.whitelist.bypass")) {
+                    event.setResult(ServerPreConnectEvent.ServerResult.denied());
+                    player.disconnect(mm.deserialize(lang.format("command-whitelist-kick", Map.of("group", "Proxy"))));
+                    return;
+                }
+            }
+        }
+
+        int groupId = plugin.getGroupManager().getGroupId(serverName);
+        if (groupId != -1) {
+            String groupIdentifier = plugin.getGroupManager().getGroupIdentifier(groupId);
+            if (plugin.getMySQLManager().isWhitelistActive(groupIdentifier)) {
+                if (!plugin.getMySQLManager().isWhitelisted(player.getUniqueId(), groupId)) {
+                    if (!player.hasPermission("network.whitelist.bypass")) {
+                        event.setResult(ServerPreConnectEvent.ServerResult.denied());
+
+                        // Unterscheidung: Erst-Join (Kick) oder Server-Wechsel (Nachricht)
+                        if (player.getCurrentServer().isEmpty()) {
+                            player.disconnect(mm.deserialize(lang.format("command-whitelist-kick", Map.of("group", groupIdentifier))));
+                        } else {
+                            player.sendMessage(mm.deserialize(lang.format("command-whitelist-kick", Map.of("group", groupIdentifier))));
+                        }
+                        return;
+                    }
+                }
+            }
         }
 
         if (player.hasPermission("network.maintenance.bypass.all") ||
@@ -178,13 +230,10 @@ public class ServerSwitchListener {
                 .collect(Collectors.toList());
 
         for (Player member : groupPlayers) {
-            member.getTabList().clearAll();
 
             for (Player networkPlayer : groupPlayers) {
                 String prefix = plugin.getLuckpermsUtils().getPlayerPrefix(networkPlayer);
                 int weight = plugin.getLuckpermsUtils().getWeight(networkPlayer);
-
-                int priority = weight;
 
                 String displayNameRaw = lang.format("tab-player-format", Map.of(
                         "rank-prefix", prefix != null ? prefix : "",
@@ -196,9 +245,10 @@ public class ServerSwitchListener {
                         .tabList(member.getTabList())
                         .displayName(mm.deserialize(displayNameRaw))
                         .latency((int) networkPlayer.getPing())
-                        .listOrder(priority)
+                        .listOrder(weight)
                         .build();
 
+                member.getTabList().removeEntry(networkPlayer.getUniqueId());
                 member.getTabList().addEntry(entry);
             }
         }

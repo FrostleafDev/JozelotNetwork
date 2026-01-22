@@ -84,6 +84,9 @@ redis:
 # network.command.tpohere
 # network.command.send
 # network.command.server
+# network.command.whitelist
+# network.whitelist.bypass
+
 # network.command.msg
 # network.command.gmsg
 # network.command.global

@@ -33,8 +33,21 @@ network-help:
   - '{grey}- {primary}/net help {grey}Zeigt diese Nachricht'
   - '{grey}- {primary}/net reload {grey}Lädt das gesamte Netzwerk neu'
   - '{grey}- {primary}/net manage <display_name/motd/maintenance/max_players> {grey}Stelle die einzelnen Backend Server ein'
+  - '{grey}- {primary}/net start/stop/restart/status {grey}Du hast die volle Kontrolle über jeden Server'
   - '{grey}- {primary}/find <Spieler> {grey}Sieh auf welchem Server sind ein Spieler befindet'
   - '{grey}- {primary}/clearchat {grey}Lehre den Chat'
+  - '{grey}- {primary}/ban <Spieler> <Länge> <Grund> {grey}Banne Spieler vom Netzwerk'
+  - '{grey}- {primary}/banlist {grey}Zeigt dir alle gebannten Spieler an'
+  - '{grey}- {primary}/unban <Spieler> {grey}Entbannt einen Spieler'
+  - '{grey}- {primary}/kick <Spieler> <Grund> {grey}Kickt einen Spieler vom Netzwerk'
+  - '{grey}- {primary}/server <Server> {grey}Gelange zu einem beliebigen Unterserver'
+  - '{grey}- {primary}/send <Ziel> <Server> {grey}Sende eine Gruppe von Spielern auf einen bestimmen Server'
+  - '{grey}- {primary}/tpo <Spieler> {grey}Gelange auf den Server eines anderen Spielers'
+  - '{grey}- {primary}/tpohere {grey}Hole einen Spieler auf deinen Server'
+  - '{grey}- {primary}/lobby {grey}Geh zur Lobby'
+  - '{grey}- {primary}/msg <Spieler> <Nachricht> {grey}Schreibe einem Spieler in der Gruppe eine Nachricht'
+  - '{grey}- {primary}/gmsg <Spieler> <Nachricht> {grey}Schreibe einem Spieler eine Nachricht'
+  - '{grey}- {primary}/reply {grey}Antworte einem Spieler'
 network-reload-success: '{primary}Das Netzwerk wurde erfolgreich neu geladen'
 network-reload-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat das Netzwerk neu geladen'
 chat-cleared:
@@ -176,11 +189,20 @@ command-reply-usage: '{tertiary}/reply <Nachricht>'
 command-reply-no-target: '{danger}Du hast niemanden, dem du antworten kannst'
 command-reply-target-offline: '{danger}Der Spieler, dem du antworten möchtest, ist nicht mehr online'
 
+command-global-usage: '{tertiary}/g <Nachricht>'
 
+command-whitelist-usage: '{tertiary}/whitelist <add|remove|on|off|list> <Gruppe> [Spieler]'
+command-whitelist-not-found: '{grey}Die Gruppe {danger}{group} existiert nicht'
+command-whitelist-added: '{primary}{player} {grey}wurde zur Whitelist von {primary}{group}{grey} hinzugefügt'
+command-whitelist-removed: '{primary}{player} {grey}wurde von der Whitelist von {primary}{group}{grey} entfernt'
+command-whitelist-state: '{primary}Whitelist{grey} für {primary}{group}{grey} ist nun {secondary}{state}'
+command-whitelist-list-header: '{primary}Whitelist für {group}:'
+command-whitelist-kick: '{danger}Du bist nicht auf der Whitelist für diesen Server-Bereich!'
 
-
-
-
+# Whitelist Admin Logs
+command-whitelist-state-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat die Whitelist für {primary}{group} {primary}{state}'
+command-whitelist-added-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat {primary}{target} {grey}zur Whitelist von {primary}{group} {grey}hinzugefügt'
+command-whitelist-removed-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat {primary}{target} {grey}von der Whitelist von {primary}{group} {grey}entfernt'
 
 
 

@@ -134,6 +134,8 @@ public class JozelotProxy {
         CommandMeta gmsgMeta = cm.metaBuilder("gmsg").aliases("globalmsg").build();
         CommandMeta msgMeta = cm.metaBuilder("msg").aliases("tell").build();
         CommandMeta replyMeta = cm.metaBuilder("reply").aliases("r").build();
+        CommandMeta globalMeta = cm.metaBuilder("global").aliases("g").build();
+        CommandMeta whitelistMeta = cm.metaBuilder("whitelist").build();
 
         cm.register(hubMeta, new LobbyCommand(this));
         cm.register(networkMeta, new NetworkCommand(this));
@@ -150,6 +152,8 @@ public class JozelotProxy {
         cm.register(gmsgMeta, new GMsgCommand(this));
         cm.register(msgMeta, new MsgCommand(this));
         cm.register(replyMeta, new ReplyCommand(this));
+        cm.register(globalMeta, new GlobalCommand(this));
+        cm.register(whitelistMeta, new WhitelistCommand(this));
         consoleLogger.broadCastToConsole("Commands erstellt");
 
         // Listener

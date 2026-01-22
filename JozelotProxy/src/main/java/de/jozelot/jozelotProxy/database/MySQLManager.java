@@ -77,7 +77,8 @@ public class MySQLManager {
                         "identifier VARCHAR(32) UNIQUE," +
                         "display_name VARCHAR(32)," +
                         "scoreboard_enabled BOOLEAN DEFAULT TRUE," +
-                        "custom_tab_enabled BOOLEAN DEFAULT TRUE" +
+                        "custom_tab_enabled BOOLEAN DEFAULT TRUE," +
+                        "whitelist_active BOOLEAN DEFAULT FALSE" +
                         ");",
 
                 // 6. Server in Group (Mapping Tabelle)
@@ -114,6 +115,7 @@ public class MySQLManager {
                         "PRIMARY KEY (player_uuid, group_id)," +
                         "FOREIGN KEY (group_id) REFERENCES server_group(id) ON DELETE CASCADE" +
                         ");",
+
                 "CREATE TABLE IF NOT EXISTS action_logs (" +
                         "id INT AUTO_INCREMENT PRIMARY KEY," +
                         "operator_uuid CHAR(36)," +
@@ -716,6 +718,144 @@ public class MySQLManager {
             e.printStackTrace();
         }
         return true;
+    }
+
+    // --- Whitelist Management ---
+
+    public void setWhitelistState(String identifier, boolean active) {
+        String query = identifier.equals("proxy")
+                ? "UPDATE server_group SET whitelist_active = ? WHERE identifier = 'proxy'"
+                : "UPDATE server_group SET whitelist_active = ? WHERE identifier = ?";
+
+        try (Connection conn = mySQLSetup.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+            ps.setBoolean(1, active);
+            ps.setString(2, identifier);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean isWhitelistActive(String identifier) {
+        try (Connection conn = mySQLSetup.getConnection();
+             PreparedStatement ps = conn.prepareStatement("SELECT whitelist_active FROM server_group WHERE identifier = ?")) {
+            ps.setString(1, identifier);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getBoolean("whitelist_active");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public void addToWhitelist(UUID uuid, int groupId, UUID operatorUuid) {
+        try (Connection conn = mySQLSetup.getConnection();
+             PreparedStatement ps = conn.prepareStatement(
+                     "INSERT INTO whitelist (player_uuid, group_id, added_by) VALUES (?, ?, ?) " +
+                             "ON DUPLICATE KEY UPDATE added_at = CURRENT_TIMESTAMP")) {
+            ps.setString(1, uuid.toString());
+            ps.setInt(2, groupId);
+            ps.setString(3, operatorUuid.toString());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void removeFromWhitelist(UUID uuid, int groupId) {
+        try (Connection conn = mySQLSetup.getConnection();
+             PreparedStatement ps = conn.prepareStatement("DELETE FROM whitelist WHERE player_uuid = ? AND group_id = ?")) {
+            ps.setString(1, uuid.toString());
+            ps.setInt(2, groupId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean isWhitelisted(UUID uuid, int groupId) {
+        try (Connection conn = mySQLSetup.getConnection();
+             PreparedStatement ps = conn.prepareStatement("SELECT 1 FROM whitelist WHERE player_uuid = ? AND group_id = ?")) {
+            ps.setString(1, uuid.toString());
+            ps.setInt(2, groupId);
+            return ps.executeQuery().next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public List<String> getWhitelistPlayers(int groupId) {
+        List<String> players = new ArrayList<>();
+        try (Connection conn = mySQLSetup.getConnection();
+             PreparedStatement ps = conn.prepareStatement(
+                     "SELECT p.username FROM whitelist w JOIN player p ON w.player_uuid = p.uuid WHERE w.group_id = ?")) {
+            ps.setInt(1, groupId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) players.add(rs.getString("username"));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return players;
+    }
+
+    public UUID getUUIDByUsername(String username) {
+        try (Connection conn = mySQLSetup.getConnection();
+             PreparedStatement ps = conn.prepareStatement("SELECT uuid FROM player WHERE username = ? LIMIT 1")) {
+            ps.setString(1, username);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return UUID.fromString(rs.getString("uuid"));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public void loadGroups(Map<String, Integer> serverToGroup, Map<Integer, String> groupNames, Map<Integer, String> groupIdentifiers) {
+        try (Connection conn = mySQLSetup.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement("SELECT id, identifier, display_name FROM server_group")) {
+                ResultSet rs = ps.executeQuery();
+                while (rs.next()) {
+                    int id = rs.getInt("id");
+                    groupIdentifiers.put(id, rs.getString("identifier"));
+                    groupNames.put(id, rs.getString("display_name"));
+                }
+            }
+            try (PreparedStatement ps = conn.prepareStatement(
+                    "SELECT s.identifier, sig.group_id FROM server s JOIN server_in_group sig ON s.id = sig.server_id")) {
+                ResultSet rs = ps.executeQuery();
+                while (rs.next()) {
+                    serverToGroup.put(rs.getString("identifier"), rs.getInt("group_id"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public int getGroupIdByIdentifier(String identifier) {
+        try (Connection conn = mySQLSetup.getConnection();
+             PreparedStatement ps = conn.prepareStatement("SELECT id FROM server_group WHERE identifier = ?")) {
+            ps.setString(1, identifier);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    public void ensureProxyGroupExists() {
+        try (Connection conn = mySQLSetup.getConnection();
+        PreparedStatement ps = conn.prepareStatement(
+                     "INSERT IGNORE INTO server_group (id, identifier, display_name, whitelist_active) VALUES (0, 'proxy', 'Netzwerk', FALSE)")) {
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean isServerInMaintenance(String serverName) {
