@@ -70,9 +70,9 @@ public class JozelotProxy {
 
     private final Map<UUID, ReplyData> replyMap = new HashMap<>();
 
-    /***
-     * Plugin start
-     * @param server Proxy Server halt
+    /**
+     * Plugin start - Loads the Datadirectory and the proxy server.
+     * @param server The proxy server where you can get verious infos about the velocity proxy
      * @param logger Logger to log stuff
      * @param dataDirectory Directory of the plugin config and files
      */
@@ -85,19 +85,23 @@ public class JozelotProxy {
         logger.info("Proxy wird gestartet...");
     }
 
-    /***
+    /**
      * Server start
+     * Loads all Object Classes and registers all Commands and Listeners
      */
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
+        // CONFIG
         this.config = new ConfigManager(dataDirectory, "config.yml");
         this.config.loadDefaultConfig(getClass().getResourceAsStream("/config.yml"));
         logger.info("Config geladen");
 
+        // LANGUAGE FILE
         this.lang = new LangManager(this, dataDirectory, "lang.yml");
         lang.loadDefaultLang(getClass().getResourceAsStream("/lang.yml"));
         logger.info("Sprachdatei geladen");
 
+        // THE OBJECT CLASSES
         this.playerSends = new PlayerSends(this);
         this.consoleLogger = new ConsoleLogger(this);
         this.pteroManager = new PteroManager(this);
@@ -121,7 +125,7 @@ public class JozelotProxy {
         this.luckpermsUtils = new LuckpermsUtils(this);
         brandNameChanger = new BrandNameChanger();
 
-        // Commands
+        // REGISTER COMMANDS
         CommandManager cm = server.getCommandManager();
         CommandMeta hubMeta = cm.metaBuilder("hub").aliases("lobby", "l").build();
         CommandMeta networkMeta = cm.metaBuilder("network").aliases("net").build();
@@ -162,12 +166,11 @@ public class JozelotProxy {
         cm.register(whitelistMeta, new WhitelistCommand(this));
         cm.register(playtimeMeta, new PlaytimeCommand(this));
         cm.register(broadcastMeta, new BroadcastCommand(this));
-        consoleLogger.broadCastToConsole("Commands erstellt");
-
 
         this.playtimeListener = new PlaytimeListener(this);
+        consoleLogger.broadCastToConsole("Commands erstellt");
 
-        // Listener
+        // REGISTER LISTENER
         server.getEventManager().register(this, new ServerSwitchListener(this));
         server.getEventManager().register(this, new ProxyPingListener(this));
         server.getEventManager().register(this, new GroupChatListener(this));
@@ -187,6 +190,7 @@ public class JozelotProxy {
 
     /***
      * Plugin shutdown
+     * Important to save all the players playtime, because if an error encounters it could break the playtime and-or session
      */
     @Subscribe
     public void onProxyShutdown(ProxyShutdownEvent event) {
@@ -194,6 +198,9 @@ public class JozelotProxy {
         server.getAllPlayers().forEach(p -> playtimeListener.saveAndRemoveSession(p));
     }
 
+    /*
+     * GETTER METHODS
+     */
     public ProxyServer getServer() {
         return server;
     }
@@ -258,6 +265,10 @@ public class JozelotProxy {
         return playtimeListener;
     }
 
+    /**
+     * Get the project version
+     * @return String of the version
+     */
     public String getVersion() {
         return server.getPluginManager().getPlugin("jozelotproxy")
                 .flatMap(container -> container.getDescription().getVersion())

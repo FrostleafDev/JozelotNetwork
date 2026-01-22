@@ -14,6 +14,9 @@ public class LuckpermsUtils {
         this.plugin = plugin;
     }
 
+    /**
+     * Gets the Luckperms prefix of the rank of the player
+     */
     public String getPlayerPrefix(Player player) {
         if (plugin.getLuckPerms() == null) return "";
 
@@ -24,7 +27,10 @@ public class LuckpermsUtils {
         return (prefix != null) ? prefix : "";
     }
 
-
+    /**
+     * This is for the Tablist sorting.
+     * So player with a higher rank get put higher in the Tablist
+     */
     public int getWeight(Player player) {
         if (plugin.getLuckPerms() == null) return 0;
 

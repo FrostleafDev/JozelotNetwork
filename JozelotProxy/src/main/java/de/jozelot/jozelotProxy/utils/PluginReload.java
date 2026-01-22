@@ -26,6 +26,10 @@ public class PluginReload {
         this.plugin = plugin;
     }
 
+    /**
+     * Reloads the config & lang and databases
+     * Later will reload all backend server plugins via Redis
+     */
     public void reload() {
         config.reload();
         lang.reload();

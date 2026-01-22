@@ -8,6 +8,12 @@ import java.nio.charset.StandardCharsets;
 
 public class BrandNameChanger {
 
+    /**
+     * I love that thing
+     * I send packets to the player that change the 'Paper (Velocity)' text in the F3-Debug menu
+     * @param player The player to change the brand
+     * @param brand The text that's going to be put there
+     */
     public void sendBrandName(Player player, String brand) {
 
         byte[] brandBytes = brand.getBytes(StandardCharsets.UTF_8);

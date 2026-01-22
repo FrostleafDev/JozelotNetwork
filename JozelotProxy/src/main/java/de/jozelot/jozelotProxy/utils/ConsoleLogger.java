@@ -15,6 +15,10 @@ public class ConsoleLogger {
         this.config = plugin.getConfig();
     }
 
+    /**
+     * Just a generell logger for my plugin, so you can see in the console
+     * when my plugin sends a message
+     */
     public void broadCastToConsole(String message) {
         server.getConsoleCommandSource().sendMessage(
                 MiniMessage.miniMessage().deserialize("<" + config.getColorGrey() + ">[<gradient:#f90036:#f90011><b>JozelotProxy<" + config.getColorGrey() + ">] <reset>" + message)

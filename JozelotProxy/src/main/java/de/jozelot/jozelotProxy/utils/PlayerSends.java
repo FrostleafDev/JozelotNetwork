@@ -28,11 +28,18 @@ public class PlayerSends {
         this.lang = plugin.getLang();
     }
 
+
     private String getDisplayName(String identifier) {
         String displayName = plugin.getMySQLManager().getServerDisplayName(identifier);
         return (displayName != null && !displayName.isEmpty()) ? displayName : identifier;
     }
 
+    /**
+     * Connect the player to another backend server
+     * It's called simple because it doesn't send a success message so you only notice it when an error encounters
+     * @param player Player obejct to send to backend
+     * @param serverName Name of the backend server
+     */
     public void connectPlayerSimple(Player player, String serverName) {
         Optional<RegisteredServer> targetServer = server.getServer(serverName);
         Optional<ServerConnection> currentConnection = player.getCurrentServer();
@@ -57,6 +64,9 @@ public class PlayerSends {
         });
     }
 
+    /**
+     * Only for the tpo command
+     */
     public CompletableFuture<Boolean> sendPlayerToPlayer(Player player, Player target) {
         Optional<ServerConnection> targetConn = target.getCurrentServer();
 
@@ -87,6 +97,9 @@ public class PlayerSends {
         });
     }
 
+    /**
+     * Only for the tpohere command
+     */
     public CompletableFuture<Boolean> sendPlayerToPlayer2(Player player, Player target, boolean silent) {
         Optional<ServerConnection> adminConn = player.getCurrentServer();
 

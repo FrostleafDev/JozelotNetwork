@@ -72,10 +72,22 @@ public class LangManager {
         return prefix;
     }
 
+    /**
+     * Method to change variables in the lang.yml with {} to variables from the map
+     * @param path The path from the lang.yml. e.g: 'command-ban-usage'
+     * @param variables Map of the variables to replace. First one which text should be replaced. Second one with what it should be replaced with
+     * @return
+     */
     public String format(String path, Map<String, String> variables) {
         return applyReplacements(getString(path), path.equals("prefix"), variables);
     }
 
+    /**
+     * Same as from the format method but for lists
+     * @param path The path from the lang.yml. e.g: 'command-ban-kick'
+     * @param variables Map of the variables to replace. First one which text should be replaced. Second one with what it should be replaced with
+     * @return
+     */
     public List<String> formatList(String path, Map<String, String> variables) {
         List<String> rawList = getStringList(path);
         List<String> formattedList = new ArrayList<>();
@@ -87,6 +99,9 @@ public class LangManager {
         return formattedList;
     }
 
+    /**
+     * This is the place where the whole thing gets replaced
+     */
     private String applyReplacements(String text, boolean isPrefix, Map<String, String> variables) {
         if (text == null || text.isEmpty()) return "";
 
