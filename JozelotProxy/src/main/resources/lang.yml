@@ -199,6 +199,7 @@ command-global-usage: '{tertiary}/g <Nachricht>'
 
 command-whitelist-usage: '{tertiary}/whitelist <add|remove|on|off|list> <Gruppe> [Spieler]'
 command-whitelist-not-found: '{grey}Die Gruppe {danger}{group} existiert nicht'
+command-whitelist-player-not-found: '{danger}{player-name} {grey}wurde nicht gefunden'
 command-whitelist-added: '{primary}{player} {grey}wurde zur Whitelist von {primary}{group}{grey} hinzugefügt'
 command-whitelist-removed: '{primary}{player} {grey}wurde von der Whitelist von {primary}{group}{grey} entfernt'
 command-whitelist-state: '{primary}Whitelist{grey} für {primary}{group}{grey} ist nun {secondary}{state}'
@@ -210,7 +211,7 @@ command-whitelist-removed-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{gr
 
 command-playtime-usage: '{tertiary}/playtime <Spieler>'
 command-playtime-no-playtime: '{grey}Der Spieler {danger}{player-name}{grey} war noch nie auf dieser Region'
-command-playtime-total: '{grey}Spielzeit von {primary}{player-name} {grey}auf {primary}{type}{grey}   : {secondary}{days}d {hours}h {minutes}m {seconds}s'
+command-playtime-total: '{grey}Spielzeit von {primary}{player-name} {grey}auf {primary}{type}{grey}: {secondary}{days}d {hours}h {minutes}m {seconds}s'
 command-playtime-syntax-error: '{grey}Bitte nutze: {danger}server: / group:'
 
 command-broadcast-usage: '{tertiary}/broadcast <Ziel> <Typ> <Nachricht>'
@@ -249,3 +250,43 @@ broadcast-warning:
   - ""
   - "<dark_gray> ---------------------------------"
   - ""
+
+server-full-kick: "{danger}Der Server {server-name} ist voll! {grey}({max}/{max})"
+server-full-message: "{danger}Du kannst nicht auf {server-name} verbinden, da dieser voll ist."
+
+proxy-full-kick:
+  - "{danger}Das Netzwerk ist aktuell voll!"
+  - "{grey}Bitte versuche es später erneut oder erwerbe einen Rang."
+  - "<dark_gray>(Limit: {max} Spieler)"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

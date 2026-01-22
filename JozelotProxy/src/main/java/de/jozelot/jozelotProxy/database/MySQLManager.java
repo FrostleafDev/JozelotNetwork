@@ -988,6 +988,20 @@ public class MySQLManager {
         return 0;
     }
 
+    public int getMaxPlayers(String serverName) {
+        String sql = "SELECT max_players FROM registered_servers WHERE server_name = ?";
+        try (Connection conn = mySQLSetup.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, serverName);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt("max_players");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1; // Standardwert: Kein Limit
+    }
+
     public boolean isServerInMaintenance(String serverName) {
         return maintenanceCache.getOrDefault(serverName, false);
     }

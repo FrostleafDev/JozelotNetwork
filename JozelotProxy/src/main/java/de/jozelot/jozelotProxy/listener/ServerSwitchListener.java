@@ -8,229 +8,247 @@ import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.event.player.ServerConnectedEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.player.TabListEntry;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.jozelot.jozelotProxy.JozelotProxy;
 import de.jozelot.jozelotProxy.storage.ConfigManager;
 import de.jozelot.jozelotProxy.storage.LangManager;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
-import java.lang.reflect.Method;
-import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Diese Klasse steuert den gesamten Lebenszyklus eines Spielers auf dem Proxy.
+ * Vom ersten Verbindungsversuch über Serverwechsel bis zum Logout.
+ */
 public class ServerSwitchListener {
 
     private final JozelotProxy plugin;
+    private final ProxyServer server;
     private final LangManager lang;
     private final ConfigManager config;
-    private MiniMessage mm = MiniMessage.miniMessage();
+    private final MiniMessage mm = MiniMessage.miniMessage();
 
     public ServerSwitchListener(JozelotProxy plugin) {
         this.plugin = plugin;
+        this.server = plugin.getServer();
         this.lang = plugin.getLang();
         this.config = plugin.getConfig();
 
+        // Falls sich Ränge in LuckPerms ändern, updaten wir die Tablist sofort
         if (plugin.getLuckPerms() != null) {
             plugin.getLuckPerms().getEventBus().subscribe(plugin, net.luckperms.api.event.user.UserDataRecalculateEvent.class, event -> {
-                UUID uuid = event.getUser().getUniqueId();
-                plugin.getServer().getPlayer(uuid).ifPresent(player -> {
-                    player.getCurrentServer().ifPresent(serverConn -> {
-                        plugin.getServer().getScheduler().buildTask(plugin, () -> {
-                            updateTabForGroup(player, serverConn.getServer());
-                        }).schedule();
+                server.getPlayer(event.getUser().getUniqueId()).ifPresent(player -> {
+                    player.getCurrentServer().ifPresent(conn -> {
+                        server.getScheduler().buildTask(plugin, () -> updateTabForGroup(player, conn.getServer())).schedule();
                     });
                 });
             });
         }
 
-        plugin.getServer().getScheduler().buildTask(plugin, () -> {
-            for (Player player : plugin.getServer().getAllPlayers()) {
+        // Ein "Herzschlag" für das Netzwerk: Aktualisiert alle 3 Sek. Header, Footer und Pings
+        server.getScheduler().buildTask(plugin, () -> {
+            for (Player player : server.getAllPlayers()) {
                 player.getCurrentServer().ifPresent(conn -> {
                     int groupId = plugin.getGroupManager().getGroupId(conn.getServerInfo().getName());
                     if (groupId != -1) {
-                        if (plugin.getGroupManager().isTabEnabled(groupId)) {
-                            updateTabHeaderForPlayer(player, groupId);
-                        }
-                        updateTabEntryPings(player, groupId);
+                        if (plugin.getGroupManager().isTabEnabled(groupId)) updateTabHeaderForPlayer(player, groupId);
+                        updateTabEntryPings(player);
                     }
                 });
             }
-        }).repeat(java.time.Duration.ofSeconds(3)).schedule();
+        }).repeat(Duration.ofSeconds(3)).schedule();
     }
 
-    @Subscribe
-    public void onPostLogin(PostLoginEvent event) {
-        Player player = event.getPlayer();
-        plugin.getBrandNameChanger().sendBrandName(player, config.getBrandName());
-    }
-
-    @Subscribe
-    public void onServerConnected(ServerConnectedEvent event) {
-        Player player = event.getPlayer();
-        RegisteredServer connectedServer = event.getServer();
-
-        plugin.getServer().getScheduler().buildTask(plugin, () -> {
-            plugin.getMySQLManager().updatePlayerServer(player.getUniqueId(), connectedServer.getServerInfo().getName());
-            plugin.getBrandNameChanger().sendBrandName(player, config.getBrandName());
-
-            updateTabForGroup(player, connectedServer);
-
-            int groupId = plugin.getGroupManager().getGroupId(connectedServer.getServerInfo().getName());
-            if (groupId != -1) {
-                if (plugin.getGroupManager().isTabEnabled(groupId)) {
-                    updateTabHeaderForPlayer(player, groupId);
-                }
-            }
-        }).delay(java.time.Duration.ofMillis(250)).schedule();
-    }
-
-    @Subscribe
-    public void onDisconnect(DisconnectEvent event) {
-        Player player = event.getPlayer();
-        removeFromAllTabs(player);
-        plugin.getReplyMap().remove(player.getUniqueId());
-        plugin.getReplyMap().values().removeIf(data -> data.partnerId().equals(player.getUniqueId()));
-    }
-
-    @Subscribe
-    public void onServerPreConnect(ServerPreConnectEvent event) {
-        if (event.getPlayer().getCurrentServer().isPresent()) {
-            removeFromAllTabs(event.getPlayer());
-        }
-    }
-
-    private void removeFromAllTabs(Player playerToRemove) {
-        for (Player all : plugin.getServer().getAllPlayers()) {
-            all.getTabList().removeEntry(playerToRemove.getUniqueId());
-        }
-    }
-
-    @Subscribe
-    public void onPreServerSwitch(ServerPreConnectEvent event) {
-        Player player = event.getPlayer();
-        RegisteredServer targetServer = event.getOriginalServer();
-        String serverName = targetServer.getServerInfo().getName();
-
-
-        if (player.getCurrentServer().isEmpty()) {
-            player.getVirtualHost().ifPresent(host -> {
-                String domain = host.getHostName().toLowerCase();
-                if (domain.contains(".")) {
-                    if (!player.hasPermission("network.forcedhost.all") &&
-                            !player.hasPermission("network.forcedhost." + serverName)) {
-
-                        event.setResult(ServerPreConnectEvent.ServerResult.denied());
-                        player.disconnect(mm.deserialize(lang.format("no-forcedhost-permission",
-                                Map.of("server-name", serverName))));
-                    }
-                }
-            });
-
-            if (event.getResult().isAllowed() == false) return;
-        }
-        if (plugin.getMySQLManager().isWhitelistActive("proxy")) {
-            int proxyGroupId = plugin.getMySQLManager().getGroupIdByIdentifier("proxy");
-
-            if (!plugin.getMySQLManager().isWhitelisted(player.getUniqueId(), proxyGroupId)) {
-                if (!player.hasPermission("network.whitelist.bypass")) {
-                    event.setResult(ServerPreConnectEvent.ServerResult.denied());
-                    player.disconnect(mm.deserialize(lang.format("command-whitelist-kick", Map.of("group", "Proxy"))));
-                    return;
-                }
-            }
-        }
-
-        int groupId = plugin.getGroupManager().getGroupId(serverName);
-        if (groupId != -1) {
-            String groupIdentifier = plugin.getGroupManager().getGroupIdentifier(groupId);
-            if (plugin.getMySQLManager().isWhitelistActive(groupIdentifier)) {
-                if (!plugin.getMySQLManager().isWhitelisted(player.getUniqueId(), groupId)) {
-                    if (!player.hasPermission("network.whitelist.bypass")) {
-                        event.setResult(ServerPreConnectEvent.ServerResult.denied());
-
-                        // Unterscheidung: Erst-Join (Kick) oder Server-Wechsel (Nachricht)
-                        if (player.getCurrentServer().isEmpty()) {
-                            player.disconnect(mm.deserialize(lang.format("command-whitelist-kick", Map.of("group", groupIdentifier))));
-                        } else {
-                            player.sendMessage(mm.deserialize(lang.format("command-whitelist-kick", Map.of("group", groupIdentifier))));
-                        }
-                        return;
-                    }
-                }
-            }
-        }
-
-        if (player.hasPermission("network.maintenance.bypass.all") ||
-                player.hasPermission("network.maintenance.bypass." + serverName)) {
-            return;
-        }
-
-        if (plugin.getMySQLManager().isServerInMaintenance(serverName)) {
-            event.setResult(ServerPreConnectEvent.ServerResult.denied());
-
-            String displayName = plugin.getMySQLManager().getServerDisplayName(serverName);
-            String finalName = (displayName != null && !displayName.isEmpty()) ? displayName : serverName;
-
-            if (player.getCurrentServer().isEmpty()) {
-                player.disconnect(mm.deserialize(lang.format("server-maintenance-kick",
-                        Map.of("server-name", finalName))));
-            } else {
-                player.sendMessage(mm.deserialize(lang.format("server-maintenance-no-access",
-                        Map.of("server-name", finalName))));
-            }
-        }
-    }
+    // ==================================================================================
+    // 1. LOGIN-PHASE (VOR DEM BEITRITT)
+    // ==================================================================================
 
     @Subscribe
     public void onLogin(LoginEvent event) {
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
 
+        // 1. Ban-Check: Wer gebannt ist, kommt nicht rein (außer er hat die Bypass-Permission)
         Map<String, String> banInfo = plugin.getMySQLManager().getActiveBan(uuid);
-
-        if (banInfo != null) {
-            if (!player.hasPermission("network.ban.bypass")) {
-                List<String> banLines = lang.formatList("ban-join-screen", Map.of(
-                        "reason", banInfo.get("reason"),
-                        "duration", banInfo.get("duration")
-                ));
-
-                event.setResult(ResultedEvent.ComponentResult.denied(
-                        mm.deserialize(String.join("<newline>", banLines))
-                ));
-                return;
-            }
-        }
-
-        if (player.hasPermission("network.maintenance.bypass.all") || player.hasPermission("network.maintenance.bypass.proxy")) {
+        if (banInfo != null && !player.hasPermission("network.ban.bypass")) {
+            event.setResult(ResultedEvent.ComponentResult.denied(mm.deserialize(
+                    String.join("<newline>", lang.formatList("ban-join-screen", banInfo)))));
             return;
         }
 
-        if (plugin.getMySQLManager().isServerInMaintenance("proxy")) {
-            List<String> kickLines = lang.formatList("proxy-maintenance-kick", null);
-            String kickMessage = String.join("<newline>", kickLines);
+        // 2. Netzwerk-Wartung: Ist der Proxy im Wartungsmodus?
+        if (plugin.getMySQLManager().isServerInMaintenance("proxy") &&
+                !player.hasPermission("network.maintenance.bypass.proxy")) {
+            event.setResult(ResultedEvent.ComponentResult.denied(mm.deserialize(
+                    String.join("<newline>", lang.formatList("proxy-maintenance-kick", null)))));
+            return;
+        }
 
-            event.setResult(ResultedEvent.ComponentResult.denied(
-                    mm.deserialize(kickMessage)
-            ));
+        // 3. Proxy-Kapazität: Ist das gesamte Netzwerk voll?
+        int maxProxy = plugin.getMySQLManager().getMaxPlayers("proxy");
+        if (maxProxy > 0 && server.getPlayerCount() >= maxProxy && !player.hasPermission("network.maxplayers.bypass.proxy")) {
+            event.setResult(ResultedEvent.ComponentResult.denied(mm.deserialize(
+                    String.join("<newline>", lang.formatList("proxy-full-kick", Map.of("max", String.valueOf(maxProxy)))))));
         }
     }
+
+    @Subscribe
+    public void onPostLogin(PostLoginEvent event) {
+        Player player = event.getPlayer();
+        UUID uuid = player.getUniqueId();
+        String username = player.getUsername();
+
+        // Brand Name senden
+        plugin.getBrandNameChanger().sendBrandName(player, config.getBrandName());
+
+        // Datenbank-Aufgaben asynchron erledigen
+        server.getScheduler().buildTask(plugin, () -> {
+            // Spieler in die Liste eintragen und prüfen, ob er neu ist
+            boolean isNew = plugin.getMySQLManager().addToPlayerList(uuid, username);
+            if (isNew) {
+                lang.formatList("first-join", Map.of("player-name", username))
+                        .forEach(line -> player.sendMessage(mm.deserialize(line)));
+            }
+
+            // Info für Admins, wenn sie trotz eines aktiven Bans joinen
+            if (player.hasPermission("network.ban.bypass")) {
+                Map<String, String> ban = plugin.getMySQLManager().getActiveBan(uuid);
+                if (ban != null) {
+                    player.sendMessage(mm.deserialize(String.join("<newline>",
+                            lang.formatList("ban-bypass-info", Map.of(
+                                    "reason", ban.get("reason"),
+                                    "duration", ban.get("duration"),
+                                    "player-name", username,
+                                    "admin-name", ban.getOrDefault("operator", "Unbekannt")
+                            )))));
+                }
+            }
+        }).schedule();
+    }
+
+    // ==================================================================================
+    // 2. VERBINDUNGS-PHASE (SERVERWECHSEL)
+    // ==================================================================================
+
+    @Subscribe
+    public void onPreServerSwitch(ServerPreConnectEvent event) {
+        Player player = event.getPlayer();
+        RegisteredServer target = event.getOriginalServer();
+        String name = target.getServerInfo().getName();
+
+        // 1. Forced-Host Check (Nur beim ersten Betreten des Proxys)
+        if (player.getCurrentServer().isEmpty()) {
+            player.getVirtualHost().ifPresent(host -> {
+                if (host.getHostName().contains(".") && !player.hasPermission("network.forcedhost.all") && !player.hasPermission("network.forcedhost." + name)) {
+                    event.setResult(ServerPreConnectEvent.ServerResult.denied());
+                    player.disconnect(mm.deserialize(lang.format("no-forcedhost-permission", Map.of("server-name", name))));
+                }
+            });
+            if (!event.getResult().isAllowed()) return;
+        }
+
+        // 2. Whitelist Check (Proxy weit oder Gruppen spezifisch)
+        if (!isWhitelisted(player, name)) {
+            event.setResult(ServerPreConnectEvent.ServerResult.denied());
+            handleDenial(player, "command-whitelist-kick", Map.of("group", name));
+            return;
+        }
+
+        // 3. Wartungsarneiten für den Zielserver
+        if (plugin.getMySQLManager().isServerInMaintenance(name) && !player.hasPermission("network.maintenance.bypass." + name)) {
+            event.setResult(ServerPreConnectEvent.ServerResult.denied());
+            handleDenial(player, "server-maintenance-no-access", Map.of("server-name", name));
+            return;
+        }
+
+        // 4. Max Player Check für den Zielserver
+        int max = plugin.getMySQLManager().getMaxPlayers(name);
+        if (max > 0 && target.getPlayersConnected().size() >= max && !player.hasPermission("network.maxplayers.bypass." + name)) {
+            event.setResult(ServerPreConnectEvent.ServerResult.denied());
+            handleDenial(player, "server-full-message", Map.of("server-name", name, "max", String.valueOf(max)));
+        }
+
+        // Tab Cleanup: Wenn der Spieler den Server wechselt, entfernen wir ihn aus den alten Tabs
+        if (player.getCurrentServer().isPresent()) {
+            removeFromAllTabs(player);
+        }
+    }
+
+    @Subscribe
+    public void onServerConnected(ServerConnectedEvent event) {
+        Player player = event.getPlayer();
+        String serverName = event.getServer().getServerInfo().getName();
+
+        int groupId = plugin.getGroupManager().getGroupId(serverName);
+        if (groupId != -1) {
+            updateTabHeaderForPlayer(player, groupId);
+        }
+
+        server.getScheduler().buildTask(plugin, () -> {
+            plugin.getMySQLManager().updatePlayerServer(player.getUniqueId(), serverName);
+            refreshGroupTab(serverName);
+
+        }).delay(Duration.ofMillis(200)).schedule();
+    }
+
+    @Subscribe
+    public void onDisconnect(DisconnectEvent event) {
+        Player p = event.getPlayer();
+        removeFromAllTabs(p);
+        plugin.getReplyMap().remove(p.getUniqueId());
+        plugin.getReplyMap().values().removeIf(data -> data.partnerId().equals(p.getUniqueId()));
+    }
+
+    // ==================================================================================
+    // 3. INTERNE LOGIK METHODEN
+    // ==================================================================================
+
+    private boolean isWhitelisted(Player p, String serverName) {
+        if (p.hasPermission("network.whitelist.bypass")) return true;
+
+        // Globale Whitelist prüfen
+        if (plugin.getMySQLManager().isWhitelistActive("proxy")) {
+            int gid = plugin.getMySQLManager().getGroupIdByIdentifier("proxy");
+            if (!plugin.getMySQLManager().isWhitelisted(p.getUniqueId(), gid)) return false;
+        }
+
+        // Spezifische Gruppen Whitelist prüfen
+        int gid = plugin.getGroupManager().getGroupId(serverName);
+        if (gid != -1) {
+            String identifier = plugin.getGroupManager().getGroupIdentifier(gid);
+            if (plugin.getMySQLManager().isWhitelistActive(identifier)) {
+                return plugin.getMySQLManager().isWhitelisted(p.getUniqueId(), gid);
+            }
+        }
+        return true;
+    }
+
+    private void handleDenial(Player p, String langKey, Map<String, String> placeholders) {
+        if (p.getCurrentServer().isEmpty()) {
+            p.disconnect(mm.deserialize(lang.format(langKey, placeholders)));
+        } else {
+            p.sendMessage(mm.deserialize(lang.format(langKey, placeholders)));
+        }
+    }
+
+    // ==================================================================================
+    // 4. TABLISTEN-STYLING
+    // ==================================================================================
 
     public void updateTabForGroup(Player player, RegisteredServer connectedServer) {
         int groupId = plugin.getGroupManager().getGroupId(connectedServer.getServerInfo().getName());
         if (groupId == -1) return;
 
-        List<Player> groupPlayers = plugin.getServer().getAllPlayers().stream()
+        List<Player> groupPlayers = server.getAllPlayers().stream()
                 .filter(p -> p.getCurrentServer().isPresent())
                 .filter(p -> plugin.getGroupManager().getGroupId(p.getCurrentServer().get().getServerInfo().getName()) == groupId)
                 .collect(Collectors.toList());
 
         for (Player member : groupPlayers) {
-
             for (Player networkPlayer : groupPlayers) {
                 String prefix = plugin.getLuckpermsUtils().getPlayerPrefix(networkPlayer);
                 int weight = plugin.getLuckpermsUtils().getWeight(networkPlayer);
@@ -254,9 +272,9 @@ public class ServerSwitchListener {
         }
     }
 
-    private void updateTabEntryPings(Player viewer, int groupId) {
+    private void updateTabEntryPings(Player viewer) {
         for (TabListEntry entry : viewer.getTabList().getEntries()) {
-            plugin.getServer().getPlayer(entry.getProfile().getId()).ifPresent(target -> {
+            server.getPlayer(entry.getProfile().getId()).ifPresent(target -> {
                 if (entry.getLatency() != (int) target.getPing()) {
                     entry.setLatency((int) target.getPing());
                 }
@@ -268,16 +286,11 @@ public class ServerSwitchListener {
         String groupName = plugin.getGroupManager().getGroupName(groupId);
         List<String> serversInGroup = plugin.getGroupManager().getServersInGroup(groupId);
 
-        String currentServerInternal = p.getCurrentServer()
-                .map(conn -> conn.getServerInfo().getName())
-                .orElse("Unbekannt");
-
+        String currentServerInternal = p.getCurrentServer().map(conn -> conn.getServerInfo().getName()).orElse("Unbekannt");
         String currentServerDisplay = plugin.getMySQLManager().getServerDisplayName(currentServerInternal);
         String serverNameToShow = (currentServerDisplay != null) ? currentServerDisplay : currentServerInternal;
 
-        String infoLine = (serversInGroup.size() <= 1)
-                ? "(Lokal)"
-                : groupName + " (Netzwerk)";
+        String infoLine = (serversInGroup.size() <= 1) ? "(Lokal)" : groupName + " (Netzwerk)";
 
         Map<String, String> placeholders = Map.of(
                 "group-info", infoLine,
@@ -286,12 +299,29 @@ public class ServerSwitchListener {
                 "ping", String.valueOf(p.getPing())
         );
 
-        List<String> headerLines = lang.formatList("tab-header", placeholders);
-        List<String> footerLines = lang.formatList("tab-footer", placeholders);
-
         p.sendPlayerListHeaderAndFooter(
-                mm.deserialize(String.join("\n", headerLines)),
-                mm.deserialize(String.join("\n", footerLines))
+                mm.deserialize(String.join("\n", lang.formatList("tab-header", placeholders))),
+                mm.deserialize(String.join("\n", lang.formatList("tab-footer", placeholders)))
         );
+    }
+
+    private void removeFromAllTabs(Player playerToRemove) {
+        for (Player all : server.getAllPlayers()) {
+            all.getTabList().removeEntry(playerToRemove.getUniqueId());
+        }
+    }
+
+    private void refreshGroupTab(String serverName) {
+        int groupId = plugin.getGroupManager().getGroupId(serverName);
+        if (groupId == -1) return;
+
+        List<Player> groupPlayers = server.getAllPlayers().stream()
+                .filter(p -> p.getCurrentServer().isPresent())
+                .filter(p -> plugin.getGroupManager().getGroupId(p.getCurrentServer().get().getServerInfo().getName()) == groupId)
+                .collect(Collectors.toList());
+
+        for (Player p : groupPlayers) {
+            p.getCurrentServer().ifPresent(conn -> updateTabForGroup(p, conn.getServer()));
+        }
     }
 }
