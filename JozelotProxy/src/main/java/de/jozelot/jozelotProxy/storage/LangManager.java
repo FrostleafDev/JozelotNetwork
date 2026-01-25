@@ -180,5 +180,7 @@ public class LangManager {
         return current;
     }
 
-
+    public Map<String, Object> getAllData() {
+        return this.data;
+    }
 }

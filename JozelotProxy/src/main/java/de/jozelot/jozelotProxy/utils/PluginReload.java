@@ -4,6 +4,7 @@ import com.velocitypowered.api.proxy.Player;
 import de.jozelot.jozelotProxy.JozelotProxy;
 import de.jozelot.jozelotProxy.apis.GroupManager;
 import de.jozelot.jozelotProxy.database.MySQLSetup;
+import de.jozelot.jozelotProxy.database.RedisManager;
 import de.jozelot.jozelotProxy.database.RedisSetup;
 import de.jozelot.jozelotProxy.storage.ConfigManager;
 import de.jozelot.jozelotProxy.storage.LangManager;
@@ -14,6 +15,7 @@ public class PluginReload {
     private final LangManager lang;
     private final MySQLSetup mySQLSetup;
     private final RedisSetup redisSetup;
+    private final RedisManager redisManager;
     private final GroupManager groupManager;
     private final JozelotProxy plugin;
 
@@ -23,6 +25,7 @@ public class PluginReload {
         this.redisSetup = plugin.getRedisSetup();
         this.mySQLSetup = plugin.getMySQLSetup();
         this.groupManager = plugin.getGroupManager();
+        this.redisManager = plugin.getRedisManager();
         this.plugin = plugin;
     }
 
@@ -36,6 +39,9 @@ public class PluginReload {
         groupManager.load();
         redisSetup.setup();
         mySQLSetup.setup();
+        redisManager.uploadLanguage(lang.getAllData());
+        redisManager.sendReloadSignal();
+
         for (Player player : plugin.getServer().getAllPlayers()) {
             plugin.getBrandNameChanger().sendBrandName(player, config.getBrandName());
         }

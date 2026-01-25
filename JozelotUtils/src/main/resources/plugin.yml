@@ -5,3 +5,39 @@ api-version: '1.21'
 authors: [ jozelot_ ]
 description: Utils Plugin für jozelot.de - Bereitgestellt von jozelot_
 website: https://jozelot.de
+
+commands:
+  fly:
+    description: Lässt dich im Überlebensmodus fliegen
+    permission: network.utils.command.fly
+
+  flyspeed:
+    description: Ändert die Fluggeschwindigkeit
+    permission: network.utils.command.flyspeed
+
+permissions:
+  network.utils.command.fly:
+    description: Permission for command
+    default: op
+
+  network.utils.command.fly.others:
+    description: Permission for command
+    default: op
+
+  network.utils.command.fly.all:
+    description: Permission for command
+    default: op
+
+  network.utils.join.fly:
+    description: Permission for automatic flight on join
+    default: op
+
+  network.utils.command.flyspeed:
+    description: Permission for command
+    default: op
+
+  network.utils.admin.build:
+    default: op
+
+  network.utils.admin.inventory:
+    default: op

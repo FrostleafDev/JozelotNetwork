@@ -20,6 +20,7 @@ import de.jozelot.jozelotProxy.commands.messaging.MsgCommand;
 import de.jozelot.jozelotProxy.commands.messaging.ReplyCommand;
 import de.jozelot.jozelotProxy.database.MySQLManager;
 import de.jozelot.jozelotProxy.database.MySQLSetup;
+import de.jozelot.jozelotProxy.database.RedisManager;
 import de.jozelot.jozelotProxy.database.RedisSetup;
 import de.jozelot.jozelotProxy.listener.*;
 import de.jozelot.jozelotProxy.storage.ConfigManager;
@@ -62,6 +63,7 @@ public class JozelotProxy {
     private PlaytimeListener playtimeListener;
 
     private RedisSetup redisSetup;
+    private RedisManager redisManager;
     private MySQLSetup mySQLSetup;
     private MySQLManager mySQLManager;
 
@@ -111,6 +113,8 @@ public class JozelotProxy {
 
         this.redisSetup = new RedisSetup(this);
         redisSetup.setup();
+        this.redisManager = new RedisManager(this);
+            redisManager.uploadLanguage(lang.getAllData());
         this.mySQLSetup = new MySQLSetup(this);
         mySQLSetup.setup();
         this.mySQLManager = new MySQLManager(this);
@@ -269,6 +273,9 @@ public class JozelotProxy {
         return playtimeListener;
     }
 
+    public RedisManager getRedisManager() {
+        return redisManager;
+    }
     /**
      * Get the project version
      * @return String of the version

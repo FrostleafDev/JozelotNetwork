@@ -1,0 +1,27 @@
+automatic-flight-for-admins: true
+automatic-flight-for-player: false
+
+default-gamemode: survival
+can-build: false
+inventory-locked: true
+can-take-damage: false
+can-hunger: false
+
+color-settings:
+  primary: '#00A4FC'
+  secondary: '#00FC00'
+  tertiary: '#FCE300'
+  danger: '#f90036'
+  grey:  '#A8A8A8'
+
+mysql:
+  host: 'localhost'
+  port: 3306
+  database: 'jozelot_network'
+  user: ''
+  password: ''
+
+redis:
+  host: 'localhost'
+  port: 6379
+  password: ''

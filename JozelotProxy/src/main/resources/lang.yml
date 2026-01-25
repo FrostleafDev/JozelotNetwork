@@ -23,6 +23,7 @@ generic-error: '{danger}An error encoured'
 send-to-lobby: '{grey}Du wirst zur {primary}Lobby{grey} gesendet...'
 already-on-lobby: '{grey}Du befindest dich bereits in der {danger}Lobby'
 server-not-found: '{grey}Der Server {danger}{server-name}{grey} wurde nicht gefunden'
+player-not-found: '{grey}Der Spieler {danger}{player-name}{grey} wurde nicht gefunden'
 already-on-server: '{grey}Du befindest dich schon auf {danger}{server-name}'
 connection-failed: '{grey}Verbindung zu {danger}{server-name} {grey}fehlgeschlagen'
 player-not-on-server: '{danger}{server-name}{grey} befindet sich auf keinem Server'
@@ -279,10 +280,14 @@ protocol-recomment:
   - '<red>Du kannst auf dieser Version weiterspielen, aber nicht jeder Server ist damit beitretbar!'
 
 
+# Backend Lang
+command-fly-success: '{grey}Flugmodus wurde {primary}{state}'
+command-fly-others-success: '{grey}Flugmodus für {primary}{player} {primary}{state}'
+command-fly-all-success: '{grey}Flugmodus für {primary}alle Spieler {grey}umgeschaltet'
 
-
-
-
+command-flyspeed-usage: '{tertiary}/flyspeed <1-10>'
+command-flyspeed-success: '{grey}Deine Fluggeschwindigkeit wurde auf {primary}{speed}{grey} gesetzt'
+invalid-number: '{danger}{input}{grey} ist keine Zahl'
 
 
 
