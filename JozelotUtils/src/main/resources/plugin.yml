@@ -1,0 +1,7 @@
+name: JozelotUtils
+version: '1.0.0'
+main: de.jozelot.jozelotUtils.JozelotUtils
+api-version: '1.21'
+authors: [ jozelot_ ]
+description: Utils Plugin für jozelot.de - Bereitgestellt von jozelot_
+website: https://jozelot.de
