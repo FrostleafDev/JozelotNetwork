@@ -8,6 +8,7 @@ import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
+import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import de.jozelot.jozelotProxy.apis.GroupManager;
 import de.jozelot.jozelotProxy.apis.PteroManager;
@@ -30,9 +31,8 @@ import net.luckperms.api.LuckPermsProvider;
 import org.slf4j.Logger;
 
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.sql.Array;
+import java.util.*;
 
 @Plugin(
         id = "jozelotproxy",
@@ -188,6 +188,7 @@ public class JozelotProxy {
         consoleLogger.broadCastToConsole( "<" + config.getColorPrimary() + ">----------------------------------------------");
         consoleLogger.broadCastToConsole( "<" + config.getColorPrimary() + ">    Version: <" + config.getColorSecondary() + ">" + getVersion());
         consoleLogger.broadCastToConsole( "<" + config.getColorPrimary() + ">----------------------------------------------");
+
     }
 
     /***

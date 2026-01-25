@@ -151,6 +151,8 @@ pterodactyl-control-no-id: '{grey}Es ist keine Pterodactyl-ID für {danger}{serv
 pterodactyl-control-success: '{grey}Befehl für {primary}{action}{grey} wurde an {primary}{server-name}{grey} gesendet'
 pterodactyl-control-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat den Befehl für {primary}{action}{grey} an {primary}{server-name}{grey} gesendet'
 pterodactyl-control-api-error: '{grey}Die API hat mit dem Fehler Code {danger}{code}{grey} geantwortet'
+pterodactyl-restart-kick:
+  - "{danger}<b>ACHTUNG!</b> Die Proxy wird neugestartet!"
 
 pterodactlyl-status-error: '{grey}Fehler beim abrufer der {danger}API Daten'
 pterodactyl-status-message:
@@ -260,9 +262,21 @@ proxy-full-kick:
   - "{grey}Bitte versuche es später erneut oder erwerbe einen Rang."
   - "<dark_gray>(Limit: {max} Spieler)"
 
+protocol-to-old:
+  - '{danger}Falsche Version'
+  - '{danger}Bitte nutze die {min-version} oder neuer!'
+  - '{grey}Deine Version: {danger}{current-version}'
+  -
+protocol-to-new:
+  - '{danger}Falsche Version'
+  - '{danger}Bitte nutze die {max-version} oder älter!'
+  - '{grey}Deine Version: {danger}{current-version}'
 
-
-
+protocol-recomment:
+  - '{danger}<b>ACHTUNG!</b>'
+  - '{danger}Du bist gerade auf der <b>{current-version}</b>, wir empfehlen für das beste Spielerlebnis'
+  - 'alle Versionen ab <b>{reco-version}</b> bis <b>{max-version}</b>!'
+  - '<red>Du kannst auf dieser Version weiterspielen, aber nicht jeder Server ist damit beitretbar!'
 
 
 

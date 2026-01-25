@@ -7,6 +7,7 @@ import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.event.player.ServerConnectedEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
+import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.player.TabListEntry;
@@ -18,6 +19,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 
 import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -88,7 +90,30 @@ public class ServerSwitchListener {
             return;
         }
 
-        // 3. Proxy-Kapazität: Ist das gesamte Netzwerk voll?
+        // 3. Version check
+        int protocolMin = config.getProtocalMin();
+        String versionMin = ProtocolVersion.getProtocolVersion(protocolMin).getName();
+
+        int protocolMax = config.getProtocalMax();
+        String versionMax = ProtocolVersion.getProtocolVersion(protocolMax).getName();
+
+        int protocolVersion = player.getProtocolVersion().getProtocol();
+        String versionPlayer = ProtocolVersion.getProtocolVersion(protocolVersion).getName();
+
+        if (protocolVersion < protocolMin) {
+            event.setResult(ResultedEvent.ComponentResult.denied(mm.deserialize(
+                    String.join("<newline>", lang.formatList("protocol-to-old", Map.of("min-version", versionMin, "current-version", versionPlayer)))
+            )));
+            return;
+        }
+        if (protocolVersion > protocolMax) {
+            event.setResult(ResultedEvent.ComponentResult.denied(mm.deserialize(
+                    String.join("<newline>", lang.formatList("protocol-to-new", Map.of("ax-version", versionMax, "current-version", versionPlayer)))
+            )));
+            return;
+        }
+
+        // 4. Proxy-Kapazität: Ist das gesamte Netzwerk voll?
         int maxProxy = plugin.getMySQLManager().getMaxPlayers("proxy");
         if (maxProxy > 0 && server.getPlayerCount() >= maxProxy && !player.hasPermission("network.maxplayers.bypass.proxy")) {
             event.setResult(ResultedEvent.ComponentResult.denied(mm.deserialize(
@@ -103,7 +128,20 @@ public class ServerSwitchListener {
         String username = player.getUsername();
 
         // Brand Name senden
-        plugin.getBrandNameChanger().sendBrandName(player, config.getBrandName());
+        server.getScheduler().buildTask(plugin, () -> {
+            plugin.getBrandNameChanger().sendBrandName(player, config.getBrandName());
+        }).delay(250, TimeUnit.MILLISECONDS).schedule();
+
+        int protocolReco = config.getProtocalReco();
+        String versionReco = ProtocolVersion.getProtocolVersion(protocolReco).getName();
+        int protocolVersion = player.getProtocolVersion().getProtocol();
+        String versionPlayer = ProtocolVersion.getProtocolVersion(protocolVersion).getName();
+        int protocolMax = config.getProtocalMax();
+        String versionMax = ProtocolVersion.getProtocolVersion(protocolMax).getName();
+
+        if (protocolVersion < protocolReco) {
+            player.sendMessage(mm.deserialize(String.join("<newline>", lang.formatList("protocol-recomment", Map.of("current-version", versionPlayer, "reco-version", versionReco, "max-version", versionMax)))));
+        }
 
         // Datenbank-Aufgaben asynchron erledigen
         server.getScheduler().buildTask(plugin, () -> {
@@ -187,6 +225,10 @@ public class ServerSwitchListener {
         if (groupId != -1) {
             updateTabHeaderForPlayer(player, groupId);
         }
+
+        server.getScheduler().buildTask(plugin, () -> {
+            plugin.getBrandNameChanger().sendBrandName(player, config.getBrandName());
+        }).delay(250, TimeUnit.MILLISECONDS).schedule();
 
         server.getScheduler().buildTask(plugin, () -> {
             plugin.getMySQLManager().updatePlayerServer(player.getUniqueId(), serverName);

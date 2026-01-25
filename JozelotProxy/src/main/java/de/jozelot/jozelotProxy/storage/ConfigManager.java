@@ -37,6 +37,10 @@ public class ConfigManager {
     private List<String> hardBlocked;
     private Map<String, List<String>> commandGroups;
 
+    private int protocalMin;
+    private int protocalMax;
+    private int protocalReco;
+
     public ConfigManager(Path directory, String fileName) {
         this.file = new File(directory.toFile(), fileName);
         this.faviconDirectory = directory.resolve("favicons");
@@ -125,6 +129,18 @@ public class ConfigManager {
         return hardBlocked;
     }
 
+    public int getProtocalMax() {
+        return protocalMax;
+    }
+
+    public int getProtocalReco() {
+        return protocalReco;
+    }
+
+    public int getProtocalMin() {
+        return protocalMin;
+    }
+
     public void reload() {
         try (InputStream in = new FileInputStream(file)) {
             this.data = yaml.load(in);
@@ -152,6 +168,10 @@ public class ConfigManager {
 
         brandName = getString("brand-name");
         hardBlocked = getStringList("blocked-commands.hard-blocked");
+
+        protocalMin = getInt("protocol-versions.min");
+        protocalMax = getInt("protocol-versions.max");
+        protocalReco = getInt("protocol-versions.recommended");
 
         loadCommandGroups();
     }

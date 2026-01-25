@@ -5,6 +5,11 @@
 network-name: 'jozelot.de'
 brand-name: '§b§ljozelot.de§r'
 
+protocol-versions:
+  min: 767
+  recommended: 773
+  max: 774
+
 punishment-reasons:
   - "101 Hacking"
   - "102 Killaura"

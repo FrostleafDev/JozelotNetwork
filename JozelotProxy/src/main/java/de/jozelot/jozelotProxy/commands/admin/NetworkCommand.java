@@ -81,6 +81,13 @@ public class NetworkCommand implements SimpleCommand {
                     return;
                 }
 
+                if ((action.equalsIgnoreCase("restart") || action.equalsIgnoreCase("stop")) && serverName.equalsIgnoreCase("proxy")) {
+
+                    List<String> kickLines = lang.formatList("pterodactyl-restart-kick", null);
+
+                    server.getAllPlayers().forEach(p -> p.disconnect(mm.deserialize(String.join("<newline>", kickLines))));
+                }
+
                 plugin.getPteroManager().sendAction(pteroId, action, code -> {
                     if (code == 204) {
                         String senderName = (source instanceof Player player) ? player.getUsername() : "Konsole";
