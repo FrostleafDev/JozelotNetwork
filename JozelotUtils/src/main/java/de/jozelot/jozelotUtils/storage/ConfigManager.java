@@ -28,6 +28,7 @@ public class ConfigManager {
     private boolean inventoryLocked;
     private boolean canTakeDamage;
     private boolean canHunger;
+    private boolean showPlayerNameTags;
 
     public ConfigManager(JozelotUtils plugin) {
         this.plugin = plugin;
@@ -94,6 +95,10 @@ public class ConfigManager {
         return canHunger;
     }
 
+    public boolean isShowPlayerNameTags() {
+        return showPlayerNameTags;
+    }
+
     public void loadConfig() {
         plugin.saveDefaultConfig();
 
@@ -115,6 +120,8 @@ public class ConfigManager {
         inventoryLocked = plugin.getConfig().getBoolean("inventory-locked");
         canTakeDamage = plugin.getConfig().getBoolean("can-take-damage");
         canHunger = plugin.getConfig().getBoolean("can-hunger");
+
+        showPlayerNameTags = plugin.getConfig().getBoolean("enable-player-name-tag");
     }
 
 }

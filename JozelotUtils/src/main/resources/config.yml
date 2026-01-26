@@ -6,6 +6,9 @@ can-build: false
 inventory-locked: true
 can-take-damage: false
 can-hunger: false
+entities-focus-player: false
+
+enable-player-name-tag: true
 
 color-settings:
   primary: '#00A4FC'

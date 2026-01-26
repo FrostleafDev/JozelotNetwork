@@ -9,6 +9,7 @@ import de.jozelot.jozelotUtils.database.RedisManager;
 import de.jozelot.jozelotUtils.database.RedisSetup;
 import de.jozelot.jozelotUtils.listener.GriefPrevention;
 import de.jozelot.jozelotUtils.listener.JoinListener;
+import de.jozelot.jozelotUtils.listener.PlayerNameTag;
 import de.jozelot.jozelotUtils.storage.ConfigManager;
 import de.jozelot.jozelotUtils.storage.LangManager;
 import de.jozelot.jozelotUtils.utils.ReloadPlugin;
@@ -25,6 +26,7 @@ public final class JozelotUtils extends JavaPlugin {
     private RedisManager redisManager;
     private LangManager lang;
     private ReloadPlugin reloadPlugin;
+    private PlayerNameTag playerNameTag;
 
     @Override
     public void onEnable() {
@@ -51,6 +53,8 @@ public final class JozelotUtils extends JavaPlugin {
         getCommand("flyspeed").setTabCompleter(new FlySpeedCommandTab());
 
         getServer().getPluginManager().registerEvents(new JoinListener(this), this);
+        playerNameTag = new PlayerNameTag(this);
+        getServer().getPluginManager().registerEvents(playerNameTag, this);
         getServer().getPluginManager().registerEvents(new GriefPrevention(this), this);
 
         getServer().getConsoleSender().sendMessage("§a[§6JoUtils§a]§a Minecraft läuft in der " + Bukkit.getBukkitVersion());
@@ -87,5 +91,8 @@ public final class JozelotUtils extends JavaPlugin {
     }
     public ReloadPlugin getReloadPlugin() {
         return reloadPlugin;
+    }
+    public PlayerNameTag getPlayerNameTag() {
+        return playerNameTag;
     }
 }
