@@ -7,8 +7,23 @@ inventory-locked: true
 can-take-damage: false
 can-hunger: false
 entities-focus-player: false
+entity-grief: false
+can-mob-spawn: false
+
+drop-items-on-death: false
+keep-inventory: true
+fire-spread: false
+leaf-decay: false
+natural-regeneration: false
+daylight-cycle: false
+weather-cycle: false
+announce-advancements: false
+advancements-enabled: false
 
 enable-player-name-tag: true
+
+join-messages: default # default, disabled, custom
+leave-messages: default # default, disabled, custom
 
 color-settings:
   primary: '#00A4FC'

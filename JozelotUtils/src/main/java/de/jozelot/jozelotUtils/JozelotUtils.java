@@ -7,14 +7,14 @@ import de.jozelot.jozelotUtils.commands.FlySpeedCommandTab;
 import de.jozelot.jozelotUtils.database.RedisListener;
 import de.jozelot.jozelotUtils.database.RedisManager;
 import de.jozelot.jozelotUtils.database.RedisSetup;
-import de.jozelot.jozelotUtils.listener.GriefPrevention;
-import de.jozelot.jozelotUtils.listener.JoinListener;
-import de.jozelot.jozelotUtils.listener.PlayerNameTag;
+import de.jozelot.jozelotUtils.listener.*;
 import de.jozelot.jozelotUtils.storage.ConfigManager;
 import de.jozelot.jozelotUtils.storage.LangManager;
 import de.jozelot.jozelotUtils.utils.ReloadPlugin;
 import org.apache.commons.codec.language.bm.Lang;
 import org.bukkit.Bukkit;
+import org.bukkit.GameRule;
+import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Map;
@@ -53,9 +53,13 @@ public final class JozelotUtils extends JavaPlugin {
         getCommand("flyspeed").setTabCompleter(new FlySpeedCommandTab());
 
         getServer().getPluginManager().registerEvents(new JoinListener(this), this);
+        getServer().getPluginManager().registerEvents(new LeaveListener(this), this);
+        getServer().getPluginManager().registerEvents(new GriefPrevention(this), this);
+        getServer().getPluginManager().registerEvents(new WorldSettings(this), this);
+
         playerNameTag = new PlayerNameTag(this);
         getServer().getPluginManager().registerEvents(playerNameTag, this);
-        getServer().getPluginManager().registerEvents(new GriefPrevention(this), this);
+        applyGameRules();
 
         getServer().getConsoleSender().sendMessage("§a[§6JoUtils§a]§a Minecraft läuft in der " + Bukkit.getBukkitVersion());
         getServer().getConsoleSender().sendMessage("§a[§6JoUtils§a]§a ----------------------------------------------");
@@ -75,8 +79,6 @@ public final class JozelotUtils extends JavaPlugin {
     public String getVersion() {
         return getDescription().getVersion();
     }
-
-
     public ConfigManager getConfigManager() {
         return config;
     }
@@ -94,5 +96,20 @@ public final class JozelotUtils extends JavaPlugin {
     }
     public PlayerNameTag getPlayerNameTag() {
         return playerNameTag;
+    }
+
+    public void applyGameRules() {
+        for (World world : Bukkit.getWorlds()) {
+            world.setGameRule(GameRule.KEEP_INVENTORY, config.isKeepInventory());
+            world.setGameRule(GameRule.DO_FIRE_TICK, config.isFireSpread());
+            world.setGameRule(GameRule.NATURAL_REGENERATION, config.isNaturalRegeneration());
+            world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, config.isDaylightCycle());
+            world.setGameRule(GameRule.DO_WEATHER_CYCLE, config.isWeatherCycle());
+            world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, config.isAnnounceAdvancements());
+
+            if (!config.isDaylightCycle()) {
+                world.setTime(6000L);
+            }
+        }
     }
 }

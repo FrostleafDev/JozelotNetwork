@@ -289,6 +289,9 @@ command-flyspeed-usage: '{tertiary}/flyspeed <1-10>'
 command-flyspeed-success: '{grey}Deine Fluggeschwindigkeit wurde auf {primary}{speed}{grey} gesetzt'
 invalid-number: '{danger}{input}{grey} ist keine Zahl'
 
+join-message: '<dark_grey>[<green>+<dark_grey>] {grey}{player-name}'
+leave-message: '<dark_grey>[<red>-<dark_grey>] {grey}{player-name}'
+
 
 
 

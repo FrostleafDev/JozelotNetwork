@@ -29,6 +29,22 @@ public class ConfigManager {
     private boolean canTakeDamage;
     private boolean canHunger;
     private boolean showPlayerNameTags;
+    private boolean entitiesFocusPlayer;
+    private boolean entityGrief;
+    private boolean canMobSpawn;
+
+    private boolean dropItemsOnDeath;
+    private boolean keepInventory;
+    private boolean fireSpread;
+    private boolean leafDecay;
+    private boolean naturalRegeneration;
+    private boolean daylightCycle;
+    private boolean weatherCycle;
+    private boolean announceAdvancements;
+    private boolean advancementsEnabled;
+
+    private String joinMessageType;
+    private String leaveMessageType;
 
     public ConfigManager(JozelotUtils plugin) {
         this.plugin = plugin;
@@ -99,6 +115,62 @@ public class ConfigManager {
         return showPlayerNameTags;
     }
 
+    public String getJoinMessageType() {
+        return joinMessageType;
+    }
+
+    public String getLeaveMessageType() {
+        return leaveMessageType;
+    }
+
+    public boolean isEntitiesFocusPlayer() {
+        return entitiesFocusPlayer;
+    }
+
+    public boolean isEntityGrief() {
+        return entityGrief;
+    }
+
+    public boolean isCanMobSpawn() {
+        return canMobSpawn;
+    }
+
+    public boolean isDropItemsOnDeath() {
+        return dropItemsOnDeath;
+    }
+
+    public boolean isKeepInventory() {
+        return keepInventory;
+    }
+
+    public boolean isFireSpread() {
+        return fireSpread;
+    }
+
+    public boolean isLeafDecay() {
+        return leafDecay;
+    }
+
+    public boolean isNaturalRegeneration() {
+        return naturalRegeneration;
+    }
+
+    public boolean isDaylightCycle() {
+        return daylightCycle;
+    }
+
+    public boolean isWeatherCycle() {
+        return weatherCycle;
+    }
+
+    public boolean isAnnounceAdvancements() {
+        return announceAdvancements;
+    }
+
+    public boolean isAdvancementsEnabled() {
+        return advancementsEnabled;
+    }
+
     public void loadConfig() {
         plugin.saveDefaultConfig();
 
@@ -122,6 +194,25 @@ public class ConfigManager {
         canHunger = plugin.getConfig().getBoolean("can-hunger");
 
         showPlayerNameTags = plugin.getConfig().getBoolean("enable-player-name-tag");
+
+        joinMessageType = plugin.getConfig().getString("join-messages");
+        leaveMessageType = plugin.getConfig().getString("leave-messages");
+
+        entitiesFocusPlayer = plugin.getConfig().getBoolean("entities-focus-player");
+
+        entityGrief = plugin.getConfig().getBoolean("entity-grief");
+
+        canMobSpawn = plugin.getConfig().getBoolean("can-mob-spawn");
+
+        dropItemsOnDeath = plugin.getConfig().getBoolean("drop-items-on-death", false);
+        keepInventory = plugin.getConfig().getBoolean("keep-inventory", true);
+        fireSpread = plugin.getConfig().getBoolean("fire-spread", false);
+        leafDecay = plugin.getConfig().getBoolean("leaf-decay", false);
+        naturalRegeneration = plugin.getConfig().getBoolean("natural-regeneration", false);
+        daylightCycle = plugin.getConfig().getBoolean("daylight-cycle", false);
+        weatherCycle = plugin.getConfig().getBoolean("weather-cycle", false);
+        announceAdvancements = plugin.getConfig().getBoolean("announce-advancements", false);
+        advancementsEnabled = plugin.getConfig().getBoolean("advancements-enabled", false);
     }
 
 }
