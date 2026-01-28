@@ -7,14 +7,28 @@ prefix: '{grey}[<gradient:#f90036:#f90011><b>System</b>{grey}]'
 only-player: '{danger}Nur Spieler können diesen Command ausführen'
 no-permission: '{danger}Du hast keine Rechte dazu'
 first-join:
-  - '{primary}Willkommen {player-name} auf {secondary}jozelot.de{primary}!'
-  - '{grey}Schau dich gerne um!'
+  - ""
+  - "  <gradient:#00A4FC:#00FC00><b>WILLKOMMEN AUF JOZELOT.DE</b></gradient>"
+  - "  {grey}Hey <white>{player-name}</white>, schön dass du da bist!"
+  - ""
+  - "  {grey}Du startest heute dein Abenteuer auf unserem Netzwerk."
+  - "  {grey}Erkunde die Lobby, triff Freunde und hab Spaß!"
+  - ""
+  - "  <dark_gray>» {secondary}Discord: <white>jozelot.de/discord</white>"
+  - ""
 
 server-maintenance-kick: '{danger}Du wurdest wegen Wartungsarbeiten von {server-name} gekickt'
 server-maintenance-no-access: '{danger}Du kannst {server-name} nicht, wegen aktuellen Wartungsarbeiten, beitreten, '
 proxy-maintenance-kick:
-  - '{danger}Unser Netzwerk befindet sich aktuell in Wartungsarbeiten!'
-  - '{grey}Probiere es erneut'
+  - "<gradient:#f90036:#f90011><b>WARTUNGSARBEITEN</b></gradient>"
+  - ""
+  - "{grey}Unser Netzwerk wird aktuell {danger}überarbeitet{grey},"
+  - "{grey}um dein Spielerlebnis noch besser zu machen."
+  - ""
+  - "{grey}Wir sind in Kürze wieder für dich da!"
+  - ""
+  - "<dark_gray>Aktuelle Infos & Updates findest du hier:"
+  - "{secondary}jozelot.de/discord <dark_gray>| <white>jozelot.de</white>"
 maintenance-version: '§4Wartungsarbeiten'
 no-forcedhost-permission: '{danger}Du kannst {server-name} nicht über einen Horced Host joinen'
 
@@ -95,21 +109,38 @@ command-ban-success: '{grey}Du hast {primary}{player-name}{grey} erfolgreich geb
 command-ban-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat {primary}{ban-name} {grey}gebannt. Länge:{primary} {duration}'
 
 ban-kick-screen:
-  - '{danger}<bold>DU WURDEST GEBANNT<reset>'
-  - '{grey}Grund: {danger}{reason}'
-  - '{grey}Länge: {danger}{duration}'
+  - "<gradient:#f90036:#f90011><b>AUSSCHLUSS VOM NETZWERK</b></gradient>"
+  - ""
+  - "{grey}Deine Verbindung wurde dauerhaft getrennt."
+  - ""
+  - "{grey}Grund: <white>{reason}"
+  - "{grey}Dauer: <white>{duration}"
+  - ""
+  - "{grey}Erstelle einen Entbannungsantrag unter:"
+  - "{secondary}jozelot.de/discord"
+
 ban-join-screen:
-  - '{danger}<bold>DU WURDEST GEBANNT<reset>'
-  - '{grey}Grund: {danger}{reason}'
-  - '{grey}Ban bis: {danger}{duration}'
-  - '{grey}Wenn das ein Fehler ist, melde dich bei einem Administrator'
+  - "<gradient:#f90036:#f90011><b>DU BIST GEBANNT</b></gradient>"
+  - ""
+  - "{grey}Du bist aktuell vom Netzwerk ausgeschlossen."
+  - ""
+  - "{grey}Grund: <white>{reason}"
+  - "{grey}Datum des Unbans: <white>{duration}"
+  - ""
+  - "{grey}Sollte dies ein Fehler sein, wende dich an das Team."
+
 ban-bypass-info:
-  - '{secondary}<bold>INFO: Du wurdest gebannt!</bold>'
-  - '{secondary}Du kannst jedoch, wegen deinen Rechten, trotzdem joinen.'
-  - '{grey}Wenn das ein Fehler ist, mach /unban {player-name}'
-  - '{grey}Grund: {danger}{reason}'
-  - '{grey}Bis: {danger}{duration}'
-  - '{grey}Von: {danger}{admin-name}'
+  - ""
+  - "  <gradient:#00A4FC:#00FC00><b>ADMIN-BYPASS AKTIV</b></gradient>"
+  - "  {grey}Du bist eigentlich auf dem Netzwerk {danger}gebannt{grey}."
+  - "  {grey}Aufgrund deiner Rechte wurdest du dennoch verbunden."
+  - ""
+  - "  <dark_gray>»</dark_gray> {grey}Grund: <white>{reason}"
+  - "  <dark_gray>»</dark_gray> {grey}Bis: <white>{duration}"
+  - "  <dark_gray>»</dark_gray> {grey}Von: <white>{admin-name}"
+  - ""
+  - "  {grey}Nutze {primary}/unban {player-name}{grey}, um den Bann aufzuheben."
+  - ""
 
 command-unban-usage: '{tertiary}/unban <Spieler>'
 command-unban-success: '{primary}{player-name} {grey}wurde entbannt'
@@ -128,8 +159,15 @@ command-kick-success: '{grey}Du hast {primary}{player-name}{grey} erfolgreich ge
 command-kick-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat {primary}{ban-name} {grey}gekickt.'
 
 kick-screen:
-  - '{danger}<bold>DU WURDEST GEKICKT<reset>'
-  - '{grey}Grund: {danger}{reason}'
+  - "<gradient:#f90036:#f90011><b>VERBINDUNG GETRENNT</b></gradient>"
+  - ""
+  - "{grey}Du wurdest vom <white>jozelot.de</white> Netzwerk gekickt."
+  - ""
+  - "{grey}Grund für den Ausschluss:"
+  - "<white>» {danger}{reason}"
+  - ""
+  - "{grey}Solltest du diesen Kick für unberechtigt halten,"
+  - "{grey}melde dich bitte auf unserem {secondary}Discord{grey}."
 
 command-tpo-player-not-found: '{danger}{player-name}{grey} konnte nicht gefunden werden'
 send-to-server-success: '{grey}Du wurdest erfolgreich zu {primary}{player-name} {grey}auf {primary}{server-name}{grey} gesendet'
@@ -254,31 +292,45 @@ broadcast-warning:
   - ""
   - "<dark_gray> ---------------------------------"
   - ""
-
-server-full-kick: "{danger}Der Server {server-name} ist voll! {grey}({max}/{max})"
+  -
 server-full-message: "{danger}Du kannst nicht auf {server-name} verbinden, da dieser voll ist."
 
 proxy-full-kick:
-  - "{danger}Das Netzwerk ist aktuell voll!"
-  - "{grey}Bitte versuche es später erneut oder erwerbe einen Rang."
-  - "<dark_gray>(Limit: {max} Spieler)"
+  - "<gradient:#f90036:#f90011><b>NETZWERK AUSGELASTET</b></gradient>"
+  - ""
+  - "{grey}Aktuell sind alle <white>{max} Slots</white> belegt."
+  - ""
+  - "{grey}Mit dem <gradient:#00A4FC:#00FC00><b>VIP Rang</b></gradient> kannst du"
+  - "{grey}auch bei vollem Netzwerk jederzeit beitreten!"
 
 protocol-to-old:
-  - '{danger}Falsche Version'
-  - '{danger}Bitte nutze die {min-version} oder neuer!'
-  - '{grey}Deine Version: {danger}{current-version}'
-  -
+  - "<red><b>ZUTRITT VERWEIGERT</b>"
+  - ""
+  - "{grey}Deine Minecraft-Version ist zu {danger}alt{grey}."
+  - "{grey}Aktuelle Version: {danger}{current-version}"
+  - ""
+  - "{grey}Bitte nutze mindestens die Version: {primary}{min-version}"
+
 protocol-to-new:
-  - '{danger}Falsche Version'
-  - '{danger}Bitte nutze die {max-version} oder älter!'
-  - '{grey}Deine Version: {danger}{current-version}'
+  - "<red><b>ZUTRITT VERWEIGERT</b>"
+  - ""
+  - "{grey}Deine Minecraft-Version ist zu <danger>neu{grey}."
+  - "{grey}Aktuelle Version: {danger}{current-version}"
+  - ""
+  - "{grey}Bitte nutze maximal die Version: {primary}{max-version}"
+  - "{grey}Empfohlene Version: {primary}{reco-version}"
+  - ""
+  - "{grey}Du kannst mit der {primary}{max-version}{grey} problemlos joinen."
 
 protocol-recomment:
-  - '{danger}<b>ACHTUNG!</b>'
-  - '{danger}Du bist gerade auf der <b>{current-version}</b>, wir empfehlen für das beste Spielerlebnis'
-  - 'alle Versionen ab <b>{reco-version}</b> bis <b>{max-version}</b>!'
-  - '<red>Du kannst auf dieser Version weiterspielen, aber nicht jeder Server ist damit beitretbar!'
-
+  - ''
+  - '  <gradient:#f90036:#f90011><b>HINWEIS ZUR SPIELVERSION</b></gradient>'
+  - '  {grey}Du spielst aktuell auf der Version {danger}{current-version}{grey}.'
+  - '  {grey}Für das {secondary}beste Spielerlebnis{grey} empfehlen wir:'
+  - '  <white>» <gradient:#00A4FC:#00FC00><b>{reco-version}</b></gradient> <dark_gray>bis</dark_gray> <gradient:#00A4FC:#00FC00><b>{max-version}</b></gradient>'
+  - ''
+  - '  <dark_gray><i>Einige Serverfunktionen sind mit deiner Version eingeschränkt.</i>'
+  - ''
 
 # Backend Lang
 command-fly-success: '{grey}Flugmodus wurde {primary}{state}'

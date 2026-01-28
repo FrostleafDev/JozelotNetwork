@@ -73,7 +73,7 @@ public class TpoHereCommand implements SimpleCommand {
         consoleLogger.broadCastToConsole("<yellow>" + senderName + " <gray>hat <white>" + args[0] + " <gray>zu sich <gray>verschoben");
         for (Player p : server.getAllPlayers()) {
             if (p.hasPermission("network.get.logs") && !p.equals(source)) {
-                p.sendMessage(mm.deserialize(lang.format("command-tpohere-success-admin", Map.of("player-name", senderName, "target-name", args[1]))));
+                p.sendMessage(mm.deserialize(lang.format("command-tpohere-success-admin", Map.of("player-name", senderName, "target-name", target.get().getUsername()))));
             }
         }
 

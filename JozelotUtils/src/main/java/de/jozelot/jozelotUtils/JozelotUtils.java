@@ -14,6 +14,7 @@ import de.jozelot.jozelotUtils.utils.ReloadPlugin;
 import org.apache.commons.codec.language.bm.Lang;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
+import org.bukkit.ServerTickManager;
 import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -106,10 +107,16 @@ public final class JozelotUtils extends JavaPlugin {
             world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, config.isDaylightCycle());
             world.setGameRule(GameRule.DO_WEATHER_CYCLE, config.isWeatherCycle());
             world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, config.isAnnounceAdvancements());
+            world.setGameRule(GameRule.RANDOM_TICK_SPEED, config.getTickSpeed());
 
             if (!config.isDaylightCycle()) {
                 world.setTime(6000L);
             }
         }
+    }
+
+    public void freezeGame(boolean state) {
+        ServerTickManager serverTickManager = Bukkit.getServerTickManager();
+        serverTickManager.setFrozen(state);
     }
 }

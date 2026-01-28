@@ -46,23 +46,15 @@ public class GriefPrevention implements Listener {
         if (config.canBuild()) return;
         if (canBypass(event.getPlayer())) return;
 
-        if (event.getAction() == Action.PHYSICAL && event.getClickedBlock() != null) {
-            if (event.getClickedBlock().getType() == Material.FARMLAND) {
-                event.setCancelled(true);
-                return;
-            }
-        }
+        event.setCancelled(true);
+    }
 
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            if (event.getClickedBlock() != null && event.getClickedBlock().getType().isInteractable()) {
-                event.setCancelled(true);
-                return;
-            }
-        }
+    @EventHandler
+    public void onConsume(PlayerItemConsumeEvent event) {
+        if (config.canBuild()) return;
+        if (canBypass(event.getPlayer())) return;
 
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.LEFT_CLICK_BLOCK) {
-            event.setCancelled(true);
-        }
+        event.setCancelled(true);
     }
 
     @EventHandler
@@ -95,8 +87,8 @@ public class GriefPrevention implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        if (config.isInventoryLocked() && event.getWhoClicked() instanceof Player player) {
-            if (!canBypass(player) && !player.hasPermission("network.utils.admin.inventory")) {
+        if (event.getWhoClicked() instanceof Player player) {
+            if (config.isInventoryLocked() && !canBypass(player) && !player.hasPermission("network.utils.admin.inventory")) {
                 event.setCancelled(true);
             }
         }
@@ -104,15 +96,16 @@ public class GriefPrevention implements Listener {
 
     @EventHandler
     public void onDrop(PlayerDropItemEvent event) {
-        if (config.isInventoryLocked() && !canBypass(event.getPlayer()) && !event.getPlayer().hasPermission("network.utils.admin.inventory")) {
+        Player player = event.getPlayer();
+        if (config.isInventoryLocked() && !canBypass(player) && !player.hasPermission("network.utils.admin.inventory")) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onPickup(EntityPickupItemEvent event) {
-        if (config.isInventoryLocked() && event.getEntity() instanceof Player player) {
-            if (!canBypass(player) && !player.hasPermission("network.utils.admin.inventory")) {
+        if (event.getEntity() instanceof Player player) {
+            if (config.isInventoryLocked() && !canBypass(player) && !player.hasPermission("network.utils.admin.inventory")) {
                 event.setCancelled(true);
             }
         }

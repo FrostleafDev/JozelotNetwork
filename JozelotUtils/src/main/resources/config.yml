@@ -20,6 +20,9 @@ weather-cycle: false
 announce-advancements: false
 advancements-enabled: false
 
+tick-freeze: true
+tick-speed: 0
+
 enable-player-name-tag: true
 
 join-messages: default # default, disabled, custom

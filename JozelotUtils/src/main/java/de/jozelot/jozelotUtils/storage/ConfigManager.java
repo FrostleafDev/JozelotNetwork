@@ -42,6 +42,9 @@ public class ConfigManager {
     private boolean weatherCycle;
     private boolean announceAdvancements;
     private boolean advancementsEnabled;
+    private int tickSpeed;
+
+    private boolean ticksFreeze;
 
     private String joinMessageType;
     private String leaveMessageType;
@@ -171,6 +174,14 @@ public class ConfigManager {
         return advancementsEnabled;
     }
 
+    public int getTickSpeed() {
+        return tickSpeed;
+    }
+
+    public boolean isTicksFreeze() {
+        return ticksFreeze;
+    }
+
     public void loadConfig() {
         plugin.saveDefaultConfig();
 
@@ -213,6 +224,8 @@ public class ConfigManager {
         weatherCycle = plugin.getConfig().getBoolean("weather-cycle", false);
         announceAdvancements = plugin.getConfig().getBoolean("announce-advancements", false);
         advancementsEnabled = plugin.getConfig().getBoolean("advancements-enabled", false);
+        ticksFreeze = plugin.getConfig().getBoolean("tick-freeze", false);
+        tickSpeed = plugin.getConfig().getInt("tick-speed");
     }
 
 }

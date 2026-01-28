@@ -39,5 +39,7 @@ public class ReloadPlugin {
                 pnt.updateNametag(all);
             }
         }
+        plugin.applyGameRules();
+        plugin.freezeGame(config.isTicksFreeze());
     }
 }
