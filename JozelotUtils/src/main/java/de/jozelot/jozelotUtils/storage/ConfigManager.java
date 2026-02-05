@@ -43,6 +43,10 @@ public class ConfigManager {
     private boolean announceAdvancements;
     private boolean advancementsEnabled;
     private int tickSpeed;
+    private boolean isCustomExperienceLevel;
+    private int customExperienceLevel;
+    private boolean isCustomBarLevel;
+    private int customBarLevel;
 
     private boolean ticksFreeze;
 
@@ -182,6 +186,22 @@ public class ConfigManager {
         return ticksFreeze;
     }
 
+    public boolean isCustomExperienceLevel() {
+        return isCustomExperienceLevel;
+    }
+
+    public int getCustomExperienceLevel() {
+        return customExperienceLevel;
+    }
+
+    public boolean isCustomBarLevel() {
+        return isCustomBarLevel;
+    }
+
+    public int getCustomBarLevel() {
+        return customBarLevel;
+    }
+
     public void loadConfig() {
         plugin.saveDefaultConfig();
 
@@ -226,6 +246,11 @@ public class ConfigManager {
         advancementsEnabled = plugin.getConfig().getBoolean("advancements-enabled", false);
         ticksFreeze = plugin.getConfig().getBoolean("tick-freeze", false);
         tickSpeed = plugin.getConfig().getInt("tick-speed");
-    }
 
+        isCustomExperienceLevel = plugin.getConfig().getBoolean("custom-experience-level");
+        customExperienceLevel = plugin.getConfig().getInt("experience-level-set");
+
+        isCustomBarLevel = plugin.getConfig().getBoolean("custom-bar-level");
+        customBarLevel = plugin.getConfig().getInt("bar-level-set");
+    }
 }

@@ -61,11 +61,8 @@ public class GriefPrevention implements Listener {
     public void onEntityDamage(EntityDamageByEntityEvent event) {
         if (config.canBuild()) return;
 
-        EntityType type = event.getEntityType();
-        if (type == EntityType.ITEM_FRAME || type == EntityType.ARMOR_STAND || type == EntityType.GLOW_ITEM_FRAME) {
-            if (event.getDamager() instanceof Player player) {
-                if (!canBypass(player)) event.setCancelled(true);
-            } else {
+        if (event.getDamager() instanceof Player player) {
+            if (!canBypass(player)) {
                 event.setCancelled(true);
             }
         }
@@ -87,8 +84,12 @@ public class GriefPrevention implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        if (event.getWhoClicked() instanceof Player player) {
-            if (config.isInventoryLocked() && !canBypass(player) && !player.hasPermission("network.utils.admin.inventory")) {
+        if (!(event.getWhoClicked() instanceof Player player)) return;
+
+        if (config.isInventoryLocked()) {
+            boolean isAuthorizedAdmin = (player.getGameMode() == GameMode.CREATIVE)
+                    && player.hasPermission("network.utils.admin.build");
+            if (!isAuthorizedAdmin) {
                 event.setCancelled(true);
             }
         }
@@ -97,15 +98,23 @@ public class GriefPrevention implements Listener {
     @EventHandler
     public void onDrop(PlayerDropItemEvent event) {
         Player player = event.getPlayer();
-        if (config.isInventoryLocked() && !canBypass(player) && !player.hasPermission("network.utils.admin.inventory")) {
-            event.setCancelled(true);
+        if (config.isInventoryLocked()) {
+            boolean isAuthorizedAdmin = (player.getGameMode() == GameMode.CREATIVE)
+                    && player.hasPermission("network.utils.admin.build");
+            if (!isAuthorizedAdmin) {
+                event.setCancelled(true);
+            }
         }
     }
 
     @EventHandler
     public void onPickup(EntityPickupItemEvent event) {
-        if (event.getEntity() instanceof Player player) {
-            if (config.isInventoryLocked() && !canBypass(player) && !player.hasPermission("network.utils.admin.inventory")) {
+        if (!(event.getEntity() instanceof Player player)) return;
+
+        if (config.isInventoryLocked()) {
+            boolean isAuthorizedAdmin = (player.getGameMode() == GameMode.CREATIVE)
+                    && player.hasPermission("network.utils.admin.build");
+            if (!isAuthorizedAdmin) {
                 event.setCancelled(true);
             }
         }
@@ -113,8 +122,14 @@ public class GriefPrevention implements Listener {
 
     @EventHandler
     public void onOffhandSwap(PlayerSwapHandItemsEvent event) {
-        if (config.isInventoryLocked() && !canBypass(event.getPlayer()) && !event.getPlayer().hasPermission("network.utils.admin.inventory")) {
-            event.setCancelled(true);
+        Player player = event.getPlayer();
+
+        if (config.isInventoryLocked()) {
+            boolean isAuthorizedAdmin = (player.getGameMode() == GameMode.CREATIVE)
+                    && player.hasPermission("network.utils.admin.build");
+            if (!isAuthorizedAdmin) {
+                event.setCancelled(true);
+            }
         }
     }
 
@@ -173,10 +188,16 @@ public class GriefPrevention implements Listener {
 
     @EventHandler
     public void onMobSpawn(EntitySpawnEvent event) {
-        if (!config.isCanMobSpawn()) {
-            if (event.getEntity() instanceof org.bukkit.entity.LivingEntity && !(event.getEntity() instanceof Player)) {
-                event.setCancelled(true);
-            }
+        if (config.isCanMobSpawn()) return;
+
+        CreatureSpawnEvent.SpawnReason reason = event.getEntity().getEntitySpawnReason();
+
+        if (reason == CreatureSpawnEvent.SpawnReason.SPAWNER_EGG || reason == CreatureSpawnEvent.SpawnReason.COMMAND || reason == CreatureSpawnEvent.SpawnReason.CUSTOM) {
+            return;
+        }
+
+        if (event.getEntity() instanceof org.bukkit.entity.LivingEntity && !(event.getEntity() instanceof Player)) {
+            event.setCancelled(true);
         }
     }
 }

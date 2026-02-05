@@ -33,6 +33,16 @@ public class RedisSetup {
         }
     }
 
+    public void close() {
+        if (jedis != null) {
+            try {
+                jedis.close();
+            } catch (Exception e) {
+            } finally {
+                this.jedis = null;
+            }
+        }
+    }
     public JedisPooled getJedis() {
         return jedis;
     }

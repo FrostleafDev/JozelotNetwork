@@ -37,6 +37,8 @@ public class PluginReload {
         config.reload();
         lang.reload();
         groupManager.load();
+        mySQLSetup.close();
+        redisSetup.close();
         redisSetup.setup();
         mySQLSetup.setup();
         redisManager.uploadLanguage(lang.getAllData());

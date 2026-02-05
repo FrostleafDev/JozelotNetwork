@@ -46,11 +46,23 @@ public class JoinListener implements Listener {
             player.setAllowFlight(false);
         }
 
+        player.setFlySpeed(0.1f);
+
         if (config.getJoinMessageType().equalsIgnoreCase("default")) return;
         else if (config.getJoinMessageType().equalsIgnoreCase("disabled")) {
             event.setJoinMessage("");
         } else if (config.getJoinMessageType().equalsIgnoreCase("custom")) {
             event.joinMessage(mm.deserialize(lang.format("join-message", Map.of("player-name", player.getName()))));
+        }
+
+        if (config.isCustomExperienceLevel()) {
+            player.setLevel(config.getCustomExperienceLevel());
+            // player.setExp(0.0F);
+        }
+        if (config.isCustomBarLevel()) {
+            int procent = config.getCustomBarLevel();
+            float xp = procent / 100.0f;
+            player.setExp(xp);
         }
     }
 

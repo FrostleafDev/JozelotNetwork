@@ -40,6 +40,19 @@ public class RedisSetup {
         }
     }
 
+    public void close() {
+        if (jedis != null) {
+            try {
+                jedis.close();
+                consoleLogger.broadCastToConsole("Redis: Verbindung wurde erfolgreich geschlossen.");
+            } catch (Exception e) {
+                consoleLogger.broadCastToConsole("Redis: Fehler beim Schließen der Verbindung: " + e.getMessage());
+            } finally {
+                this.jedis = null;
+            }
+        }
+    }
+
     public JedisPooled getJedis() {
         return jedis;
     }

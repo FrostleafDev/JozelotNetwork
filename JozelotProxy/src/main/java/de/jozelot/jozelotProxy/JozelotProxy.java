@@ -204,6 +204,8 @@ public class JozelotProxy {
     public void onProxyShutdown(ProxyShutdownEvent event) {
         consoleLogger.broadCastToConsole("Proxy wird beendet, schließe Verbindungen...");
         server.getAllPlayers().forEach(p -> playtimeListener.saveAndRemoveSession(p));
+        mySQLSetup.close();
+        redisSetup.close();
     }
 
     /*

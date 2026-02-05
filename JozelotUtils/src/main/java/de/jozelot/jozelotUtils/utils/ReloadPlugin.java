@@ -41,5 +41,18 @@ public class ReloadPlugin {
         }
         plugin.applyGameRules();
         plugin.freezeGame(config.isTicksFreeze());
+
+        if (config.isCustomExperienceLevel()) {
+            Bukkit.getOnlinePlayers().forEach(p -> {
+                p.setLevel(config.getCustomExperienceLevel());
+            });
+        }
+        if (config.isCustomBarLevel()) {
+            Bukkit.getOnlinePlayers().forEach(p -> {
+                int procent = config.getCustomBarLevel();
+                float xp = procent / 100.0f;
+                p.setExp(xp);
+            });
+        }
     }
 }

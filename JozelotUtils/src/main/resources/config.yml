@@ -20,6 +20,11 @@ weather-cycle: false
 announce-advancements: false
 advancements-enabled: false
 
+custom-experience-level: true # default, custom
+experience-level-set: 2026 # default, custom
+custom-bar-level: true
+bar-level-set: 100
+
 tick-freeze: true
 tick-speed: 0
 

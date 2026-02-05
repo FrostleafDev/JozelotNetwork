@@ -42,7 +42,7 @@ public class FlyCommand implements CommandExecutor {
                 toggleFly(all);
             }
 
-            sender.sendMessage(mm.deserialize(lang.format("command-fly-all-success", null)));
+            sender.sendActionBar(mm.deserialize(lang.format("command-fly-all-success",null)));
             return true;
         }
 
@@ -64,7 +64,7 @@ public class FlyCommand implements CommandExecutor {
             sender.sendMessage(mm.deserialize(lang.format("command-fly-others-success",
                     Map.of("player", target.getName(), "state", stateName))));
 
-            target.sendMessage(mm.deserialize(lang.format("command-fly-success", Map.of("state", stateName))));
+            target.sendActionBar(mm.deserialize(lang.format("command-fly-success", Map.of("state", stateName))));
             return true;
         }
 
@@ -75,7 +75,7 @@ public class FlyCommand implements CommandExecutor {
 
         boolean newState = toggleFly(player);
         String stateName = newState ? "aktiviert" : "deaktiviert";
-        player.sendMessage(mm.deserialize(lang.format("command-fly-success", Map.of("state", stateName))));
+        player.sendActionBar(mm.deserialize(lang.format("command-fly-success", Map.of("state", stateName))));
 
         return true;
     }
