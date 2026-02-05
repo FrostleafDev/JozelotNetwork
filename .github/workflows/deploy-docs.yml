@@ -7,10 +7,10 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: ./JozelotProxy
+    strategy:
+      # Hier fügst du alle Ordnernamen deiner Projekte hinzu
+      matrix:
+        project: [JozelotProxy, JozelotLobby, JozelotUtils]
 
     steps:
       - name: Checkout Code
@@ -24,7 +24,8 @@ jobs:
           cache: 'maven'
 
       - name: Generate JavaDoc
-        run: mvn javadoc:javadoc
+        # Wir führen mvn im jeweiligen Unterordner aus
+        run: mvn javadoc:javadoc -f ${{ matrix.project }}/pom.xml
 
       - name: Deploy to Nginx via SSH
         uses: easingthemes/ssh-deploy@main
@@ -32,6 +33,7 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
-          SOURCE: "JozelotProxy/docs/"
-          TARGET: "/var/www/docs.jozelot.de/pages/main/jd"
+          # Dynamische Pfade basierend auf dem Projektnamen
+          SOURCE: "docs/${{ matrix.project }}/"
+          TARGET: "/var/www/docs.jozelot.de/pages/main/jd/${{ matrix.project }}"
           ARGS: "-rlgoDzvc -i --delete"
