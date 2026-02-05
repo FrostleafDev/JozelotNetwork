@@ -49,7 +49,9 @@
                     <reportOutputDirectory>${project.basedir}/../docs</reportOutputDirectory>
                     <destDir>JozelotUtils</destDir>
                     <additionalOptions>
-                        <additionalOption>-header &lt;link rel="icon" href="https://cdn.jozelot.de/assets/images/favicons/favicon_64x64.png" type="image/png"&gt;</additionalOption>
+                        <additionalOption>-header</additionalOption>
+                        <additionalOption>&lt;link rel="icon" href="https://cdn.jozelot.de/assets/images/favicons/favicon_64x64.png"&gt;</additionalOption>
+                        <additionalOption>-Xdoclint:none</additionalOption>
                     </additionalOptions>
                 </configuration>
             </plugin>
