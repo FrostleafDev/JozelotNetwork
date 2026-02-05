@@ -14,7 +14,7 @@ first-join:
   - "  {grey}Du startest heute dein Abenteuer auf unserem Netzwerk."
   - "  {grey}Erkunde die Lobby, triff Freunde und hab Spaß!"
   - ""
-  - "  <dark_gray>» {secondary}Discord: <white>jozelot.de/discord</white>"
+  - "  <dark_gray>» {secondary}Discord: <click:open_url:'https://jozelot.de/discord'><hover:show_text:'{primary}Klicke hier, um unserem Discord beizutreten!'><u><white>jozelot.de/discord</white></u></hover></click>"
   - ""
 
 server-maintenance-kick: '{danger}Du wurdest wegen Wartungsarbeiten von {server-name} gekickt'
@@ -191,7 +191,15 @@ pterodactyl-control-success: '{grey}Befehl für {primary}{action}{grey} wurde an
 pterodactyl-control-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat den Befehl für {primary}{action}{grey} an {primary}{server-name}{grey} gesendet'
 pterodactyl-control-api-error: '{grey}Die API hat mit dem Fehler Code {danger}{code}{grey} geantwortet'
 pterodactyl-restart-kick:
-  - "{danger}<b>ACHTUNG!</b> Die Proxy wird neugestartet!"
+  - "<gradient:#f90036:#f90011><b>NETZWERK NEUSTART</b></gradient>"
+  - ""
+  - "{grey}Das System wird aktuell {danger}neu gestartet{grey},"
+  - "{grey}um Updates oder Änderungen zu übernehmen."
+  - ""
+  - "{grey}Bitte gedulde dich einen kleinen Moment."
+  - "{grey}Du kannst in Kürze wieder {secondary}beitreten{grey}."
+  - ""
+  - "<dark_gray>Versuche es in ca. <white>10 Sekunden</white> erneut."
 
 pterodactlyl-status-error: '{grey}Fehler beim abrufer der {danger}API Daten'
 pterodactyl-status-message:
@@ -207,14 +215,18 @@ pterodactyl-status-message:
 
 tab-header:
   - ''
-  - '<gradient:#00A4FC:#00FC00><bold>jozelot.de</bold></gradient>'
+  - '<gradient:#00A4FC:#00f4fc><bold>jozelot.de</bold></gradient>'
   - ''
-  - '{grey}<strikethrough>                                                          </strikethrough>'
+  - '<dark_grey>- {primary}{server-name} <dark_grey>-'
+  - ''
+  - '{grey}<strikethrough>                                                 </strikethrough>'
+  - ''
 
 tab-footer:
-  - '{grey}<strikethrough>                                                          </strikethrough>'
   - ''
-  - '{grey}{group-info} <dark_gray>| {grey}{server-name} <dark_gray>| {grey}Ping: {secondary}{ping}ms'
+  - '{grey}<strikethrough>                                                 </strikethrough>'
+  - ''
+  - '{primary}{group-info} <dark_gray>| {grey}Ping: {secondary}{ping}ms'
 
 tab-player-format: '{rank-prefix}{player-name}'
 chat-format: '{rank-prefix}{player-name} {grey}» <white>{message}'

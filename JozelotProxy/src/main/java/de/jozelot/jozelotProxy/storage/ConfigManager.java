@@ -1,5 +1,7 @@
 package de.jozelot.jozelotProxy.storage;
 
+import com.velocitypowered.api.util.ServerLink;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.yaml.snakeyaml.Yaml;
 import java.io.*;
 import java.nio.file.Files;
@@ -36,6 +38,7 @@ public class ConfigManager {
     private String brandName;
     private List<String> hardBlocked;
     private Map<String, List<String>> commandGroups;
+    private int tabRefreshTime;
 
     private int protocalMin;
     private int protocalMax;
@@ -141,6 +144,10 @@ public class ConfigManager {
         return protocalMin;
     }
 
+    public int getTabRefreshTime() {
+        return tabRefreshTime;
+    }
+
     public void reload() {
         try (InputStream in = new FileInputStream(file)) {
             this.data = yaml.load(in);
@@ -173,6 +180,7 @@ public class ConfigManager {
         protocalMax = getInt("protocol-versions.max");
         protocalReco = getInt("protocol-versions.recommended");
 
+        tabRefreshTime = getInt("tab-refresh-time");
         loadCommandGroups();
     }
 
@@ -248,6 +256,24 @@ public class ConfigManager {
                 commandGroups.put(groupName, commands);
             }
         }
+    }
+
+    public List<ServerLink> getServerLinks() {
+        List<ServerLink> links = new ArrayList<>();
+        Object rawObj = get("server-links");
+
+        if (rawObj instanceof List<?> rawList) {
+            for (Object obj : rawList) {
+                // SnakeYaml lädt verschachtelte Listen als List<Object>
+                if (obj instanceof List<?> entry && entry.size() >= 2) {
+                    String label = String.valueOf(entry.get(0));
+                    String url = String.valueOf(entry.get(1));
+
+                    links.add(ServerLink.serverLink(MiniMessage.miniMessage().deserialize(label), url));
+                }
+            }
+        }
+        return links;
     }
 
     // Getter für die Gruppen

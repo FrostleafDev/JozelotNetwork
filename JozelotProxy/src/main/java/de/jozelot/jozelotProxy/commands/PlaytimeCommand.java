@@ -8,12 +8,11 @@ import de.jozelot.jozelotProxy.JozelotProxy;
 import de.jozelot.jozelotProxy.storage.LangManager;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
-import java.lang.reflect.Array;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 public class PlaytimeCommand implements SimpleCommand {
 
@@ -45,9 +44,13 @@ public class PlaytimeCommand implements SimpleCommand {
             return;
         }
 
-        java.util.UUID targetUUID = plugin.getMySQLManager().getUUIDByUsername(targetName);
-        if (targetUUID == null) {
-            targetUUID = server.getPlayer(targetName).map(Player::getUniqueId).orElse(null);
+        UUID targetUUID;
+        Optional<Player> onlinePlayer = server.getPlayer(targetName);
+
+        if (onlinePlayer.isPresent()) {
+            targetUUID = onlinePlayer.get().getUniqueId();
+        } else {
+            targetUUID = plugin.getMySQLManager().getUUIDByUsername(targetName);
         }
 
         if (targetUUID == null) {
@@ -58,7 +61,6 @@ public class PlaytimeCommand implements SimpleCommand {
         long playtime = 0;
         long liveTime = 0;
         String typeLabel = "dem Netzwerk";
-        Optional<Player> onlinePlayer = server.getPlayer(targetUUID);
 
         if (args.length < 2) {
             playtime = plugin.getMySQLManager().getTotalNetworkPlaytime(targetUUID);
@@ -103,11 +105,12 @@ public class PlaytimeCommand implements SimpleCommand {
 
         long totalPlaytime = playtime + liveTime;
 
-        if (totalPlaytime == 0) {
+        if (totalPlaytime <= 0) {
             source.sendMessage(mm.deserialize(lang.format("command-playtime-no-playtime", Map.of("player-name", targetName))));
             return;
         }
 
+        // 5. Zeit formatieren und senden
         long[] time = formatTime(totalPlaytime);
 
         source.sendMessage(mm.deserialize(lang.format("command-playtime-total", Map.of(
@@ -122,7 +125,6 @@ public class PlaytimeCommand implements SimpleCommand {
 
     private long[] formatTime(long playtime) {
         Duration d = Duration.ofMillis(playtime);
-
         return new long[]{
                 d.toDays(),
                 (long) d.toHoursPart(),
@@ -145,7 +147,7 @@ public class PlaytimeCommand implements SimpleCommand {
                     .toList();
         }
 
-        if (!invocation.source().hasPermission("network.command.playtime.admin")) {return List.of();}
+        if (!invocation.source().hasPermission("network.command.playtime.admin")) { return List.of(); }
 
         if (args.length == 2) {
             if (!currentArg.contains(":")) {
@@ -155,7 +157,6 @@ public class PlaytimeCommand implements SimpleCommand {
             }
 
             if (currentArg.startsWith("server:")) {
-                String subQuery = currentArg.replace("server:", "");
                 return plugin.getMySQLManager().getRegisteredServerCache().stream()
                         .map(name -> "server:" + name)
                         .filter(s -> s.toLowerCase().startsWith(currentArg))
@@ -177,5 +178,4 @@ public class PlaytimeCommand implements SimpleCommand {
     public boolean hasPermission(Invocation invocation) {
         return invocation.source().hasPermission("network.command.playtime");
     }
-
 }

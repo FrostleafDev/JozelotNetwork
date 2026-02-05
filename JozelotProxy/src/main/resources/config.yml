@@ -5,6 +5,19 @@
 network-name: 'jozelot.de'
 brand-name: '§b§ljozelot.de§r'
 
+tab-refresh-time: 1
+
+server-links:
+  - |
+    <#f90036><b>Webseite
+    https://jozelot.de
+  - |
+    <#7289DA><b>Discord
+    https://jozelot.de/discord
+  - |
+    <#00A4FC><b>Hosting
+    https://panel.jozelot.de
+
 protocol-versions:
   min: 767
   recommended: 773

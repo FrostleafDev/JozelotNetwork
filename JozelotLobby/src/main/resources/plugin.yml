@@ -1,0 +1,7 @@
+name: JozelotLobby
+version: '1.0.0'
+main: de.jozelot.jozelotLobby.JozelotLobby
+api-version: '1.21'
+authors: [ jozelot_ ]
+description: Lobby Plugin für jozelot.de - Bereitgestellt von jozelot_
+website: https://jozelot.de

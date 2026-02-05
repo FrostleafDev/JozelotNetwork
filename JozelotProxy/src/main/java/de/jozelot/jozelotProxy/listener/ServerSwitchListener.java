@@ -12,6 +12,7 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.player.TabListEntry;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
+import com.velocitypowered.api.util.ServerLink;
 import de.jozelot.jozelotProxy.JozelotProxy;
 import de.jozelot.jozelotProxy.storage.ConfigManager;
 import de.jozelot.jozelotProxy.storage.LangManager;
@@ -51,18 +52,21 @@ public class ServerSwitchListener {
             });
         }
 
-        // Ein "Herzschlag" für das Netzwerk: Aktualisiert alle 3 Sek. Header, Footer und Pings
         server.getScheduler().buildTask(plugin, () -> {
             for (Player player : server.getAllPlayers()) {
                 player.getCurrentServer().ifPresent(conn -> {
                     int groupId = plugin.getGroupManager().getGroupId(conn.getServerInfo().getName());
                     if (groupId != -1) {
-                        if (plugin.getGroupManager().isTabEnabled(groupId)) updateTabHeaderForPlayer(player, groupId);
-                        updateTabEntryPings(player);
+                        if (plugin.getGroupManager().isTabEnabled(groupId)) {
+                            updateTabHeaderForPlayer(player, groupId);
+                            updateTabEntryPings(player);
+                        } else {
+                            player.sendPlayerListHeaderAndFooter(mm.deserialize(""), mm.deserialize(""));
+                        }
                     }
                 });
             }
-        }).repeat(Duration.ofSeconds(3)).schedule();
+        }).repeat(Duration.ofSeconds(config.getTabRefreshTime())).schedule();
     }
 
     // ==================================================================================
@@ -126,6 +130,11 @@ public class ServerSwitchListener {
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
         String username = player.getUsername();
+
+        List<ServerLink> links = config.getServerLinks();
+        if (!links.isEmpty()) {
+            player.setServerLinks(links);
+        }
 
         // Brand Name senden
         server.getScheduler().buildTask(plugin, () -> {
@@ -285,31 +294,43 @@ public class ServerSwitchListener {
         int groupId = plugin.getGroupManager().getGroupId(connectedServer.getServerInfo().getName());
         if (groupId == -1) return;
 
+        boolean tabEnabled = plugin.getGroupManager().isTabEnabled(groupId);
+
         List<Player> groupPlayers = server.getAllPlayers().stream()
                 .filter(p -> p.getCurrentServer().isPresent())
                 .filter(p -> plugin.getGroupManager().getGroupId(p.getCurrentServer().get().getServerInfo().getName()) == groupId)
                 .collect(Collectors.toList());
 
-        for (Player member : groupPlayers) {
-            for (Player networkPlayer : groupPlayers) {
-                String prefix = plugin.getLuckpermsUtils().getPlayerPrefix(networkPlayer);
-                int weight = plugin.getLuckpermsUtils().getWeight(networkPlayer);
+        for (Player viewer : groupPlayers) {
 
-                String displayNameRaw = lang.format("tab-player-format", Map.of(
-                        "rank-prefix", prefix != null ? prefix : "",
-                        "player-name", networkPlayer.getUsername()
-                ));
+            if (!tabEnabled) {
+                viewer.getTabList().clearAll();
+            }
 
-                TabListEntry entry = TabListEntry.builder()
-                        .profile(networkPlayer.getGameProfile())
-                        .tabList(member.getTabList())
-                        .displayName(mm.deserialize(displayNameRaw))
-                        .latency((int) networkPlayer.getPing())
-                        .listOrder(weight)
-                        .build();
+            for (Player target : groupPlayers) {
+                TabListEntry.Builder entryBuilder = TabListEntry.builder()
+                        .profile(target.getGameProfile())
+                        .tabList(viewer.getTabList())
+                        .latency((int) target.getPing());
 
-                member.getTabList().removeEntry(networkPlayer.getUniqueId());
-                member.getTabList().addEntry(entry);
+                if (tabEnabled) {
+                    String prefix = plugin.getLuckpermsUtils().getPlayerPrefix(target);
+                    int weight = plugin.getLuckpermsUtils().getWeight(target);
+
+                    String displayNameRaw = lang.format("tab-player-format", Map.of(
+                            "rank-prefix", prefix != null ? prefix : "",
+                            "player-name", target.getUsername()
+                    ));
+
+                    entryBuilder.displayName(mm.deserialize(displayNameRaw));
+                    entryBuilder.listOrder(weight);
+                } else {
+                    entryBuilder.displayName(null);
+                    entryBuilder.listOrder(0);
+                }
+
+                viewer.getTabList().removeEntry(target.getUniqueId());
+                viewer.getTabList().addEntry(entryBuilder.build());
             }
         }
     }
@@ -338,6 +359,7 @@ public class ServerSwitchListener {
                 "group-info", infoLine,
                 "group-name", groupName,
                 "server-name", serverNameToShow,
+                "online-players", String.valueOf(plugin.getServer().getAllPlayers().size()),
                 "ping", String.valueOf(p.getPing())
         );
 

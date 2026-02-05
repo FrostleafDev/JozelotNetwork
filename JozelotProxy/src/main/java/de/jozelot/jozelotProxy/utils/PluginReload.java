@@ -1,6 +1,7 @@
 package de.jozelot.jozelotProxy.utils;
 
 import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.api.util.ServerLink;
 import de.jozelot.jozelotProxy.JozelotProxy;
 import de.jozelot.jozelotProxy.apis.GroupManager;
 import de.jozelot.jozelotProxy.database.MySQLSetup;
@@ -8,6 +9,8 @@ import de.jozelot.jozelotProxy.database.RedisManager;
 import de.jozelot.jozelotProxy.database.RedisSetup;
 import de.jozelot.jozelotProxy.storage.ConfigManager;
 import de.jozelot.jozelotProxy.storage.LangManager;
+
+import java.util.List;
 
 public class PluginReload {
 
@@ -45,6 +48,10 @@ public class PluginReload {
         redisManager.sendReloadSignal();
 
         for (Player player : plugin.getServer().getAllPlayers()) {
+            List<ServerLink> links = config.getServerLinks();
+            if (!links.isEmpty()) {
+                player.setServerLinks(links);
+            }
             plugin.getBrandNameChanger().sendBrandName(player, config.getBrandName());
         }
 
