@@ -30,16 +30,15 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.5.3</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                    </execution>
-                </executions>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.6.3</version>
+                <configuration>
+                    <reportOutputDirectory>${project.basedir}/../docs</reportOutputDirectory>
+                    <destDir>JoLobby</destDir>
+                    <additionalOptions>
+                        <additionalOption>-header &lt;link rel="icon" href="https://cdn.jozelot.de/assets/images/favicons/favicon_64x64.png" type="image/png"&gt;</additionalOption>
+                    </additionalOptions>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
