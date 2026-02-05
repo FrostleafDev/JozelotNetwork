@@ -15,6 +15,10 @@ commands:
     description: Ändert die Fluggeschwindigkeit
     permission: network.utils.command.flyspeed
 
+  spec:
+    description: Ändert den Gamemode in den Spec
+    permission: network.utils.command.spec
+
 permissions:
   network.utils.command.fly:
     description: Permission for command
@@ -40,4 +44,7 @@ permissions:
     default: op
 
   network.utils.admin.inventory:
+    default: op
+
+  network.utils.command.spec:
     default: op

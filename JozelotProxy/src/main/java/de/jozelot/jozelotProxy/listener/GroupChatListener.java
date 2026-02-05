@@ -17,13 +17,36 @@ public class GroupChatListener {
         this.plugin = plugin;
     }
 
-    /**
-     * Will get finished when I start with the backend plugins.
-     * You cant cancel the PlayerChatEvent on the proxy :(
-     * @param event
-     */
     @Subscribe
     public void onPlayerChat(PlayerChatEvent event) {
+        Player player = event.getPlayer();
+        String rawMessage = event.getMessage();
 
+        if (rawMessage.startsWith("/")) return;
+
+        if (player.getCurrentServer().isEmpty()) return;
+        String serverName = player.getCurrentServer().get().getServerInfo().getName();
+        int groupId = plugin.getGroupManager().getGroupId(serverName);
+
+        if (groupId == -1 || !plugin.getGroupManager().isTabEnabled(groupId)) {
+            return;
+        }
+
+        String processedMessage = rawMessage;
+        if (!player.hasPermission("network.chat.minimessage")) {
+            processedMessage = mm.escapeTags(rawMessage);
+        }
+
+        String prefix = plugin.getLuckpermsUtils().getPlayerPrefix(player);
+        String format = plugin.getLang().format("chat-format", Map.of(
+                "rank-prefix", prefix != null ? prefix : "",
+                "player-name", player.getUsername(),
+                "message", processedMessage
+        ));
+
+        plugin.getServer().getAllPlayers().stream()
+                .filter(p -> p.getCurrentServer().isPresent())
+                .filter(p -> plugin.getGroupManager().getGroupId(p.getCurrentServer().get().getServerInfo().getName()) == groupId)
+                .forEach(p -> p.sendMessage(mm.deserialize(format)));
     }
 }

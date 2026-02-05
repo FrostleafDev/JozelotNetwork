@@ -25,6 +25,8 @@ experience-level-set: 2026 # default, custom
 custom-bar-level: true
 bar-level-set: 100
 
+disable-default-chat: true
+
 tick-freeze: true
 tick-speed: 0
 

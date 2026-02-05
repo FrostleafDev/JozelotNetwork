@@ -48,6 +48,7 @@ public class ConfigManager {
     private boolean isCustomBarLevel;
     private int customBarLevel;
 
+    private boolean isChatDisabled;
     private boolean ticksFreeze;
 
     private String joinMessageType;
@@ -202,6 +203,10 @@ public class ConfigManager {
         return customBarLevel;
     }
 
+    public boolean isChatDisabled() {
+        return isChatDisabled;
+    }
+
     public void loadConfig() {
         plugin.saveDefaultConfig();
 
@@ -252,5 +257,8 @@ public class ConfigManager {
 
         isCustomBarLevel = plugin.getConfig().getBoolean("custom-bar-level");
         customBarLevel = plugin.getConfig().getInt("bar-level-set");
+
+        isChatDisabled = plugin.getConfig().getBoolean("disable-default-chat");
+
     }
 }

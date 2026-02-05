@@ -1,15 +1,13 @@
 package de.jozelot.jozelotUtils;
 
-import de.jozelot.jozelotUtils.commands.FlyCommand;
-import de.jozelot.jozelotUtils.commands.FlyCommandTab;
-import de.jozelot.jozelotUtils.commands.FlySpeedCommand;
-import de.jozelot.jozelotUtils.commands.FlySpeedCommandTab;
+import de.jozelot.jozelotUtils.commands.*;
 import de.jozelot.jozelotUtils.database.RedisListener;
 import de.jozelot.jozelotUtils.database.RedisManager;
 import de.jozelot.jozelotUtils.database.RedisSetup;
 import de.jozelot.jozelotUtils.listener.*;
 import de.jozelot.jozelotUtils.storage.ConfigManager;
 import de.jozelot.jozelotUtils.storage.LangManager;
+import de.jozelot.jozelotUtils.utils.ConsoleLogger;
 import de.jozelot.jozelotUtils.utils.ReloadPlugin;
 import org.apache.commons.codec.language.bm.Lang;
 import org.bukkit.Bukkit;
@@ -28,6 +26,7 @@ public final class JozelotUtils extends JavaPlugin {
     private LangManager lang;
     private ReloadPlugin reloadPlugin;
     private PlayerNameTag playerNameTag;
+    private ConsoleLogger consoleLogger;
 
     @Override
     public void onEnable() {
@@ -39,6 +38,7 @@ public final class JozelotUtils extends JavaPlugin {
         redisSetup.setup();
         this.redisManager = new RedisManager(this);
         this.reloadPlugin = new ReloadPlugin(this);
+        this.consoleLogger = new ConsoleLogger(this);
 
         new RedisListener(this);
 
@@ -52,11 +52,13 @@ public final class JozelotUtils extends JavaPlugin {
         getCommand("fly").setTabCompleter(new FlyCommandTab());
         getCommand("flyspeed").setExecutor(new FlySpeedCommand(this));
         getCommand("flyspeed").setTabCompleter(new FlySpeedCommandTab());
+        getCommand("spec").setExecutor(new SpecCommand(this));
 
         getServer().getPluginManager().registerEvents(new JoinListener(this), this);
         getServer().getPluginManager().registerEvents(new LeaveListener(this), this);
         getServer().getPluginManager().registerEvents(new GriefPrevention(this), this);
         getServer().getPluginManager().registerEvents(new WorldSettings(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerChatListener(this), this);
 
         playerNameTag = new PlayerNameTag(this);
         getServer().getPluginManager().registerEvents(playerNameTag, this);
@@ -119,4 +121,9 @@ public final class JozelotUtils extends JavaPlugin {
         ServerTickManager serverTickManager = Bukkit.getServerTickManager();
         serverTickManager.setFrozen(state);
     }
+
+    public ConsoleLogger getConsoleLogger() {
+        return consoleLogger;
+    }
+
 }
