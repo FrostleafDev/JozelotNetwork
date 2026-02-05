@@ -15,7 +15,10 @@ This repository acts as the central place for all parts of the network, includin
 - Configuration and shared utilities
 - Website and supporting tools
 
-**Java Docs:** https://docs.jozelot.de/jd/JozelotProxy/
+**Java Docs:** 
+- https://docs.jozelot.de/jd/JozelotProxy/
+- https://docs.jozelot.de/jd/JozelotUtils/
+- https://docs.jozelot.de/jd/JozelotLobby/
 
 _A more detailed breakdown will be added as the project evolves._
 
