@@ -27,9 +27,9 @@ _A more detailed breakdown will be added as the project evolves._
 >
 > **JozelotWebsite:** `Not started`
 > 
-> **JozelotLobby:** `Not started`
+> **JozelotLobby:** `Started`
 > 
-> **JozelotUtility:** `Not started`
+> **JozelotUtility:** `In Developement`
 
 ## Details
 > Proxy: Velocity `3.4.0-SNAPSHOT`  
