@@ -150,7 +150,6 @@ public class PlayerInfoCommand implements SimpleCommand {
         placeholders.put("version", version);
         placeholders.put("server", targetFinal.getCurrentServer().map(s -> s.getServerInfo().getName()).orElse("N/A"));
         placeholders.put("group", groupName);
-        placeholders.put("online_time", "Session basiert");
         placeholders.put("alts", altsFormatted);
         placeholders.put("client", clientBrand);
         placeholders.put("online_time", onlineSince);
