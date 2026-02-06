@@ -6,6 +6,8 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import de.jozelot.jozelotProxy.JozelotProxy;
 import de.jozelot.jozelotProxy.storage.LangManager;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
 import java.util.ArrayList;
@@ -33,10 +35,42 @@ public class FindCommand implements SimpleCommand {
 
         if (!source.hasPermission("network.command.find")) {
             source.sendMessage(mm.deserialize(lang.getNoPermission()));
+            if (source instanceof Player) {
+                String soundPath = lang.getRaw("sounds.error");
+                if (!soundPath.isEmpty()) {
+                    try {
+                        Sound successSound = Sound.sound(
+                                Key.key(soundPath),
+                                Sound.Source.UI,
+                                1.0f,
+                                1.0f
+                        );
+                        source.playSound(successSound, Sound.Emitter.self());
+                    } catch (Exception e) {
+                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                    }
+                }
+            }
             return;
         }
         if (args.length == 0) {
             source.sendMessage(mm.deserialize(lang.format("command-find-missing-argument", null)));
+            if (source instanceof Player) {
+                String soundPath = lang.getRaw("sounds.error");
+                if (!soundPath.isEmpty()) {
+                    try {
+                        Sound successSound = Sound.sound(
+                                Key.key(soundPath),
+                                Sound.Source.UI,
+                                1.0f,
+                                1.0f
+                        );
+                        source.playSound(successSound, Sound.Emitter.self());
+                    } catch (Exception e) {
+                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                    }
+                }
+            }
             return;
         }
 
@@ -63,6 +97,38 @@ public class FindCommand implements SimpleCommand {
             } else {
                 source.sendMessage(mm.deserialize(lang.format("command-find-offline",
                         Map.of("player-name", playerName, "server-name", serverDisplayName))));
+                if (source instanceof Player) {
+                    String soundPath = lang.getRaw("sounds.error");
+                    if (!soundPath.isEmpty()) {
+                        try {
+                            Sound successSound = Sound.sound(
+                                    Key.key(soundPath),
+                                    Sound.Source.UI,
+                                    1.0f,
+                                    1.0f
+                            );
+                            source.playSound(successSound, Sound.Emitter.self());
+                        } catch (Exception e) {
+                            plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                        }
+                    }
+                }
+            }
+            if (source instanceof Player) {
+                String soundPath = lang.getRaw("sounds.error");
+                if (!soundPath.isEmpty()) {
+                    try {
+                        Sound successSound = Sound.sound(
+                                Key.key(soundPath),
+                                Sound.Source.UI,
+                                1.0f,
+                                1.0f
+                        );
+                        source.playSound(successSound, Sound.Emitter.self());
+                    } catch (Exception e) {
+                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                    }
+                }
             }
         }).schedule();
     }

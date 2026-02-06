@@ -8,6 +8,8 @@ import de.jozelot.jozelotProxy.JozelotProxy;
 import de.jozelot.jozelotProxy.storage.ConfigManager;
 import de.jozelot.jozelotProxy.storage.LangManager;
 import de.jozelot.jozelotProxy.utils.ConsoleLogger;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
 import java.util.List;
@@ -35,6 +37,22 @@ public class ClearChatCommand implements SimpleCommand {
     public void execute(Invocation invocation) {
         if (!invocation.source().hasPermission("network.command.clearchat")) {
             invocation.source().sendMessage(mm.deserialize(lang.getNoPermission()));
+            if (invocation.source() instanceof Player) {
+                String soundPath = lang.getRaw("sounds.error");
+                if (!soundPath.isEmpty()) {
+                    try {
+                        Sound successSound = Sound.sound(
+                                Key.key(soundPath),
+                                Sound.Source.UI,
+                                1.0f,
+                                1.0f
+                        );
+                        invocation.source().playSound(successSound, Sound.Emitter.self());
+                    } catch (Exception e) {
+                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                    }
+                }
+            }
             return;
         }
         CommandSource source = invocation.source();
@@ -52,6 +70,22 @@ public class ClearChatCommand implements SimpleCommand {
                 continue;
             }
             player.sendMessage(mm.deserialize(clearBlock));
+            if (source instanceof Player) {
+                String soundPath = lang.getRaw("sounds.pling");
+                if (!soundPath.isEmpty()) {
+                    try {
+                        Sound successSound = Sound.sound(
+                                Key.key(soundPath),
+                                Sound.Source.UI,
+                                1.0f,
+                                1.0f
+                        );
+                        player.playSound(successSound, Sound.Emitter.self());
+                    } catch (Exception e) {
+                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                    }
+                }
+            }
 
             for (String line : successMessage) {
                 player.sendMessage(mm.deserialize(line));

@@ -54,5 +54,10 @@ public class ReloadPlugin {
                 p.setExp(xp);
             });
         }
+        Bukkit.getOnlinePlayers().forEach(p -> {
+            if (config.getDefaultHotbarSlot() != -1) {
+                p.getInventory().setHeldItemSlot(config.getDefaultHotbarSlot());
+            }
+        });
     }
 }

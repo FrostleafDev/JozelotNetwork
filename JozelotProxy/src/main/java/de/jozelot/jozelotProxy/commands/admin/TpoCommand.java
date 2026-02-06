@@ -7,6 +7,8 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import de.jozelot.jozelotProxy.JozelotProxy;
 import de.jozelot.jozelotProxy.storage.LangManager;
 import de.jozelot.jozelotProxy.utils.PlayerSends;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
 import java.util.List;
@@ -33,6 +35,22 @@ public class TpoCommand implements SimpleCommand {
 
         if (!source.hasPermission("network.command.tpo")) {
             source.sendMessage(mm.deserialize(lang.getNoPermission()));
+            if (source instanceof Player) {
+                String soundPath = lang.getRaw("sounds.error");
+                if (!soundPath.isEmpty()) {
+                    try {
+                        Sound successSound = Sound.sound(
+                                Key.key(soundPath),
+                                Sound.Source.UI,
+                                1.0f,
+                                1.0f
+                        );
+                        source.playSound(successSound, Sound.Emitter.self());
+                    } catch (Exception e) {
+
+                    }
+                }
+            }
             return;
         }
 
@@ -43,6 +61,21 @@ public class TpoCommand implements SimpleCommand {
 
         if (args.length < 1) {
             player.sendMessage(mm.deserialize(lang.format("command-tpo-usage", null)));
+            if (source instanceof Player) {
+                String soundPath = lang.getRaw("sounds.error");
+                if (!soundPath.isEmpty()) {
+                    try {
+                        Sound successSound = Sound.sound(
+                                Key.key(soundPath),
+                                Sound.Source.UI,
+                                1.0f,
+                                1.0f
+                        );
+                        source.playSound(successSound, Sound.Emitter.self());
+                    } catch (Exception e) {
+                    }
+                }
+            }
             return;
         }
 
@@ -50,10 +83,41 @@ public class TpoCommand implements SimpleCommand {
 
         if (!target.isPresent()) {
             player.sendMessage(mm.deserialize(lang.format("command-tpo-player-not-found", Map.of("player-name", args[0]))));
+            if (source instanceof Player) {
+                String soundPath = lang.getRaw("sounds.error");
+                if (!soundPath.isEmpty()) {
+                    try {
+                        Sound successSound = Sound.sound(
+                                Key.key(soundPath),
+                                Sound.Source.UI,
+                                1.0f,
+                                1.0f
+                        );
+                        source.playSound(successSound, Sound.Emitter.self());
+                    } catch (Exception e) {
+                    }
+                }
+            }
             return;
         }
 
         Player targetFinal = target.get();
+
+        if (source instanceof Player) {
+            String soundPath = lang.getRaw("sounds.success");
+            if (!soundPath.isEmpty()) {
+                try {
+                    Sound successSound = Sound.sound(
+                            Key.key(soundPath),
+                            Sound.Source.UI,
+                            1.0f,
+                            1.0f
+                    );
+                    source.playSound(successSound, Sound.Emitter.self());
+                } catch (Exception e) {
+                }
+            }
+        }
 
         playerSends.sendPlayerToPlayer(player, targetFinal);
     }

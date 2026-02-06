@@ -8,6 +8,8 @@ import de.jozelot.jozelotProxy.JozelotProxy;
 import de.jozelot.jozelotProxy.storage.ConfigManager;
 import de.jozelot.jozelotProxy.storage.LangManager;
 import de.jozelot.jozelotProxy.utils.ConsoleLogger;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
 import java.util.ArrayList;
@@ -40,11 +42,43 @@ public class BroadcastCommand implements SimpleCommand {
 
         if (!source.hasPermission("network.command.broadcast")) {
             source.sendMessage(mm.deserialize(lang.getNoPermission()));
+            if (source instanceof Player) {
+                String soundPath = lang.getRaw("sounds.error");
+                if (!soundPath.isEmpty()) {
+                    try {
+                        Sound successSound = Sound.sound(
+                                Key.key(soundPath),
+                                Sound.Source.UI,
+                                1.0f,
+                                1.0f
+                        );
+                        source.playSound(successSound, Sound.Emitter.self());
+                    } catch (Exception e) {
+                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                    }
+                }
+            }
             return;
         }
 
         if (args.length < 3) {
             source.sendMessage(mm.deserialize(lang.format("command-broadcast-usage", null)));
+            if (source instanceof Player) {
+                String soundPath = lang.getRaw("sounds.error");
+                if (!soundPath.isEmpty()) {
+                    try {
+                        Sound successSound = Sound.sound(
+                                Key.key(soundPath),
+                                Sound.Source.UI,
+                                1.0f,
+                                1.0f
+                        );
+                        source.playSound(successSound, Sound.Emitter.self());
+                    } catch (Exception e) {
+                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                    }
+                }
+            }
             return;
         }
 
@@ -79,6 +113,22 @@ public class BroadcastCommand implements SimpleCommand {
 
         if (targets.isEmpty()) {
             source.sendMessage(mm.deserialize(lang.format("command-broadcast-invalid", null)));
+            if (source instanceof Player) {
+                String soundPath = lang.getRaw("sounds.error");
+                if (!soundPath.isEmpty()) {
+                    try {
+                        Sound successSound = Sound.sound(
+                                Key.key(soundPath),
+                                Sound.Source.UI,
+                                1.0f,
+                                1.0f
+                        );
+                        source.playSound(successSound, Sound.Emitter.self());
+                    } catch (Exception e) {
+                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                    }
+                }
+            }
             return;
         }
 
@@ -86,6 +136,22 @@ public class BroadcastCommand implements SimpleCommand {
         for (Player target : targets) {
             for (String line : broadcastLines) {
                 target.sendMessage(mm.deserialize(line));
+                if (source instanceof Player) {
+                    String soundPath = lang.getRaw("sounds.success");
+                    if (!soundPath.isEmpty()) {
+                        try {
+                            Sound successSound = Sound.sound(
+                                    Key.key(soundPath),
+                                    Sound.Source.UI,
+                                    1.0f,
+                                    1.0f
+                            );
+                            target.playSound(successSound, Sound.Emitter.self());
+                        } catch (Exception e) {
+                            plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                        }
+                    }
+                }
             }
         }
 

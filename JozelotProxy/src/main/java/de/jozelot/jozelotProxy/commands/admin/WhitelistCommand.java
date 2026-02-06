@@ -8,6 +8,8 @@ import de.jozelot.jozelotProxy.JozelotProxy;
 import de.jozelot.jozelotProxy.storage.ConfigManager;
 import de.jozelot.jozelotProxy.storage.LangManager;
 import de.jozelot.jozelotProxy.utils.ConsoleLogger;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
 import java.io.BufferedReader;
@@ -41,6 +43,22 @@ public class WhitelistCommand implements SimpleCommand {
 
         if (args.length < 2) {
             source.sendMessage(mm.deserialize(lang.format("command-whitelist-usage", Map.of())));
+            if (source instanceof Player) {
+                String soundPath = lang.getRaw("sounds.error");
+                if (!soundPath.isEmpty()) {
+                    try {
+                        Sound successSound = Sound.sound(
+                                Key.key(soundPath),
+                                Sound.Source.UI,
+                                1.0f,
+                                1.0f
+                        );
+                        source.playSound(successSound, Sound.Emitter.self());
+                    } catch (Exception e) {
+                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                    }
+                }
+            }
             return;
         }
 
@@ -50,6 +68,22 @@ public class WhitelistCommand implements SimpleCommand {
 
         if (groupId == -1 && !groupName.equals("proxy")) {
             source.sendMessage(mm.deserialize(lang.format("command-whitelist-not-found", Map.of("group", groupName))));
+            if (source instanceof Player) {
+                String soundPath = lang.getRaw("sounds.error");
+                if (!soundPath.isEmpty()) {
+                    try {
+                        Sound successSound = Sound.sound(
+                                Key.key(soundPath),
+                                Sound.Source.UI,
+                                1.0f,
+                                1.0f
+                        );
+                        source.playSound(successSound, Sound.Emitter.self());
+                    } catch (Exception e) {
+                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                    }
+                }
+            }
             return;
         }
 
@@ -65,6 +99,22 @@ public class WhitelistCommand implements SimpleCommand {
                 CompletableFuture.supplyAsync(() -> fetchUUID(targetName)).thenAccept(targetUUID -> {
                     if (targetUUID == null) {
                         source.sendMessage(mm.deserialize(lang.format("command-whitelist-player-not-found", Map.of("player-name", targetName))));
+                        if (source instanceof Player) {
+                            String soundPath = lang.getRaw("sounds.error");
+                            if (!soundPath.isEmpty()) {
+                                try {
+                                    Sound successSound = Sound.sound(
+                                            Key.key(soundPath),
+                                            Sound.Source.UI,
+                                            1.0f,
+                                            1.0f
+                                    );
+                                    source.playSound(successSound, Sound.Emitter.self());
+                                } catch (Exception e) {
+                                    plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                                }
+                            }
+                        }
                         return;
                     }
 
@@ -73,6 +123,23 @@ public class WhitelistCommand implements SimpleCommand {
 
                     logAction(operatorName, operatorUUID, "WHITELIST_ADD", targetName, groupName, "hinzugefügt");
                     sendAdminLog("command-whitelist-added-admin", Map.of("player-name", operatorName, "target", targetName, "group", groupName), source);
+
+                    if (source instanceof Player) {
+                        String soundPath = lang.getRaw("sounds.success");
+                        if (!soundPath.isEmpty()) {
+                            try {
+                                Sound successSound = Sound.sound(
+                                        Key.key(soundPath),
+                                        Sound.Source.UI,
+                                        1.0f,
+                                        1.0f
+                                );
+                                source.playSound(successSound, Sound.Emitter.self());
+                            } catch (Exception e) {
+                                plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                            }
+                        }
+                    }
                 });
             }
             case "remove" -> {
@@ -81,6 +148,22 @@ public class WhitelistCommand implements SimpleCommand {
                 CompletableFuture.supplyAsync(() -> fetchUUID(targetName)).thenAccept(targetUUID -> {
                     if (targetUUID == null) {
                         source.sendMessage(mm.deserialize(lang.format("command-whitelist-player-not-found", Map.of("player-name", targetName))));
+                        if (source instanceof Player) {
+                            String soundPath = lang.getRaw("sounds.error");
+                            if (!soundPath.isEmpty()) {
+                                try {
+                                    Sound successSound = Sound.sound(
+                                            Key.key(soundPath),
+                                            Sound.Source.UI,
+                                            1.0f,
+                                            1.0f
+                                    );
+                                    source.playSound(successSound, Sound.Emitter.self());
+                                } catch (Exception e) {
+                                    plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                                }
+                            }
+                        }
                         return;
                     }
                     plugin.getMySQLManager().removeFromWhitelist(targetUUID, groupId);
@@ -88,12 +171,45 @@ public class WhitelistCommand implements SimpleCommand {
 
                     logAction(operatorName, operatorUUID, "WHITELIST_REMOVE", targetName, groupName, "entfernt");
                     sendAdminLog("command-whitelist-removed-admin", Map.of("player-name", operatorName, "target", targetName, "group", groupName), source);
+
+                    if (source instanceof Player) {
+                        String soundPath = lang.getRaw("sounds.success");
+                        if (!soundPath.isEmpty()) {
+                            try {
+                                Sound successSound = Sound.sound(
+                                        Key.key(soundPath),
+                                        Sound.Source.UI,
+                                        1.0f,
+                                        1.0f
+                                );
+                                source.playSound(successSound, Sound.Emitter.self());
+                            } catch (Exception e) {
+                                plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                            }
+                        }
+                    }
                 });
             }
             case "list" -> {
                 List<String> names = plugin.getMySQLManager().getWhitelistPlayers(groupId);
                 source.sendMessage(mm.deserialize(lang.format("command-whitelist-list-header", Map.of("group", groupName))));
                 source.sendMessage(mm.deserialize("<" + plugin.getConfig().getColorGrey() + ">" + String.join(", ", names)));
+                if (source instanceof Player) {
+                    String soundPath = lang.getRaw("sounds.pling");
+                    if (!soundPath.isEmpty()) {
+                        try {
+                            Sound successSound = Sound.sound(
+                                    Key.key(soundPath),
+                                    Sound.Source.UI,
+                                    1.0f,
+                                    1.0f
+                            );
+                            source.playSound(successSound, Sound.Emitter.self());
+                        } catch (Exception e) {
+                            plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                        }
+                    }
+                }
             }
         }
     }
@@ -143,6 +259,22 @@ public class WhitelistCommand implements SimpleCommand {
         plugin.getMySQLManager().setWhitelistState(group, active);
         String stateText = active ? "AN" : "AUS";
         source.sendMessage(mm.deserialize(lang.format("command-whitelist-state", Map.of("group", group, "state", stateText))));
+        if (source instanceof Player) {
+            String soundPath = lang.getRaw("sounds.success");
+            if (!soundPath.isEmpty()) {
+                try {
+                    Sound successSound = Sound.sound(
+                            Key.key(soundPath),
+                            Sound.Source.UI,
+                            1.0f,
+                            1.0f
+                    );
+                    source.playSound(successSound, Sound.Emitter.self());
+                } catch (Exception e) {
+                    plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                }
+            }
+        }
 
         logAction(opName, opUUID, "WHITELIST_STATE", group, group, active ? "aktiviert" : "deaktiviert");
         sendAdminLog("command-whitelist-state-admin", Map.of("player-name", opName, "group", group, "state", active ? "aktiviert" : "deaktiviert"), source);

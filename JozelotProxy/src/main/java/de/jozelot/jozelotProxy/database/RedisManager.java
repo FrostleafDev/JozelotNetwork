@@ -19,6 +19,20 @@ public class RedisManager {
         this.consoleLogger = plugin.getConsoleLogger();
     }
 
+    public void publish(String channel, String message) {
+        JedisPooled jedis = plugin.getRedisSetup().getJedis();
+        if (jedis == null) {
+            consoleLogger.broadCastToConsole("Redis: Publish fehlgeschlagen - Keine Verbindung!");
+            return;
+        }
+
+        try {
+            jedis.publish(channel, message);
+        } catch (Exception e) {
+            consoleLogger.broadCastToConsole("Redis: Fehler beim Publishen auf " + channel + ": " + e.getMessage());
+        }
+    }
+
     public void uploadLanguage(Map<String, Object> allMessages) {
         JedisPooled jedis = plugin.getRedisSetup().getJedis();
 

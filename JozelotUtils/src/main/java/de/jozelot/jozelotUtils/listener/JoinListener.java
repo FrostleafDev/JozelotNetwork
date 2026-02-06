@@ -18,10 +18,12 @@ public class JoinListener implements Listener {
     private final ConfigManager config;
     private final LangManager lang;
     private MiniMessage mm = MiniMessage.miniMessage();
+    private final JozelotUtils plugin;
 
     public JoinListener(JozelotUtils plugin) {
         this.config = plugin.getConfigManager();
         this.lang = plugin.getLang();
+        this.plugin = plugin;
     }
 
     @EventHandler
@@ -35,16 +37,18 @@ public class JoinListener implements Listener {
             player.setGameMode(GameMode.SURVIVAL);
         }
 
-        if (player.hasPermission("network.utils.admin") && config.isAutomaticFlight()) {
-            enableFly(player);
-        }
-        else if (config.isAutomaticFlightPlayer()) {
-            enableFly(player);
-        }
-        else {
-            player.setFlying(false);
-            player.setAllowFlight(false);
-        }
+        plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+            if (player.hasPermission("network.utils.join.fly") && config.isAutomaticFlight()) {
+                enableFly(player);
+            }
+            else if (config.isAutomaticFlightPlayer()) {
+                enableFly(player);
+            }
+            else {
+                player.setFlying(false);
+                player.setAllowFlight(false);
+            }
+        }, 2L);
 
         player.setFlySpeed(0.1f);
 
@@ -63,6 +67,10 @@ public class JoinListener implements Listener {
             int procent = config.getCustomBarLevel();
             float xp = procent / 100.0f;
             player.setExp(xp);
+        }
+
+        if (config.getDefaultHotbarSlot() != -1) {
+            player.getInventory().setHeldItemSlot(config.getDefaultHotbarSlot());
         }
     }
 

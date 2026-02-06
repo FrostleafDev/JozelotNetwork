@@ -145,7 +145,7 @@ public class JozelotProxy {
         CommandMeta serverMeta = cm.metaBuilder("server").build();
         CommandMeta sendMeta = cm.metaBuilder("send").aliases("move").build();
         CommandMeta gmsgMeta = cm.metaBuilder("gmsg").build();
-        CommandMeta msgMeta = cm.metaBuilder("msg").build();
+        CommandMeta msgMeta = cm.metaBuilder("msg").aliases("tell").build();
         CommandMeta replyMeta = cm.metaBuilder("reply").aliases("r").build();
         CommandMeta globalMeta = cm.metaBuilder("g").build();
         CommandMeta whitelistMeta = cm.metaBuilder("whitelist").build();

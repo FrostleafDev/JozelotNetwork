@@ -6,6 +6,8 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import de.jozelot.jozelotProxy.JozelotProxy;
 import de.jozelot.jozelotProxy.storage.LangManager;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
 import java.time.Duration;
@@ -34,6 +36,22 @@ public class PlaytimeCommand implements SimpleCommand {
 
         if (!source.hasPermission("network.command.playtime")) {
             source.sendMessage(mm.deserialize(lang.getNoPermission()));
+            if (invocation.source() instanceof Player) {
+                String soundPath = lang.getRaw("sounds.error");
+                if (!soundPath.isEmpty()) {
+                    try {
+                        Sound successSound = Sound.sound(
+                                Key.key(soundPath),
+                                Sound.Source.UI,
+                                1.0f,
+                                1.0f
+                        );
+                        invocation.source().playSound(successSound, Sound.Emitter.self());
+                    } catch (Exception e) {
+                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                    }
+                }
+            }
             return;
         }
 
@@ -41,6 +59,22 @@ public class PlaytimeCommand implements SimpleCommand {
 
         if (targetName == null) {
             source.sendMessage(mm.deserialize(lang.format("command-playtime-usage", null)));
+            if (invocation.source() instanceof Player) {
+                String soundPath = lang.getRaw("sounds.error");
+                if (!soundPath.isEmpty()) {
+                    try {
+                        Sound successSound = Sound.sound(
+                                Key.key(soundPath),
+                                Sound.Source.UI,
+                                1.0f,
+                                1.0f
+                        );
+                        invocation.source().playSound(successSound, Sound.Emitter.self());
+                    } catch (Exception e) {
+                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                    }
+                }
+            }
             return;
         }
 
@@ -55,6 +89,22 @@ public class PlaytimeCommand implements SimpleCommand {
 
         if (targetUUID == null) {
             source.sendMessage(mm.deserialize(lang.format("command-playtime-no-playtime", Map.of("player-name", targetName))));
+            if (invocation.source() instanceof Player) {
+                String soundPath = lang.getRaw("sounds.error");
+                if (!soundPath.isEmpty()) {
+                    try {
+                        Sound successSound = Sound.sound(
+                                Key.key(soundPath),
+                                Sound.Source.UI,
+                                1.0f,
+                                1.0f
+                        );
+                        invocation.source().playSound(successSound, Sound.Emitter.self());
+                    } catch (Exception e) {
+                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                    }
+                }
+            }
             return;
         }
 
@@ -71,6 +121,22 @@ public class PlaytimeCommand implements SimpleCommand {
             String subTarget = args[1].toLowerCase();
             if (!invocation.source().hasPermission("network.command.playtime.admin")) {
                 source.sendMessage(mm.deserialize(lang.format("command-playtime-usage", null)));
+                if (invocation.source() instanceof Player) {
+                    String soundPath = lang.getRaw("sounds.error");
+                    if (!soundPath.isEmpty()) {
+                        try {
+                            Sound successSound = Sound.sound(
+                                    Key.key(soundPath),
+                                    Sound.Source.UI,
+                                    1.0f,
+                                    1.0f
+                            );
+                            invocation.source().playSound(successSound, Sound.Emitter.self());
+                        } catch (Exception e) {
+                            plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                        }
+                    }
+                }
                 return;
             }
 
@@ -99,6 +165,22 @@ public class PlaytimeCommand implements SimpleCommand {
                 }
             } else {
                 source.sendMessage(mm.deserialize(lang.format("command-playtime-syntax-error", null)));
+                if (invocation.source() instanceof Player) {
+                    String soundPath = lang.getRaw("sounds.error");
+                    if (!soundPath.isEmpty()) {
+                        try {
+                            Sound successSound = Sound.sound(
+                                    Key.key(soundPath),
+                                    Sound.Source.UI,
+                                    1.0f,
+                                    1.0f
+                            );
+                            invocation.source().playSound(successSound, Sound.Emitter.self());
+                        } catch (Exception e) {
+                            plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                        }
+                    }
+                }
                 return;
             }
         }
@@ -107,6 +189,22 @@ public class PlaytimeCommand implements SimpleCommand {
 
         if (totalPlaytime <= 0) {
             source.sendMessage(mm.deserialize(lang.format("command-playtime-no-playtime", Map.of("player-name", targetName))));
+            if (invocation.source() instanceof Player) {
+                String soundPath = lang.getRaw("sounds.error");
+                if (!soundPath.isEmpty()) {
+                    try {
+                        Sound successSound = Sound.sound(
+                                Key.key(soundPath),
+                                Sound.Source.UI,
+                                1.0f,
+                                1.0f
+                        );
+                        invocation.source().playSound(successSound, Sound.Emitter.self());
+                    } catch (Exception e) {
+                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                    }
+                }
+            }
             return;
         }
 
@@ -121,6 +219,22 @@ public class PlaytimeCommand implements SimpleCommand {
                 "minutes", String.valueOf(time[2]),
                 "seconds", String.valueOf(time[3])
         ))));
+        if (invocation.source() instanceof Player) {
+            String soundPath = lang.getRaw("sounds.pling");
+            if (!soundPath.isEmpty()) {
+                try {
+                    Sound successSound = Sound.sound(
+                            Key.key(soundPath),
+                            Sound.Source.UI,
+                            1.0f,
+                            1.0f
+                    );
+                    invocation.source().playSound(successSound, Sound.Emitter.self());
+                } catch (Exception e) {
+                    plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                }
+            }
+        }
     }
 
     private long[] formatTime(long playtime) {

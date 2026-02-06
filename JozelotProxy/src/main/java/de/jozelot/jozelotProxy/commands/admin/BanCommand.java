@@ -8,6 +8,8 @@ import de.jozelot.jozelotProxy.JozelotProxy;
 import de.jozelot.jozelotProxy.storage.ConfigManager;
 import de.jozelot.jozelotProxy.storage.LangManager;
 import de.jozelot.jozelotProxy.utils.ConsoleLogger;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
@@ -44,6 +46,22 @@ public class BanCommand implements SimpleCommand {
 
         if (args.length < 3) {
             source.sendMessage(mm.deserialize(lang.format("command-ban-usage", null)));
+            if (source instanceof Player) {
+                String soundPath = lang.getRaw("sounds.error");
+                if (!soundPath.isEmpty()) {
+                    try {
+                        Sound successSound = Sound.sound(
+                                Key.key(soundPath),
+                                Sound.Source.UI,
+                                1.0f,
+                                1.0f
+                        );
+                        source.playSound(successSound, Sound.Emitter.self());
+                    } catch (Exception e) {
+                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                    }
+                }
+            }
             return;
         }
 
@@ -54,6 +72,22 @@ public class BanCommand implements SimpleCommand {
 
         if (targetUUID == null) {
             source.sendMessage(mm.deserialize(lang.format("command-ban-player-not-found", Map.of("player-name", args[0]))));
+            if (source instanceof Player) {
+                String soundPath = lang.getRaw("sounds.error");
+                if (!soundPath.isEmpty()) {
+                    try {
+                        Sound successSound = Sound.sound(
+                                Key.key(soundPath),
+                                Sound.Source.UI,
+                                1.0f,
+                                1.0f
+                        );
+                        source.playSound(successSound, Sound.Emitter.self());
+                    } catch (Exception e) {
+                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                    }
+                }
+            }
             return;
         }
 
@@ -70,12 +104,44 @@ public class BanCommand implements SimpleCommand {
 
             if (sourceWeight <= targetWeight && !(source instanceof ProxyServer)) {
                 source.sendMessage(mm.deserialize(lang.format("command-ban-hierarchy-error", Map.of("player-name", args[0]))));
+                if (source instanceof Player) {
+                    String soundPath = lang.getRaw("sounds.error");
+                    if (!soundPath.isEmpty()) {
+                        try {
+                            Sound successSound = Sound.sound(
+                                    Key.key(soundPath),
+                                    Sound.Source.UI,
+                                    1.0f,
+                                    1.0f
+                            );
+                            source.playSound(successSound, Sound.Emitter.self());
+                        } catch (Exception e) {
+                            plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                        }
+                    }
+                }
                 return;
             }
 
             String timeArgs = args[1].toLowerCase();
             if (!timeArgs.matches("\\d+[smhdwy]|mo") && !timeArgs.equals("permanent") && !timeArgs.equals("perma")) {
                 source.sendMessage(mm.deserialize(lang.format("command-ban-invalid-time", Map.of("input", timeArgs))));
+                if (source instanceof Player) {
+                    String soundPath = lang.getRaw("sounds.error");
+                    if (!soundPath.isEmpty()) {
+                        try {
+                            Sound successSound = Sound.sound(
+                                    Key.key(soundPath),
+                                    Sound.Source.UI,
+                                    1.0f,
+                                    1.0f
+                            );
+                            source.playSound(successSound, Sound.Emitter.self());
+                        } catch (Exception e) {
+                            plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                        }
+                    }
+                }
                 return;
             }
 
@@ -87,6 +153,22 @@ public class BanCommand implements SimpleCommand {
 
             if (alreadyBanned) {
                 source.sendMessage(mm.deserialize(lang.format("command-ban-already-banned", Map.of("player-name", args[0]))));
+                if (source instanceof Player) {
+                    String soundPath = lang.getRaw("sounds.error");
+                    if (!soundPath.isEmpty()) {
+                        try {
+                            Sound successSound = Sound.sound(
+                                    Key.key(soundPath),
+                                    Sound.Source.UI,
+                                    1.0f,
+                                    1.0f
+                            );
+                            source.playSound(successSound, Sound.Emitter.self());
+                        } catch (Exception e) {
+                            plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                        }
+                    }
+                }
                 return;
             }
 
@@ -106,6 +188,22 @@ public class BanCommand implements SimpleCommand {
             }
 
             plugin.getMySQLManager().logAction(operatorUUID, "BAN", args[0], "Grund: " + reason + " | Dauer: " + timeArgs);
+            if (source instanceof Player) {
+                String soundPath = lang.getRaw("sounds.success");
+                if (!soundPath.isEmpty()) {
+                    try {
+                        Sound successSound = Sound.sound(
+                                Key.key(soundPath),
+                                Sound.Source.UI,
+                                1.0f,
+                                1.0f
+                        );
+                        source.playSound(successSound, Sound.Emitter.self());
+                    } catch (Exception e) {
+                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                    }
+                }
+            }
         });
     }
 

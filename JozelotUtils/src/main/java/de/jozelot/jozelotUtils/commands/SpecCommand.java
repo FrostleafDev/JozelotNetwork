@@ -86,7 +86,10 @@ public class SpecCommand implements CommandExecutor, TabCompleter {
             }
 
             target.setGameMode(backTo);
-            target.sendActionBar(mm.deserialize(lang.format("command-spec-back", Map.of("gm", backTo.name()))));
+            String gmName = backTo.name().toLowerCase();
+            String formattedName = gmName.substring(0, 1).toUpperCase() + gmName.substring(1);
+
+            target.sendActionBar(mm.deserialize(lang.format("command-spec-back", Map.of("gm", formattedName))));
 
             logAndNotify(executor, target, "deaktiviert (zurück zu " + backTo.name() + ")");
         }

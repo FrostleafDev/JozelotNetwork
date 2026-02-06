@@ -8,6 +8,8 @@ import de.jozelot.jozelotProxy.JozelotProxy;
 import de.jozelot.jozelotProxy.storage.ConfigManager;
 import de.jozelot.jozelotProxy.storage.LangManager;
 import de.jozelot.jozelotProxy.utils.ConsoleLogger;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
 import java.util.*;
@@ -33,6 +35,22 @@ public class NetworkCommand implements SimpleCommand {
     public void execute(Invocation invocation) {
         if (!invocation.source().hasPermission("network.command")) {
             invocation.source().sendMessage(mm.deserialize(lang.getNoPermission()));
+            if (invocation.source() instanceof Player) {
+                String soundPath = lang.getRaw("sounds.error");
+                if (!soundPath.isEmpty()) {
+                    try {
+                        Sound successSound = Sound.sound(
+                                Key.key(soundPath),
+                                Sound.Source.UI,
+                                1.0f,
+                                1.0f
+                        );
+                        invocation.source().playSound(successSound, Sound.Emitter.self());
+                    } catch (Exception e) {
+                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                    }
+                }
+            }
             return;
         }
 
@@ -58,12 +76,45 @@ public class NetworkCommand implements SimpleCommand {
                 // LOGS
                 UUID operatorUUID = (source instanceof Player p) ? p.getUniqueId() : new UUID(0L, 0L);
                 plugin.getMySQLManager().logAction(operatorUUID, "RELOAD", "server:proxy", "Kompletter Reload des Netzwerks");
+
+                if (source instanceof Player) {
+                    String soundPath = lang.getRaw("sounds.success");
+                    if (!soundPath.isEmpty()) {
+                        try {
+                            Sound successSound = Sound.sound(
+                                    Key.key(soundPath),
+                                    Sound.Source.UI,
+                                    1.0f,
+                                    1.0f
+                            );
+                            source.playSound(successSound, Sound.Emitter.self());
+                        } catch (Exception e) {
+                            plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                        }
+                    }
+                }
                 return;
             }
 
             // HELP
             if (args[0].equalsIgnoreCase("help")) {
                 showHelp(source);
+                if (source instanceof Player) {
+                    String soundPath = lang.getRaw("sounds.pling");
+                    if (!soundPath.isEmpty()) {
+                        try {
+                            Sound successSound = Sound.sound(
+                                    Key.key(soundPath),
+                                    Sound.Source.UI,
+                                    1.0f,
+                                    1.0f
+                            );
+                            source.playSound(successSound, Sound.Emitter.self());
+                        } catch (Exception e) {
+                            plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                        }
+                    }
+                }
                 return;
             }
 
@@ -78,6 +129,22 @@ public class NetworkCommand implements SimpleCommand {
 
                 if (pteroId == null) {
                     source.sendMessage(mm.deserialize(lang.format("pterodactyl-control-no-id", Map.of("server-name", serverName))));
+                    if (source instanceof Player) {
+                        String soundPath = lang.getRaw("sounds.error");
+                        if (!soundPath.isEmpty()) {
+                            try {
+                                Sound successSound = Sound.sound(
+                                        Key.key(soundPath),
+                                        Sound.Source.UI,
+                                        1.0f,
+                                        1.0f
+                                );
+                                source.playSound(successSound, Sound.Emitter.self());
+                            } catch (Exception e) {
+                                plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                            }
+                        }
+                    }
                     return;
                 }
 
@@ -100,11 +167,44 @@ public class NetworkCommand implements SimpleCommand {
                             }
                         }
 
+                        if (source instanceof Player) {
+                            String soundPath = lang.getRaw("sounds.success");
+                            if (!soundPath.isEmpty()) {
+                                try {
+                                    Sound successSound = Sound.sound(
+                                            Key.key(soundPath),
+                                            Sound.Source.UI,
+                                            1.0f,
+                                            1.0f
+                                    );
+                                    source.playSound(successSound, Sound.Emitter.self());
+                                } catch (Exception e) {
+                                    plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                                }
+                            }
+                        }
+
                         UUID operatorUUID = (source instanceof Player p) ? p.getUniqueId() : new UUID(0L, 0L);
                         plugin.getMySQLManager().logAction(operatorUUID, "SERVER_ACTION", "server:" + serverName, "Action: " + action);
 
                     } else {
                         source.sendMessage(mm.deserialize(lang.format("pterodactyl-control-api-error", Map.of("code", String.valueOf(code)))));
+                        if (source instanceof Player) {
+                            String soundPath = lang.getRaw("sounds.error");
+                            if (!soundPath.isEmpty()) {
+                                try {
+                                    Sound successSound = Sound.sound(
+                                            Key.key(soundPath),
+                                            Sound.Source.UI,
+                                            1.0f,
+                                            1.0f
+                                    );
+                                    source.playSound(successSound, Sound.Emitter.self());
+                                } catch (Exception e) {
+                                    plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                                }
+                            }
+                        }
                     }
                 });
                 return;
@@ -117,12 +217,44 @@ public class NetworkCommand implements SimpleCommand {
 
                 if (pteroId == null) {
                     source.sendMessage(mm.deserialize(lang.format("pterodactyl-control-no-id", Map.of("server-name", serverName))));
+                    if (source instanceof Player) {
+                        String soundPath = lang.getRaw("sounds.error");
+                        if (!soundPath.isEmpty()) {
+                            try {
+                                Sound successSound = Sound.sound(
+                                        Key.key(soundPath),
+                                        Sound.Source.UI,
+                                        1.0f,
+                                        1.0f
+                                );
+                                source.playSound(successSound, Sound.Emitter.self());
+                            } catch (Exception e) {
+                                plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                            }
+                        }
+                    }
                     return;
                 }
 
                 plugin.getPteroManager().getResources(pteroId, data -> {
                     if (data == null) {
                         source.sendMessage(mm.deserialize("<red>Fehler beim Abrufen der API-Daten."));
+                        if (source instanceof Player) {
+                            String soundPath = lang.getRaw("sounds.error");
+                            if (!soundPath.isEmpty()) {
+                                try {
+                                    Sound successSound = Sound.sound(
+                                            Key.key(soundPath),
+                                            Sound.Source.UI,
+                                            1.0f,
+                                            1.0f
+                                    );
+                                    source.playSound(successSound, Sound.Emitter.self());
+                                } catch (Exception e) {
+                                    plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                                }
+                            }
+                        }
                         return;
                     }
 
@@ -146,6 +278,23 @@ public class NetworkCommand implements SimpleCommand {
                     ));
                     source.sendMessage(mm.deserialize(String.join("<newline>", infoLines)));
 
+                    if (source instanceof Player) {
+                        String soundPath = lang.getRaw("sounds.pling");
+                        if (!soundPath.isEmpty()) {
+                            try {
+                                Sound successSound = Sound.sound(
+                                        Key.key(soundPath),
+                                        Sound.Source.UI,
+                                        1.0f,
+                                        1.0f
+                                );
+                                source.playSound(successSound, Sound.Emitter.self());
+                            } catch (Exception e) {
+                                plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                            }
+                        }
+                    }
+
                 });
                 return;
             }
@@ -154,11 +303,43 @@ public class NetworkCommand implements SimpleCommand {
             if (args[0].equalsIgnoreCase("manage") && source.hasPermission("network.command.manage")) {
                 if (args.length < 4) {
                     showHelp(source);
+                    if (source instanceof Player) {
+                        String soundPath = lang.getRaw("sounds.error");
+                        if (!soundPath.isEmpty()) {
+                            try {
+                                Sound successSound = Sound.sound(
+                                        Key.key(soundPath),
+                                        Sound.Source.UI,
+                                        1.0f,
+                                        1.0f
+                                );
+                                source.playSound(successSound, Sound.Emitter.self());
+                            } catch (Exception e) {
+                                plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                            }
+                        }
+                    }
                     return;
                 }
 
                 if (args[3].equalsIgnoreCase("set") && args.length < 5) {
                     showHelp(source);
+                    if (source instanceof Player) {
+                        String soundPath = lang.getRaw("sounds.error");
+                        if (!soundPath.isEmpty()) {
+                            try {
+                                Sound successSound = Sound.sound(
+                                        Key.key(soundPath),
+                                        Sound.Source.UI,
+                                        1.0f,
+                                        1.0f
+                                );
+                                source.playSound(successSound, Sound.Emitter.self());
+                            } catch (Exception e) {
+                                plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                            }
+                        }
+                    }
                     return;
                 }
 
@@ -168,6 +349,22 @@ public class NetworkCommand implements SimpleCommand {
 
                 if (!plugin.getMySQLManager().existsInDatabase(serverName)) {
                     source.sendMessage(mm.deserialize(lang.format("server-not-found", Map.of("server-name", serverName))));
+                    if (source instanceof Player) {
+                        String soundPath = lang.getRaw("sounds.error");
+                        if (!soundPath.isEmpty()) {
+                            try {
+                                Sound successSound = Sound.sound(
+                                        Key.key(soundPath),
+                                        Sound.Source.UI,
+                                        1.0f,
+                                        1.0f
+                                );
+                                source.playSound(successSound, Sound.Emitter.self());
+                            } catch (Exception e) {
+                                plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                            }
+                        }
+                    }
                     return;
                 }
 
@@ -179,6 +376,22 @@ public class NetworkCommand implements SimpleCommand {
                         if (action.equals("get")) {
                             String displayName = plugin.getMySQLManager().getServerDisplayName(serverName);
                             source.sendMessage(mm.deserialize(lang.format("command-manage-display-name-get", Map.of("server-name", serverName, "display-name", displayName))));
+                            if (source instanceof Player) {
+                                String soundPath = lang.getRaw("sounds.pling");
+                                if (!soundPath.isEmpty()) {
+                                    try {
+                                        Sound successSound = Sound.sound(
+                                                Key.key(soundPath),
+                                                Sound.Source.UI,
+                                                1.0f,
+                                                1.0f
+                                        );
+                                        source.playSound(successSound, Sound.Emitter.self());
+                                    } catch (Exception e) {
+                                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                                    }
+                                }
+                            }
                         } else if (action.equals("set")) {
                             StringJoiner joiner = new StringJoiner(" ");
                             for (int i = 4; i < args.length; i++) joiner.add(args[i]);
@@ -186,6 +399,22 @@ public class NetworkCommand implements SimpleCommand {
 
                             plugin.getMySQLManager().setServerDisplayName(serverName, fullDisplayName);
                             source.sendMessage(mm.deserialize(lang.format("command-manage-display-name-success", Map.of("server-name", serverName, "display-name", fullDisplayName))));
+                            if (source instanceof Player) {
+                                String soundPath = lang.getRaw("sounds.success");
+                                if (!soundPath.isEmpty()) {
+                                    try {
+                                        Sound successSound = Sound.sound(
+                                                Key.key(soundPath),
+                                                Sound.Source.UI,
+                                                1.0f,
+                                                1.0f
+                                        );
+                                        source.playSound(successSound, Sound.Emitter.self());
+                                    } catch (Exception e) {
+                                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                                    }
+                                }
+                            }
 
                             consoleLogger.broadCastToConsole("<yellow>" + senderName + " <gray>hat <white>" + serverName + " <gray>in <gold>" + fullDisplayName + " <gray>umbenannt");
                             for (Player player : server.getAllPlayers()) {
@@ -204,11 +433,43 @@ public class NetworkCommand implements SimpleCommand {
                         if (action.equals("get")) {
                             int maxPlayers = plugin.getMySQLManager().getServerMaxPlayers(serverName);
                             source.sendMessage(mm.deserialize(lang.format("command-manage-max-players-get", Map.of("server-name", serverName, "max-players", String.valueOf(maxPlayers)))));
+                            if (source instanceof Player) {
+                                String soundPath = lang.getRaw("sounds.pling");
+                                if (!soundPath.isEmpty()) {
+                                    try {
+                                        Sound successSound = Sound.sound(
+                                                Key.key(soundPath),
+                                                Sound.Source.UI,
+                                                1.0f,
+                                                1.0f
+                                        );
+                                        source.playSound(successSound, Sound.Emitter.self());
+                                    } catch (Exception e) {
+                                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                                    }
+                                }
+                            }
                         } else if (action.equals("set")) {
                             try {
                                 int amount = Integer.parseInt(args[4]);
                                 plugin.getMySQLManager().setServerMaxPlayers(serverName, amount);
                                 source.sendMessage(mm.deserialize(lang.format("command-manage-max-players-success", Map.of("server-name", serverName, "max-players", String.valueOf(amount)))));
+                                if (source instanceof Player) {
+                                    String soundPath = lang.getRaw("sounds.success");
+                                    if (!soundPath.isEmpty()) {
+                                        try {
+                                            Sound successSound = Sound.sound(
+                                                    Key.key(soundPath),
+                                                    Sound.Source.UI,
+                                                    1.0f,
+                                                    1.0f
+                                            );
+                                            source.playSound(successSound, Sound.Emitter.self());
+                                        } catch (Exception e) {
+                                            plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                                        }
+                                    }
+                                }
 
                                 consoleLogger.broadCastToConsole("<yellow>" + senderName + " <gray>hat die Slots von <white>" + serverName + " <gray>auf <gold>" + amount + " <gray>gesetzt");
                                 for (Player player : server.getAllPlayers()) {
@@ -220,6 +481,22 @@ public class NetworkCommand implements SimpleCommand {
                                 plugin.getMySQLManager().logAction(operatorUUID, "MAX_PLAYERS_CHANGE", "server:" + serverName, "Zu: " + amount);
                             } catch (NumberFormatException e) {
                                 source.sendMessage(mm.deserialize(lang.format("command-manage-max-players-not-a-number", Map.of("input", args[4]))));
+                                if (source instanceof Player) {
+                                    String soundPath = lang.getRaw("sounds.error");
+                                    if (!soundPath.isEmpty()) {
+                                        try {
+                                            Sound successSound = Sound.sound(
+                                                    Key.key(soundPath),
+                                                    Sound.Source.UI,
+                                                    1.0f,
+                                                    1.0f
+                                            );
+                                            source.playSound(successSound, Sound.Emitter.self());
+                                        } catch (Exception es) {
+                                            plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -229,6 +506,22 @@ public class NetworkCommand implements SimpleCommand {
                         if (action.equals("get")) {
                             String motd = plugin.getMySQLManager().getServerMOTD(serverName);
                             source.sendMessage(mm.deserialize(lang.format("command-manage-motd-get", Map.of("server-name", serverName, "motd", motd))));
+                            if (source instanceof Player) {
+                                String soundPath = lang.getRaw("sounds.pling");
+                                if (!soundPath.isEmpty()) {
+                                    try {
+                                        Sound successSound = Sound.sound(
+                                                Key.key(soundPath),
+                                                Sound.Source.UI,
+                                                1.0f,
+                                                1.0f
+                                        );
+                                        source.playSound(successSound, Sound.Emitter.self());
+                                    } catch (Exception e) {
+                                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                                    }
+                                }
+                            }
                         } else if (action.equals("set")) {
                             StringJoiner joiner = new StringJoiner(" ");
                             for (int i = 4; i < args.length; i++) joiner.add(args[i]);
@@ -245,6 +538,22 @@ public class NetworkCommand implements SimpleCommand {
                             }
                             UUID operatorUUID = (source instanceof Player p) ? p.getUniqueId() : new UUID(0L, 0L);
                             plugin.getMySQLManager().logAction(operatorUUID, "MOTD_CHANGE", "server:" + serverName, "Zu: " + fullMotd);
+                            if (source instanceof Player) {
+                                String soundPath = lang.getRaw("sounds.success");
+                                if (!soundPath.isEmpty()) {
+                                    try {
+                                        Sound successSound = Sound.sound(
+                                                Key.key(soundPath),
+                                                Sound.Source.UI,
+                                                1.0f,
+                                                1.0f
+                                        );
+                                        source.playSound(successSound, Sound.Emitter.self());
+                                    } catch (Exception e) {
+                                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                                    }
+                                }
+                            }
                         }
                     }
 
@@ -253,6 +562,22 @@ public class NetworkCommand implements SimpleCommand {
                         if (action.equals("get")) {
                             boolean state = plugin.getMySQLManager().getServerMaintenance(serverName);
                             source.sendMessage(mm.deserialize(lang.format("command-manage-maintenance-get", Map.of("server-name", serverName, "status", state ? "An" : "Aus"))));
+                            if (source instanceof Player) {
+                                String soundPath = lang.getRaw("sounds.pling");
+                                if (!soundPath.isEmpty()) {
+                                    try {
+                                        Sound successSound = Sound.sound(
+                                                Key.key(soundPath),
+                                                Sound.Source.UI,
+                                                1.0f,
+                                                1.0f
+                                        );
+                                        source.playSound(successSound, Sound.Emitter.self());
+                                    } catch (Exception e) {
+                                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                                    }
+                                }
+                            }
                         } else if (action.equals("set")) {
                             boolean newState = args[4].equalsIgnoreCase("true") || args[4].equalsIgnoreCase("on");
                             plugin.getMySQLManager().setServerMaintenance(serverName, newState);
@@ -268,6 +593,22 @@ public class NetworkCommand implements SimpleCommand {
                             }
                             UUID operatorUUID = (source instanceof Player p) ? p.getUniqueId() : new UUID(0L, 0L);
                             plugin.getMySQLManager().logAction(operatorUUID, "MAINTENANCE_CHANGE", "server:" + serverName, "Status: " + statusText);
+                            if (source instanceof Player) {
+                                String soundPath = lang.getRaw("sounds.success");
+                                if (!soundPath.isEmpty()) {
+                                    try {
+                                        Sound successSound = Sound.sound(
+                                                Key.key(soundPath),
+                                                Sound.Source.UI,
+                                                1.0f,
+                                                1.0f
+                                        );
+                                        source.playSound(successSound, Sound.Emitter.self());
+                                    } catch (Exception e) {
+                                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                                    }
+                                }
+                            }
                         }
                     }
                 }).schedule();

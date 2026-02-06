@@ -2,6 +2,7 @@ package de.jozelot.jozelotUtils.storage;
 
 import de.jozelot.jozelotUtils.JozelotUtils;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
@@ -47,12 +48,32 @@ public class ConfigManager {
     private int customExperienceLevel;
     private boolean isCustomBarLevel;
     private int customBarLevel;
+    private boolean blockPortals;
 
     private boolean isChatDisabled;
+    private boolean isLocatorBar;
     private boolean ticksFreeze;
+
+    private boolean spawnCommand;
+    private boolean spawnOnFall;
+
+    public int getFallOffHeight() {
+        return fallOffHeight;
+    }
+
+    public boolean isSpawnOnFall() {
+        return spawnOnFall;
+    }
+
+    private int fallOffHeight;
 
     private String joinMessageType;
     private String leaveMessageType;
+
+    private Location spawnLocation;
+    private boolean spawnOnJoin;
+
+    private int defaultHotbarSlot;
 
     public ConfigManager(JozelotUtils plugin) {
         this.plugin = plugin;
@@ -207,6 +228,44 @@ public class ConfigManager {
         return isChatDisabled;
     }
 
+    public boolean isLocatorBar() {
+        return isLocatorBar;
+    }
+
+    public boolean isBlockPortals() {
+        return blockPortals;
+    }
+
+    public boolean isSpawnCommand() {
+        return spawnCommand;
+    }
+
+    public Location getSpawnLocation() {
+        return spawnLocation;
+    }
+
+    public boolean isSpawnOnJoin() {
+        return spawnOnJoin;
+    }
+
+    public void setSpawnLocation(org.bukkit.Location loc) {
+        this.spawnLocation = loc;
+
+        List<Double> posList = new java.util.ArrayList<>();
+        posList.add(loc.getX());
+        posList.add(loc.getY());
+        posList.add(loc.getZ());
+        posList.add((double) loc.getYaw());
+        posList.add((double) loc.getPitch());
+
+        plugin.getConfig().set("spawn-position", posList);
+        plugin.saveConfig();
+    }
+
+    public int getDefaultHotbarSlot() {
+        return defaultHotbarSlot;
+    }
+
     public void loadConfig() {
         plugin.saveDefaultConfig();
 
@@ -259,6 +318,33 @@ public class ConfigManager {
         customBarLevel = plugin.getConfig().getInt("bar-level-set");
 
         isChatDisabled = plugin.getConfig().getBoolean("disable-default-chat");
+        isLocatorBar = plugin.getConfig().getBoolean("locator-bar");
 
+        blockPortals = plugin.getConfig().getBoolean("block-portals");
+
+        spawnCommand = plugin.getConfig().getBoolean("spawn-command");
+
+        spawnOnJoin = plugin.getConfig().getBoolean("spawn-on-join");
+
+        List<Double> pos = plugin.getConfig().getDoubleList("spawn-position");
+
+        if (pos.size() >= 3) {
+            org.bukkit.World world = org.bukkit.Bukkit.getWorlds().get(0);
+
+            double x = pos.get(0);
+            double y = pos.get(1);
+            double z = pos.get(2);
+            float yaw = pos.size() >= 4 ? pos.get(3).floatValue() : 0.0f;
+            float pitch = pos.size() >= 5 ? pos.get(4).floatValue() : 0.0f;
+
+            spawnLocation = new org.bukkit.Location(world, x, y, z, yaw, pitch);
+        }
+
+        spawnOnJoin = plugin.getConfig().getBoolean("spawn-on-join");
+
+        fallOffHeight = plugin.getConfig().getInt("fall-off-height");
+        spawnOnFall = plugin.getConfig().getBoolean("spawn-on-fall-off");
+
+        defaultHotbarSlot = plugin.getConfig().getInt("default-hotbar-slot");
     }
 }

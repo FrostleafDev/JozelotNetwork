@@ -1,6 +1,7 @@
 package de.jozelot.jozelotProxy.storage;
 
 import de.jozelot.jozelotProxy.JozelotProxy;
+import org.intellij.lang.annotations.Subst;
 import org.yaml.snakeyaml.Yaml;
 import java.io.*;
 import java.nio.file.Files;
@@ -182,5 +183,12 @@ public class LangManager {
 
     public Map<String, Object> getAllData() {
         return this.data;
+    }
+
+    @Subst("")
+    public String getRaw(String path) {
+        String text = getString(path);
+        if (text == null || text.isEmpty()) return "";
+        return text.trim().toLowerCase();
     }
 }

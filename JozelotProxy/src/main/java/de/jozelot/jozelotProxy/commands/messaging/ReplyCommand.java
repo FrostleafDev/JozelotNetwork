@@ -5,6 +5,8 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import de.jozelot.jozelotProxy.JozelotProxy;
 import de.jozelot.jozelotProxy.storage.LangManager;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
 import java.util.List;
@@ -28,6 +30,22 @@ public class ReplyCommand implements SimpleCommand {
     public void execute(Invocation invocation) {
         if (!invocation.source().hasPermission("network.command.reply")) {
             invocation.source().sendMessage(mm.deserialize(lang.getNoPermission()));
+            if (invocation.source() instanceof Player) {
+                String soundPath = lang.getRaw("sounds.error");
+                if (!soundPath.isEmpty()) {
+                    try {
+                        Sound successSound = Sound.sound(
+                                Key.key(soundPath),
+                                Sound.Source.UI,
+                                1.0f,
+                                1.0f
+                        );
+                        invocation.source().playSound(successSound, Sound.Emitter.self());
+                    } catch (Exception e) {
+                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                    }
+                }
+            }
             return;
         }
 
@@ -39,12 +57,44 @@ public class ReplyCommand implements SimpleCommand {
         String[] args = invocation.arguments();
         if (args.length < 1) {
             player.sendMessage(mm.deserialize(lang.format("command-reply-usage", Map.of())));
+            if (invocation.source() instanceof Player) {
+                String soundPath = lang.getRaw("sounds.error");
+                if (!soundPath.isEmpty()) {
+                    try {
+                        Sound successSound = Sound.sound(
+                                Key.key(soundPath),
+                                Sound.Source.UI,
+                                1.0f,
+                                1.0f
+                        );
+                        invocation.source().playSound(successSound, Sound.Emitter.self());
+                    } catch (Exception e) {
+                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                    }
+                }
+            }
             return;
         }
 
         JozelotProxy.ReplyData data = plugin.getReplyMap().get(player.getUniqueId());
         if (data == null) {
             player.sendMessage(mm.deserialize(lang.format("command-reply-no-target", Map.of())));
+            if (invocation.source() instanceof Player) {
+                String soundPath = lang.getRaw("sounds.error");
+                if (!soundPath.isEmpty()) {
+                    try {
+                        Sound successSound = Sound.sound(
+                                Key.key(soundPath),
+                                Sound.Source.UI,
+                                1.0f,
+                                1.0f
+                        );
+                        invocation.source().playSound(successSound, Sound.Emitter.self());
+                    } catch (Exception e) {
+                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                    }
+                }
+            }
             return;
         }
 
@@ -52,6 +102,22 @@ public class ReplyCommand implements SimpleCommand {
         if (targetOptional.isEmpty()) {
             player.sendMessage(mm.deserialize(lang.format("command-reply-target-offline", Map.of())));
             plugin.getReplyMap().remove(player.getUniqueId());
+            if (invocation.source() instanceof Player) {
+                String soundPath = lang.getRaw("sounds.error");
+                if (!soundPath.isEmpty()) {
+                    try {
+                        Sound successSound = Sound.sound(
+                                Key.key(soundPath),
+                                Sound.Source.UI,
+                                1.0f,
+                                1.0f
+                        );
+                        invocation.source().playSound(successSound, Sound.Emitter.self());
+                    } catch (Exception e) {
+                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                    }
+                }
+            }
             return;
         }
 
@@ -72,6 +138,23 @@ public class ReplyCommand implements SimpleCommand {
                 "player-name", player.getUsername(),
                 "message", processedMessage
         ))));
+
+        if (target instanceof Player) {
+            String soundPath = lang.getRaw("sounds.notify");
+            if (!soundPath.isEmpty()) {
+                try {
+                    Sound successSound = Sound.sound(
+                            Key.key(soundPath),
+                            Sound.Source.UI,
+                            1.0f,
+                            1.0f
+                    );
+                   target.playSound(successSound, Sound.Emitter.self());
+                } catch (Exception e) {
+                    plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                }
+            }
+        }
 
         plugin.getReplyMap().put(target.getUniqueId(), new JozelotProxy.ReplyData(player.getUniqueId(), data.isGlobal()));
 

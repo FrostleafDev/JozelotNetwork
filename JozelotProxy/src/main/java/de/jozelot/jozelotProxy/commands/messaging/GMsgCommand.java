@@ -7,6 +7,8 @@ import de.jozelot.jozelotProxy.JozelotProxy;
 import de.jozelot.jozelotProxy.storage.ConfigManager;
 import de.jozelot.jozelotProxy.storage.LangManager;
 import de.jozelot.jozelotProxy.utils.ConsoleLogger;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
 import java.util.Arrays;
@@ -35,6 +37,22 @@ public class GMsgCommand implements SimpleCommand {
     public void execute(Invocation invocation) {
         if (!invocation.source().hasPermission("network.command.gmsg")) {
             invocation.source().sendMessage(mm.deserialize(lang.getNoPermission()));
+            if (invocation.source() instanceof Player) {
+                String soundPath = lang.getRaw("sounds.error");
+                if (!soundPath.isEmpty()) {
+                    try {
+                        Sound successSound = Sound.sound(
+                                Key.key(soundPath),
+                                Sound.Source.UI,
+                                1.0f,
+                                1.0f
+                        );
+                        invocation.source().playSound(successSound, Sound.Emitter.self());
+                    } catch (Exception e) {
+                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                    }
+                }
+            }
             return;
         }
 
@@ -47,6 +65,22 @@ public class GMsgCommand implements SimpleCommand {
 
         if (args.length < 2) {
             player.sendMessage(mm.deserialize(lang.format("command-gmsg-usage", Map.of())));
+            if (invocation.source() instanceof Player) {
+                String soundPath = lang.getRaw("sounds.error");
+                if (!soundPath.isEmpty()) {
+                    try {
+                        Sound successSound = Sound.sound(
+                                Key.key(soundPath),
+                                Sound.Source.UI,
+                                1.0f,
+                                1.0f
+                        );
+                        invocation.source().playSound(successSound, Sound.Emitter.self());
+                    } catch (Exception e) {
+                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                    }
+                }
+            }
             return;
         }
 
@@ -56,6 +90,22 @@ public class GMsgCommand implements SimpleCommand {
         if (targetOptional.isEmpty()) {
             player.sendMessage(mm.deserialize(lang.format("command-gmsg-target-not-found",
                     Map.of("player-name", targetName))));
+            if (invocation.source() instanceof Player) {
+                String soundPath = lang.getRaw("sounds.error");
+                if (!soundPath.isEmpty()) {
+                    try {
+                        Sound successSound = Sound.sound(
+                                Key.key(soundPath),
+                                Sound.Source.UI,
+                                1.0f,
+                                1.0f
+                        );
+                        invocation.source().playSound(successSound, Sound.Emitter.self());
+                    } catch (Exception e) {
+                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                    }
+                }
+            }
             return;
         }
 
@@ -63,6 +113,22 @@ public class GMsgCommand implements SimpleCommand {
 
         if (target.getUniqueId().equals(player.getUniqueId())) {
             player.sendMessage(mm.deserialize(lang.format("command-gmsg-self-msg", Map.of())));
+            if (invocation.source() instanceof Player) {
+                String soundPath = lang.getRaw("sounds.error");
+                if (!soundPath.isEmpty()) {
+                    try {
+                        Sound successSound = Sound.sound(
+                                Key.key(soundPath),
+                                Sound.Source.UI,
+                                1.0f,
+                                1.0f
+                        );
+                        invocation.source().playSound(successSound, Sound.Emitter.self());
+                    } catch (Exception e) {
+                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                    }
+                }
+            }
             return;
         }
 
@@ -85,6 +151,22 @@ public class GMsgCommand implements SimpleCommand {
 
         player.sendMessage(mm.deserialize(sendFormat));
         target.sendMessage(mm.deserialize(receiveFormat));
+        if (target instanceof Player) {
+            String soundPath = lang.getRaw("sounds.notify");
+            if (!soundPath.isEmpty()) {
+                try {
+                    Sound successSound = Sound.sound(
+                            Key.key(soundPath),
+                            Sound.Source.UI,
+                            1.0f,
+                            1.0f
+                    );
+                    target.playSound(successSound, Sound.Emitter.self());
+                } catch (Exception e) {
+                    plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                }
+            }
+        }
 
         plugin.getReplyMap().put(target.getUniqueId(), new JozelotProxy.ReplyData(player.getUniqueId(), true));
         consoleLogger.broadCastToConsole("[MSG] " + player.getUsername() + " -> " + target.getUsername() + ": " + rawMessage);

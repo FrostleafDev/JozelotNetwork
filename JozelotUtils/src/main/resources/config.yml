@@ -19,11 +19,14 @@ daylight-cycle: false
 weather-cycle: false
 announce-advancements: false
 advancements-enabled: false
+block-portals: true
 
 custom-experience-level: true # default, custom
 experience-level-set: 2026 # default, custom
 custom-bar-level: true
 bar-level-set: 100
+
+locator-bar: false
 
 disable-default-chat: true
 
@@ -31,6 +34,19 @@ tick-freeze: true
 tick-speed: 0
 
 enable-player-name-tag: true
+
+spawn-command: true
+spawn-on-join: true
+spawn-on-fall-off: true
+fall-off-height: -10
+spawn-position:
+  - 0.0f
+  - 65.0f
+  - 0.0f
+  - 0.0f
+  - 0.0f
+
+default-hotbar-slot: 4 # 0-9 , -1 to disable
 
 join-messages: default # default, disabled, custom
 leave-messages: default # default, disabled, custom

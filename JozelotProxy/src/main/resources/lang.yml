@@ -17,6 +17,14 @@ first-join:
   - "  <dark_gray>» {secondary}Discord: <click:open_url:'https://jozelot.de/discord'><hover:show_text:'{primary}Klicke hier, um unserem Discord beizutreten!'><u><white>jozelot.de/discord</white></u></hover></click>"
   - ""
 
+sounds:
+  error: "entity.villager.no"
+  success: "entity.player.levelup"
+  pling: "block.note_block.pling"
+  notify: "block.note_block.chime"
+  experience: "entity.experience_orb.pickup"
+  warning: 'block.note_block.bit'
+
 server-maintenance-kick: '{danger}Du wurdest wegen Wartungsarbeiten von {server-name} gekickt'
 server-maintenance-no-access: '{danger}Du kannst {server-name} nicht, wegen aktuellen Wartungsarbeiten, beitreten, '
 proxy-maintenance-kick:
@@ -139,7 +147,7 @@ ban-bypass-info:
   - "  <dark_gray>»</dark_gray> {grey}Bis: <white>{duration}"
   - "  <dark_gray>»</dark_gray> {grey}Von: <white>{admin-name}"
   - ""
-  - "  {grey}Nutze {primary}/unban {player-name}{grey}, um den Bann aufzuheben."
+  - "  {grey}Nutze <click:suggest_command:'/unban {player-name}'><hover:show_text:'{primary}Klicke hier, um dich zu entbannen!'>{primary}/unban {player-name}</hover></click>{grey}, um den Bann aufzuheben."
   - ""
 
 command-unban-usage: '{tertiary}/unban <Spieler>'
@@ -274,11 +282,11 @@ command-broadcast-send: '{grey}Broadcast wurde an {primary}{size} Spieler gesend
 command-broadcast-send-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat einen Broadcast an {primary}{size} Spieler gesendet'
 broadcast-announcement:
   - ""
-  - "<dark_gray> ------- « <gold><b>ANKÜNDIGUNG</b> <dark_gray>» -------"
+  - "<dark_gray> -------- « <gold><b>ANKÜNDIGUNG</b> <dark_gray>» ---------"
   - ""
   - "<gray>{message}"
   - ""
-  - "<dark_gray> ----------------------------------"
+  - "<reset><dark_gray> ----------------------------------"
   - ""
 broadcast-message:
   - ""
@@ -286,7 +294,7 @@ broadcast-message:
   - ""
   - "<gray>{message}"
   - ""
-  - "<dark_gray> ---------------------------------"
+  - "<reset><dark_gray> ---------------------------------"
   - ""
 broadcast-information:
   - ""
@@ -294,7 +302,7 @@ broadcast-information:
   - ""
   - "<gray>{message}"
   - ""
-  - "<dark_gray> ---------------------------------"
+  - "<reset><dark_gray> ---------------------------------"
   - ""
 broadcast-warning:
   - ""
@@ -302,7 +310,7 @@ broadcast-warning:
   - ""
   - "<gray>{message}"
   - ""
-  - "<dark_gray> ---------------------------------"
+  - "<reset><dark_gray> ---------------------------------"
   - ""
   -
 server-full-message: "{danger}Du kannst nicht auf {server-name} verbinden, da dieser voll ist."
@@ -366,9 +374,11 @@ command-spec-others-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{
 command-spec-usage: '{tertiary}/spec <player>'
 command-spec-back: '{grey}Dein Spielmodus wurde auf {primary}{gm} {grey}zurückgesetzt'
 
+command-spawn-success: '{grey}Du wurdest erfolgreich zum Spawn teleportiert'
 
-
-
+command-setspawn-error: '{danger}Bitte gebe richtige Koordinaten an'
+command-setspawn-usage: '{tertiary}/setspawn <x> <y> <z> [yaw] [pitch]'
+command-setspawn-success: '{grey}Der Welt Spawn wurde auf {primary}{x}{grey}, {primary}{y}{grey}, {primary}{z}{grey} gesetzt'
 
 
 

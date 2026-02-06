@@ -14,8 +14,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
 import org.bukkit.ServerTickManager;
 import org.bukkit.World;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandMap;
+import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.lang.reflect.Field;
 import java.util.Map;
 
 public final class JozelotUtils extends JavaPlugin {
@@ -59,10 +63,24 @@ public final class JozelotUtils extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new GriefPrevention(this), this);
         getServer().getPluginManager().registerEvents(new WorldSettings(this), this);
         getServer().getPluginManager().registerEvents(new PlayerChatListener(this), this);
+        getServer().getPluginManager().registerEvents(new FallOffListener(this), this);
 
         playerNameTag = new PlayerNameTag(this);
         getServer().getPluginManager().registerEvents(playerNameTag, this);
         applyGameRules();
+
+        try {
+            if (config.isSpawnCommand()) {
+                Field commandMapField = Bukkit.getServer().getClass().getDeclaredField("commandMap");
+                commandMapField.setAccessible(true);
+                CommandMap commandMap = (CommandMap) commandMapField.get(Bukkit.getServer());
+
+                commandMap.register("jozelotutils", new SpawnCommand(this));
+                commandMap.register("jozelotutils", new SetSpawnCommand(this));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         getServer().getConsoleSender().sendMessage("§a[§6JoUtils§a]§a Minecraft läuft in der " + Bukkit.getBukkitVersion());
         getServer().getConsoleSender().sendMessage("§a[§6JoUtils§a]§a ----------------------------------------------");
@@ -110,6 +128,7 @@ public final class JozelotUtils extends JavaPlugin {
             world.setGameRule(GameRule.DO_WEATHER_CYCLE, config.isWeatherCycle());
             world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, config.isAnnounceAdvancements());
             world.setGameRule(GameRule.RANDOM_TICK_SPEED, config.getTickSpeed());
+            world.setGameRule(GameRule.LOCATOR_BAR, config.isLocatorBar());
 
             if (!config.isDaylightCycle()) {
                 world.setTime(6000L);

@@ -67,7 +67,6 @@ public class CommandBlockListener {
 
     @Subscribe
     public void onTabComplete(TabCompleteEvent event) {
-
         Player player = event.getPlayer();
 
         List<String> suggestions = event.getSuggestions();

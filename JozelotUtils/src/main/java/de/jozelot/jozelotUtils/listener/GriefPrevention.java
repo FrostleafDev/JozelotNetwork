@@ -200,4 +200,18 @@ public class GriefPrevention implements Listener {
             event.setCancelled(true);
         }
     }
+
+    @EventHandler
+    public void onEntityPortal(EntityPortalEvent event) {
+        if (config.isBlockPortals()) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerPortal(PlayerPortalEvent event) {
+        if (config.isBlockPortals()) {
+            event.setCancelled(true);
+        }
+    }
 }

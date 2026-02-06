@@ -6,6 +6,7 @@ import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.event.player.ServerConnectedEvent;
+import com.velocitypowered.api.event.player.ServerPostConnectEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.api.proxy.Player;
@@ -16,6 +17,8 @@ import com.velocitypowered.api.util.ServerLink;
 import de.jozelot.jozelotProxy.JozelotProxy;
 import de.jozelot.jozelotProxy.storage.ConfigManager;
 import de.jozelot.jozelotProxy.storage.LangManager;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
 import java.time.Duration;
@@ -56,13 +59,12 @@ public class ServerSwitchListener {
             for (Player player : server.getAllPlayers()) {
                 player.getCurrentServer().ifPresent(conn -> {
                     int groupId = plugin.getGroupManager().getGroupId(conn.getServerInfo().getName());
-                    if (groupId != -1) {
-                        if (plugin.getGroupManager().isTabEnabled(groupId)) {
-                            updateTabHeaderForPlayer(player, groupId);
-                            updateTabEntryPings(player);
-                        } else {
-                            player.sendPlayerListHeaderAndFooter(mm.deserialize(""), mm.deserialize(""));
-                        }
+                    boolean isEnabled = groupId != -1 && plugin.getGroupManager().isTabEnabled(groupId);
+                    if (isEnabled) {
+                        updateTabHeaderForPlayer(player, groupId);
+                        updateTabEntryPings(player);
+                    } else {
+                        player.sendPlayerListHeaderAndFooter(mm.deserialize(""),mm.deserialize( ""));
                     }
                 });
             }
@@ -296,41 +298,48 @@ public class ServerSwitchListener {
 
         boolean tabEnabled = plugin.getGroupManager().isTabEnabled(groupId);
 
+        // WICHTIG: Wenn Tab AUS ist, machen wir einfach NICHTS.
+        // Wir löschen nichts, wir adden nichts.
+        // Dadurch "sieht" der Client nur die Pakete, die direkt vom Unterserver kommen.
+        if (!tabEnabled) {
+            return;
+        }
+
+        // Ab hier: Proxy-Tab-Logik (wenn aktiviert)
         List<Player> groupPlayers = server.getAllPlayers().stream()
                 .filter(p -> p.getCurrentServer().isPresent())
                 .filter(p -> plugin.getGroupManager().getGroupId(p.getCurrentServer().get().getServerInfo().getName()) == groupId)
                 .collect(Collectors.toList());
 
         for (Player viewer : groupPlayers) {
-
-            if (!tabEnabled) {
-                viewer.getTabList().clearAll();
-            }
+            // Falls der Viewer auf einem Server ist, der KEIN Proxy-Tab will, überspringen
+            int viewerGroupId = viewer.getCurrentServer()
+                    .map(c -> plugin.getGroupManager().getGroupId(c.getServerInfo().getName()))
+                    .orElse(-1);
+            if (viewerGroupId == -1 || !plugin.getGroupManager().isTabEnabled(viewerGroupId)) continue;
 
             for (Player target : groupPlayers) {
-                TabListEntry.Builder entryBuilder = TabListEntry.builder()
-                        .profile(target.getGameProfile())
-                        .tabList(viewer.getTabList())
-                        .latency((int) target.getPing());
+                String prefix = plugin.getLuckpermsUtils().getPlayerPrefix(target);
+                int weight = plugin.getLuckpermsUtils().getWeight(target); // Sortierung wie gewünscht direkt
 
-                if (tabEnabled) {
-                    String prefix = plugin.getLuckpermsUtils().getPlayerPrefix(target);
-                    int weight = plugin.getLuckpermsUtils().getWeight(target);
+                String displayNameRaw = "<reset><italic:false>" + lang.format("tab-player-format", Map.of(
+                        "rank-prefix", prefix != null ? prefix : "",
+                        "player-name", target.getUsername()
+                ));
 
-                    String displayNameRaw = lang.format("tab-player-format", Map.of(
-                            "rank-prefix", prefix != null ? prefix : "",
-                            "player-name", target.getUsername()
-                    ));
-
-                    entryBuilder.displayName(mm.deserialize(displayNameRaw));
-                    entryBuilder.listOrder(weight);
-                } else {
-                    entryBuilder.displayName(null);
-                    entryBuilder.listOrder(0);
-                }
-
-                viewer.getTabList().removeEntry(target.getUniqueId());
-                viewer.getTabList().addEntry(entryBuilder.build());
+                viewer.getTabList().getEntry(target.getUniqueId()).ifPresentOrElse(entry -> {
+                    entry.setDisplayName(mm.deserialize(displayNameRaw));
+                    entry.setLatency((int) target.getPing());
+                    entry.setListOrder(weight);
+                }, () -> {
+                    viewer.getTabList().addEntry(TabListEntry.builder()
+                            .profile(target.getGameProfile())
+                            .tabList(viewer.getTabList())
+                            .latency((int) target.getPing())
+                            .displayName(mm.deserialize(displayNameRaw))
+                            .listOrder(weight)
+                            .build());
+                });
             }
         }
     }
@@ -386,6 +395,26 @@ public class ServerSwitchListener {
 
         for (Player p : groupPlayers) {
             p.getCurrentServer().ifPresent(conn -> updateTabForGroup(p, conn.getServer()));
+        }
+    }
+
+    @Subscribe
+    public void onPostServerConnect(ServerPostConnectEvent event) {
+        Player player = event.getPlayer();
+
+        String soundPath = lang.getRaw("sounds.success");
+        if (!soundPath.isEmpty()) {
+            try {
+                Sound successSound = Sound.sound(
+                        Key.key(soundPath),
+                        Sound.Source.UI,
+                        1.0f,
+                        1.0f
+                );
+                player.playSound(successSound, Sound.Emitter.self());
+            } catch (Exception e) {
+                plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+            }
         }
     }
 }
