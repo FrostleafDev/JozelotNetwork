@@ -194,3 +194,5 @@ redis:
 
 # network.utils.command.spawn
 # network.utils.command.setspawn
+
+# network.command.playerinfo

@@ -147,7 +147,7 @@ ban-bypass-info:
   - "  <dark_gray>»</dark_gray> {grey}Bis: <white>{duration}"
   - "  <dark_gray>»</dark_gray> {grey}Von: <white>{admin-name}"
   - ""
-  - "  {grey}Nutze <click:suggest_command:'/unban {player-name}'><hover:show_text:'{primary}Klicke hier, um dich zu entbannen!'>{primary}/unban {player-name}</hover></click>{grey}, um den Bann aufzuheben."
+  - "  {grey}Nutze <click:suggest_command:'/unban {player-name}'><hover:show_text:'{primary}Klicke hier, um dich zu entbannen!'>{primary}<u>/unban {player-name}</u></hover></click>{grey}, um den Bann aufzuheben."
   - ""
 
 command-unban-usage: '{tertiary}/unban <Spieler>'
@@ -380,9 +380,29 @@ command-setspawn-error: '{danger}Bitte gebe richtige Koordinaten an'
 command-setspawn-usage: '{tertiary}/setspawn <x> <y> <z> [yaw] [pitch]'
 command-setspawn-success: '{grey}Der Welt Spawn wurde auf {primary}{x}{grey}, {primary}{y}{grey}, {primary}{z}{grey} gesetzt'
 
+command-playerinfo-sucess:
+  - ""
+  - "  <gradient:#00A4FC:#00f4fc><b>SPIELER INFORMATIONEN</b></gradient>"
+  - "  {grey}Details zu: <white>{player}</white>"
+  - ""
+  - "  <dark_gray>» {secondary}Allgemein:"
+  - "    {grey}UUID: <white><click:copy_to_clipboard:'{uuid}'><hover:show_text:'{primary}Klicken zum Kopieren'>{uuid}</hover></click></white>"
+  - "    {grey}Version: <white>{version}</white>"
+  - "    {grey}Client: <white>{client]</white>"
+  - "    {grey}Online seit: <white>{online_time}</white>"
+  - ""
+  - "  <dark_gray>» {secondary}Verbindung:"
+  - "    {grey}Server: <white>{server}</white> {grey}({primary}{group}{grey})"
+  - "    {grey}Ping: <white>{ping}ms</white>"
+  - "    {grey}IP-Adresse: <white><click:copy_to_clipboard:'{ip}'><hover:show_text:'{primary}Klicken zum Kopieren'>{ip}</hover></click></white>"
+  - ""
+  - "  <dark_gray>» {secondary}Sicherheit:"
+  - "    {grey}Zweitaccounts: <white>{alts}</white>"
+  - ""
 
-
-
+command-playerinfo-click-for-more: '{primary}Klicke für Info zu {name}'
+command-playerinfo-no-more-accounts: '{grey}Keine weiteren Accounts gefunden'
+command-playerinfo-usage: '{tertiary}/playerinfo <Spieler>'
 
 
 

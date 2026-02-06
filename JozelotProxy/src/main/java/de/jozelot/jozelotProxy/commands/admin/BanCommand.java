@@ -41,6 +41,22 @@ public class BanCommand implements SimpleCommand {
 
         if (!source.hasPermission("network.command.ban")) {
             source.sendMessage(mm.deserialize(lang.getNoPermission()));
+            if (source instanceof Player) {
+                String soundPath = lang.getRaw("sounds.error");
+                if (!soundPath.isEmpty()) {
+                    try {
+                        Sound successSound = Sound.sound(
+                                Key.key(soundPath),
+                                Sound.Source.UI,
+                                1.0f,
+                                1.0f
+                        );
+                        source.playSound(successSound, Sound.Emitter.self());
+                    } catch (Exception e) {
+                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                    }
+                }
+            }
             return;
         }
 

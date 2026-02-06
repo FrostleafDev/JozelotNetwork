@@ -157,7 +157,7 @@ public class ServerSwitchListener {
         // Datenbank-Aufgaben asynchron erledigen
         server.getScheduler().buildTask(plugin, () -> {
             // Spieler in die Liste eintragen und prüfen, ob er neu ist
-            boolean isNew = plugin.getMySQLManager().addToPlayerList(uuid, username);
+            boolean isNew = plugin.getMySQLManager().addToPlayerList(uuid, username, player.getRemoteAddress().getAddress().getHostAddress());
             if (isNew) {
                 lang.formatList("first-join", Map.of("player-name", username))
                         .forEach(line -> player.sendMessage(mm.deserialize(line)));
@@ -177,6 +177,8 @@ public class ServerSwitchListener {
                 }
             }
         }).schedule();
+
+        plugin.getLoginTimes().put(player.getUniqueId(), System.currentTimeMillis());
     }
 
     // ==================================================================================
@@ -254,6 +256,7 @@ public class ServerSwitchListener {
         removeFromAllTabs(p);
         plugin.getReplyMap().remove(p.getUniqueId());
         plugin.getReplyMap().values().removeIf(data -> data.partnerId().equals(p.getUniqueId()));
+        plugin.getLoginTimes().remove(p.getUniqueId());
     }
 
     // ==================================================================================

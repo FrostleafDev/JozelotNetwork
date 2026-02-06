@@ -151,6 +151,7 @@ public class JozelotProxy {
         CommandMeta whitelistMeta = cm.metaBuilder("whitelist").build();
         CommandMeta playtimeMeta = cm.metaBuilder("playtime").build();
         CommandMeta broadcastMeta = cm.metaBuilder("broadcast").build();
+        CommandMeta playerInfoMeta = cm.metaBuilder("playerinfo").build();
 
         cm.register(hubMeta, new LobbyCommand(this));
         cm.register(networkMeta, new NetworkCommand(this));
@@ -171,6 +172,7 @@ public class JozelotProxy {
         cm.register(whitelistMeta, new WhitelistCommand(this));
         cm.register(playtimeMeta, new PlaytimeCommand(this));
         cm.register(broadcastMeta, new BroadcastCommand(this));
+        cm.register(playerInfoMeta, new PlayerInfoCommand(this));
 
         this.playtimeListener = new PlaytimeListener(this);
         consoleLogger.broadCastToConsole("Commands erstellt");
@@ -206,6 +208,8 @@ public class JozelotProxy {
         server.getAllPlayers().forEach(p -> playtimeListener.saveAndRemoveSession(p));
         mySQLSetup.close();
         redisSetup.close();
+
+
     }
 
     /*
@@ -286,5 +290,11 @@ public class JozelotProxy {
         return server.getPluginManager().getPlugin("jozelotproxy")
                 .flatMap(container -> container.getDescription().getVersion())
                 .orElse("Unbekannt");
+    }
+
+    private final Map<UUID, Long> loginTimes = new HashMap<>();
+
+    public Map<UUID, Long> getLoginTimes() {
+        return loginTimes;
     }
 }

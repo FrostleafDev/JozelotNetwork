@@ -45,9 +45,11 @@ public class MySQLManager {
                         "uuid CHAR(36) PRIMARY KEY," +
                         "username VARCHAR(16)," +
                         "first_join TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
-                        "last_join TIMESTAMP NULL," +
+                        "last_join TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP," +
+                        "last_ip VARCHAR(45)," +
                         "server_id INT," +
                         "INDEX (username)," +
+                        "INDEX (last_ip)," +
                         "FOREIGN KEY (server_id) REFERENCES server(id) ON DELETE SET NULL" +
                         ");",
 
@@ -164,9 +166,9 @@ public class MySQLManager {
         }
     }
 
-    public boolean addToPlayerList(UUID uuid, String username) {
-        String sqlPlayer = "INSERT INTO player (uuid, username, last_join) VALUES (?, ?, CURRENT_TIMESTAMP) " +
-                "ON DUPLICATE KEY UPDATE username = ?, last_join = CURRENT_TIMESTAMP;";
+    public boolean addToPlayerList(UUID uuid, String username, String ip) {
+        String sqlPlayer = "INSERT INTO player (uuid, username, last_ip, last_join) VALUES (?, ?, ?, CURRENT_TIMESTAMP) " +
+                "ON DUPLICATE KEY UPDATE username = ?, last_ip = ?, last_join = CURRENT_TIMESTAMP;";
 
         String sqlState = "INSERT IGNORE INTO player_state (uuid) VALUES (?);";
 
@@ -175,7 +177,9 @@ public class MySQLManager {
             try (PreparedStatement pstmt = conn.prepareStatement(sqlPlayer)) {
                 pstmt.setString(1, uuid.toString());
                 pstmt.setString(2, username);
-                pstmt.setString(3, username);
+                pstmt.setString(3, ip);
+                pstmt.setString(4, username);
+                pstmt.setString(5, ip);
                 affectedRows = pstmt.executeUpdate();
             }
 
@@ -1012,5 +1016,24 @@ public class MySQLManager {
 
     public Set<String> getRegisteredServerCache() {
         return registeredServerCache;
+    }
+
+    public List<String> getAlts(String ip, String currentUsername) {
+        List<String> names = new ArrayList<>();
+        String sql = "SELECT username FROM player WHERE last_ip = ? AND username != ? LIMIT 10";
+
+        try (Connection conn = mySQLSetup.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, ip);
+            pstmt.setString(2, currentUsername);
+
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                names.add(rs.getString("username"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return names;
     }
 }

@@ -3,6 +3,8 @@ package de.jozelot.jozelotUtils.commands;
 import de.jozelot.jozelotUtils.JozelotUtils;
 import de.jozelot.jozelotUtils.storage.ConfigManager;
 import de.jozelot.jozelotUtils.storage.LangManager;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -38,11 +40,41 @@ public class SetSpawnCommand extends Command {
 
         if (!config.isSpawnCommand()) {
             sender.sendMessage(mm.deserialize(lang.format("blocked-command", Map.of("command", "/setspawn"))));
+            if (sender instanceof Player) {
+                String soundPath = lang.get("sounds.error");
+                if (!soundPath.isEmpty()) {
+                    try {
+                        Sound successSound = Sound.sound(
+                                Key.key(soundPath),
+                                Sound.Source.UI,
+                                1.0f,
+                                1.0f
+                        );
+                        sender.playSound(successSound, Sound.Emitter.self());
+                    } catch (Exception e) {
+                    }
+                }
+            }
             return true;
         }
 
         if (!player.hasPermission(this.getPermission())) {
             sender.sendMessage(mm.deserialize(lang.format("no-permission", null)));
+            if (sender instanceof Player) {
+                String soundPath = lang.get("sounds.error");
+                if (!soundPath.isEmpty()) {
+                    try {
+                        Sound successSound = Sound.sound(
+                                Key.key(soundPath),
+                                Sound.Source.UI,
+                                1.0f,
+                                1.0f
+                        );
+                        sender.playSound(successSound, Sound.Emitter.self());
+                    } catch (Exception e) {
+                    }
+                }
+            }
             return true;
         }
 
@@ -67,10 +99,40 @@ public class SetSpawnCommand extends Command {
                 newSpawn = new Location(player.getWorld(), x, y, z, yaw, pitch);
             } catch (NumberFormatException e) {
                 player.sendMessage(mm.deserialize(lang.format("command-setspawn-error", null)));
+                if (sender instanceof Player) {
+                    String soundPath = lang.get("sounds.error");
+                    if (!soundPath.isEmpty()) {
+                        try {
+                            Sound successSound = Sound.sound(
+                                    Key.key(soundPath),
+                                    Sound.Source.UI,
+                                    1.0f,
+                                    1.0f
+                            );
+                            sender.playSound(successSound, Sound.Emitter.self());
+                        } catch (Exception es) {
+                        }
+                    }
+                }
                 return true;
             }
         } else {
             player.sendMessage(mm.deserialize(lang.format("command-setspawn-usage", null)));
+            if (sender instanceof Player) {
+                String soundPath = lang.get("sounds.error");
+                if (!soundPath.isEmpty()) {
+                    try {
+                        Sound successSound = Sound.sound(
+                                Key.key(soundPath),
+                                Sound.Source.UI,
+                                1.0f,
+                                1.0f
+                        );
+                        sender.playSound(successSound, Sound.Emitter.self());
+                    } catch (Exception e) {
+                    }
+                }
+            }
             return true;
         }
 
@@ -80,6 +142,22 @@ public class SetSpawnCommand extends Command {
                 "y", String.format("%.2f", newSpawn.getY()),
                 "z", String.format("%.2f", newSpawn.getZ())
         ))));
+
+        if (sender instanceof Player) {
+            String soundPath = lang.get("sounds.success");
+            if (!soundPath.isEmpty()) {
+                try {
+                    Sound successSound = Sound.sound(
+                            Key.key(soundPath),
+                            Sound.Source.UI,
+                            1.0f,
+                            1.0f
+                    );
+                    sender.playSound(successSound, Sound.Emitter.self());
+                } catch (Exception e) {
+                }
+            }
+        }
 
         return true;
     }

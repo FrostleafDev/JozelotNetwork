@@ -4,6 +4,8 @@ import de.jozelot.jozelotUtils.JozelotUtils;
 import de.jozelot.jozelotUtils.storage.ConfigManager;
 import de.jozelot.jozelotUtils.storage.LangManager;
 import de.jozelot.jozelotUtils.utils.ConsoleLogger;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -35,17 +37,62 @@ public class FlyCommand implements CommandExecutor {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (!sender.hasPermission("network.utils.command.fly")) {
             sender.sendMessage(mm.deserialize(lang.format("no-permission", null)));
+            if (sender instanceof Player) {
+                String soundPath = lang.get("sounds.error");
+                if (!soundPath.isEmpty()) {
+                    try {
+                        Sound successSound = Sound.sound(
+                                Key.key(soundPath),
+                                Sound.Source.UI,
+                                1.0f,
+                                1.0f
+                        );
+                        sender.playSound(successSound, Sound.Emitter.self());
+                    } catch (Exception e) {
+                    }
+                }
+            }
             return true;
         }
 
         if (args.length == 1 && args[0].equalsIgnoreCase("all")) {
             if (!sender.hasPermission("network.utils.command.fly.all")) {
                 sender.sendMessage(mm.deserialize(lang.format("no-permission", null)));
+                if (sender instanceof Player) {
+                    String soundPath = lang.get("sounds.error");
+                    if (!soundPath.isEmpty()) {
+                        try {
+                            Sound successSound = Sound.sound(
+                                    Key.key(soundPath),
+                                    Sound.Source.UI,
+                                    1.0f,
+                                    1.0f
+                            );
+                            sender.playSound(successSound, Sound.Emitter.self());
+                        } catch (Exception e) {
+                        }
+                    }
+                }
                 return true;
             }
 
             for (Player all : Bukkit.getOnlinePlayers()) {
                 toggleFly(all);
+                if (sender instanceof Player) {
+                    String soundPath = lang.get("sounds.error");
+                    if (!soundPath.isEmpty()) {
+                        try {
+                            Sound successSound = Sound.sound(
+                                    Key.key(soundPath),
+                                    Sound.Source.UI,
+                                    1.0f,
+                                    1.0f
+                            );
+                            all.playSound(successSound, Sound.Emitter.self());
+                        } catch (Exception e) {
+                        }
+                    }
+                }
             }
 
             sender.sendActionBar(mm.deserialize(lang.format("command-fly-all-success",null)));
@@ -58,18 +105,64 @@ public class FlyCommand implements CommandExecutor {
                 }
             }
 
+            if (sender instanceof Player) {
+                String soundPath = lang.get("sounds.success");
+                if (!soundPath.isEmpty()) {
+                    try {
+                        Sound successSound = Sound.sound(
+                                Key.key(soundPath),
+                                Sound.Source.UI,
+                                1.0f,
+                                1.0f
+                        );
+                        sender.playSound(successSound, Sound.Emitter.self());
+                    } catch (Exception e) {
+                    }
+                }
+            }
+
             return true;
         }
 
         if (args.length == 1) {
             if (!sender.hasPermission("network.utils.command.fly.others")) {
                 sender.sendMessage(mm.deserialize(lang.format("no-permission", null)));
+                if (sender instanceof Player) {
+                    String soundPath = lang.get("sounds.error");
+                    if (!soundPath.isEmpty()) {
+                        try {
+                            Sound successSound = Sound.sound(
+                                    Key.key(soundPath),
+                                    Sound.Source.UI,
+                                    1.0f,
+                                    1.0f
+                            );
+                            sender.playSound(successSound, Sound.Emitter.self());
+                        } catch (Exception e) {
+                        }
+                    }
+                }
                 return true;
             }
 
             Player target = Bukkit.getPlayer(args[0]);
             if (target == null) {
                 sender.sendMessage(mm.deserialize(lang.format("player-not-found", Map.of("player-name", args[0]))));
+                if (sender instanceof Player) {
+                    String soundPath = lang.get("sounds.error");
+                    if (!soundPath.isEmpty()) {
+                        try {
+                            Sound successSound = Sound.sound(
+                                    Key.key(soundPath),
+                                    Sound.Source.UI,
+                                    1.0f,
+                                    1.0f
+                            );
+                            sender.playSound(successSound, Sound.Emitter.self());
+                        } catch (Exception e) {
+                        }
+                    }
+                }
                 return true;
             }
 
@@ -79,7 +172,38 @@ public class FlyCommand implements CommandExecutor {
             sender.sendMessage(mm.deserialize(lang.format("command-fly-others-success",
                     Map.of("player", target.getName(), "state", stateName))));
 
+            if (sender instanceof Player) {
+                String soundPath = lang.get("sounds.success");
+                if (!soundPath.isEmpty()) {
+                    try {
+                        Sound successSound = Sound.sound(
+                                Key.key(soundPath),
+                                Sound.Source.UI,
+                                1.0f,
+                                1.0f
+                        );
+                        sender.playSound(successSound, Sound.Emitter.self());
+                    } catch (Exception e) {
+                    }
+                }
+            }
+
             target.sendActionBar(mm.deserialize(lang.format("command-fly-success", Map.of("state", stateName))));
+            if (sender instanceof Player) {
+                String soundPath = lang.get("sounds.pling");
+                if (!soundPath.isEmpty()) {
+                    try {
+                        Sound successSound = Sound.sound(
+                                Key.key(soundPath),
+                                Sound.Source.UI,
+                                1.0f,
+                                1.0f
+                        );
+                        target.playSound(successSound, Sound.Emitter.self());
+                    } catch (Exception e) {
+                    }
+                }
+            }
 
             sender.sendActionBar(mm.deserialize(lang.format("command-fly-all-success",null)));
 
@@ -108,6 +232,22 @@ public class FlyCommand implements CommandExecutor {
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (p.hasPermission("network.get.logs") && !p.equals(player)) {
                 p.sendMessage(mm.deserialize(lang.format("command-fly-success-admin", Map.of("player-name", name, "state", stateName))));
+            }
+        }
+
+        if (sender instanceof Player) {
+            String soundPath = lang.get("sounds.success");
+            if (!soundPath.isEmpty()) {
+                try {
+                    Sound successSound = Sound.sound(
+                            Key.key(soundPath),
+                            Sound.Source.UI,
+                            1.0f,
+                            1.0f
+                    );
+                    sender.playSound(successSound, Sound.Emitter.self());
+                } catch (Exception e) {
+                }
             }
         }
 
