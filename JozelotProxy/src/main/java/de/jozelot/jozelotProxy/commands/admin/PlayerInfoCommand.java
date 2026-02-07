@@ -10,11 +10,9 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class PlayerInfoCommand implements SimpleCommand {
 
@@ -137,12 +135,12 @@ public class PlayerInfoCommand implements SimpleCommand {
         } else {
             altsFormatted = altList.stream()
                     .map(name -> "<click:run_command:'/playerinfo " + name + "'><hover:show_text:'" + lang.format("command-playerinfo-click-for-more", Map.of("name", name)) + "'><white>" + name + "</white></hover></click>")
-                    .collect(java.util.stream.Collectors.joining("{grey}, "));
+                    .collect(Collectors.joining("{grey}, "));
         }
 
         String clientBrand = targetFinal.getClientBrand() != null ? targetFinal.getClientBrand() : "Vanilla*";
 
-        Map<String, String> placeholders = new java.util.HashMap<>();
+        Map<String, String> placeholders = new HashMap<>();
         placeholders.put("player", targetFinal.getUsername());
         placeholders.put("uuid", targetFinal.getUniqueId().toString());
         placeholders.put("ping", String.valueOf(ping));

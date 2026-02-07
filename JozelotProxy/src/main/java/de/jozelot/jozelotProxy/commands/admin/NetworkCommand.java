@@ -4,6 +4,7 @@ import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
+import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.jozelot.jozelotProxy.JozelotProxy;
 import de.jozelot.jozelotProxy.storage.ConfigManager;
 import de.jozelot.jozelotProxy.storage.LangManager;
@@ -148,13 +149,92 @@ public class NetworkCommand implements SimpleCommand {
                     return;
                 }
 
-                if ((action.equalsIgnoreCase("restart") || action.equalsIgnoreCase("stop")) && serverName.equalsIgnoreCase("proxy")) {
+                if (action.equalsIgnoreCase("restart") || action.equalsIgnoreCase("stop")) {
+                    // Wir lagern die gesamte Logik in einen asynchronen Task aus
+                    server.getScheduler().buildTask(plugin, () -> {
 
-                    List<String> kickLines = lang.formatList("pterodactyl-restart-kick", null);
+                        if (serverName.equalsIgnoreCase("proxy")) {
+                            List<String> kickLines = lang.formatList("pterodactyl-restart-kick", null);
+                            // Disconnects können wir direkt aus dem async Task aufrufen
+                            server.getAllPlayers().forEach(p -> p.disconnect(mm.deserialize(String.join("<newline>", kickLines))));
+                        } else {
+                            Optional<RegisteredServer> targetServer = server.getServer(serverName);
+                            if (targetServer.isPresent()) {
+                                RegisteredServer rs = targetServer.get();
 
-                    server.getAllPlayers().forEach(p -> p.disconnect(mm.deserialize(String.join("<newline>", kickLines))));
+                                // DB-Abfrage (Jetzt sicher, da wir im Scheduler sind)
+                                String rawDisplayName = plugin.getMySQLManager().getServerDisplayName(serverName);
+                                String displayName = (rawDisplayName != null) ? rawDisplayName : serverName;
+
+                                Optional<RegisteredServer> lobby = server.getServer(config.getLobbyServer());
+
+                                for (Player p : rs.getPlayersConnected()) {
+                                    if (lobby.isPresent() && !rs.equals(lobby.get())) {
+                                        p.sendMessage(mm.deserialize(lang.format("server-restart-move", Map.of("server-name", displayName))));
+                                        p.createConnectionRequest(lobby.get()).fireAndForget();
+                                    } else {
+                                        p.disconnect(mm.deserialize(String.join("<newline>", lang.formatList("lobby-restart-kick", null))));
+                                    }
+                                }
+                            }
+                        }
+                        try { Thread.sleep(500); } catch (InterruptedException ignored) {}
+
+                        plugin.getPteroManager().sendAction(pteroId, action, code -> {
+                            if (code == 204) {
+                                String senderName = (source instanceof Player player) ? player.getUsername() : "Konsole";
+                                source.sendMessage(mm.deserialize(lang.format("pterodactyl-control-success", Map.of("action", action, "server-name", serverName))));
+
+                                consoleLogger.broadCastToConsole("<yellow>" + senderName + " <gray>hat <white>" + serverName + " <gray>den Befehl zu <gold>" + action + " <gray>gesendet");
+                                for (Player player : server.getAllPlayers()) {
+                                    if (player.hasPermission("network.get.logs") && !player.equals(source)) {
+                                        player.sendMessage(mm.deserialize(lang.format("pterodactyl-control-success-admin", Map.of("player-name", senderName, "server-name", serverName, "action", action))));
+                                    }
+                                }
+
+                                if (source instanceof Player) {
+                                    String soundPath = lang.getRaw("sounds.success");
+                                    if (!soundPath.isEmpty()) {
+                                        try {
+                                            Sound successSound = Sound.sound(
+                                                    Key.key(soundPath),
+                                                    Sound.Source.UI,
+                                                    1.0f,
+                                                    1.0f
+                                            );
+                                            source.playSound(successSound, Sound.Emitter.self());
+                                        } catch (Exception e) {
+                                            plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                                        }
+                                    }
+                                }
+
+                                UUID operatorUUID = (source instanceof Player p) ? p.getUniqueId() : new UUID(0L, 0L);
+                                plugin.getMySQLManager().logAction(operatorUUID, "SERVER_ACTION", "server:" + serverName, "Action: " + action);
+
+                            } else {
+                                source.sendMessage(mm.deserialize(lang.format("pterodactyl-control-api-error", Map.of("code", String.valueOf(code)))));
+                                if (source instanceof Player) {
+                                    String soundPath = lang.getRaw("sounds.error");
+                                    if (!soundPath.isEmpty()) {
+                                        try {
+                                            Sound successSound = Sound.sound(
+                                                    Key.key(soundPath),
+                                                    Sound.Source.UI,
+                                                    1.0f,
+                                                    1.0f
+                                            );
+                                            source.playSound(successSound, Sound.Emitter.self());
+                                        } catch (Exception e) {
+                                            plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }).schedule();
+                    return;
                 }
-
                 plugin.getPteroManager().sendAction(pteroId, action, code -> {
                     if (code == 204) {
                         String senderName = (source instanceof Player player) ? player.getUsername() : "Konsole";
@@ -207,7 +287,6 @@ public class NetworkCommand implements SimpleCommand {
                         }
                     }
                 });
-                return;
             }
 
             if (args[0].equalsIgnoreCase("status")) {

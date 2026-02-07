@@ -404,7 +404,16 @@ command-playerinfo-click-for-more: '{primary}Klicke für Info zu {name}'
 command-playerinfo-no-more-accounts: '{grey}Keine weiteren Accounts gefunden'
 command-playerinfo-usage: '{tertiary}/playerinfo <Spieler>'
 
-
+server-restart-move: '{grey}Der Server {danger}{server-name}{grey} startet neu. Du wurdest in die {primary}Lobby {grey}verschoben!'
+lobby-restart-kick:
+  - "<gradient:#f90036:#f90011><b>LOBBY NEUSTART</b></gradient>"
+  - ""
+  - "{grey}Die Lobby wird aktuell {danger}neu gestartet{grey}."
+  - "{grey}Da dies der Haupt Server ist, wurde deine Verbindung getrennt."
+  - ""
+  - "{grey}Bitte verbinde dich in wenigen Sekunden erneut."
+  - ""
+  - "<dark_gray>Status: <white>Wird neu geladen..."
 
 
 

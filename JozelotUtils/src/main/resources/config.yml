@@ -21,6 +21,14 @@ announce-advancements: false
 advancements-enabled: false
 block-portals: true
 
+mob-griefing: false
+do-insomia: false
+block-drops: false
+player-sleeping-percentage: 100
+spawn-phantoms: false
+spawn-wandering-trader: false
+spawn-patrols: false
+
 custom-experience-level: true # default, custom
 experience-level-set: 2026 # default, custom
 custom-bar-level: true

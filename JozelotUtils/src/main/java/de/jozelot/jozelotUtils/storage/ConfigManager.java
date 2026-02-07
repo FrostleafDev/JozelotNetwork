@@ -50,6 +50,14 @@ public class ConfigManager {
     private int customBarLevel;
     private boolean blockPortals;
 
+    private boolean doInsomnia;
+    private boolean spawnPhantoms;
+    private boolean spawnWanderingTrader;
+    private boolean spawnPatrols;
+    private boolean blockDrops;
+    private int playerSleepingPercentage;
+    private boolean mobGriefing;
+
     private boolean isChatDisabled;
     private boolean isLocatorBar;
     private boolean ticksFreeze;
@@ -266,6 +274,14 @@ public class ConfigManager {
         return defaultHotbarSlot;
     }
 
+    public boolean isSpawnPhantoms() { return spawnPhantoms; }
+    public boolean isMobGriefing() { return mobGriefing; }
+    public boolean isDoInsomnia() { return doInsomnia; }
+    public boolean isBlockDrops() { return blockDrops; }
+    public int getPlayerSleepingPercentage() { return playerSleepingPercentage; }
+    public boolean isSpawnWanderingTrader() { return spawnWanderingTrader; }
+    public boolean isSpawnPatrols() { return spawnPatrols; }
+
     public void loadConfig() {
         plugin.saveDefaultConfig();
 
@@ -346,5 +362,13 @@ public class ConfigManager {
         spawnOnFall = plugin.getConfig().getBoolean("spawn-on-fall-off");
 
         defaultHotbarSlot = plugin.getConfig().getInt("default-hotbar-slot");
+
+        mobGriefing = plugin.getConfig().getBoolean("mob-griefing", false);
+        doInsomnia = plugin.getConfig().getBoolean("do-insomnia", false);
+        blockDrops = plugin.getConfig().getBoolean("block-drops", false);
+        playerSleepingPercentage = plugin.getConfig().getInt("player-sleeping-percentage", 100);
+        spawnPhantoms = plugin.getConfig().getBoolean("spawn-phantoms", false);
+        spawnWanderingTrader = plugin.getConfig().getBoolean("spawn-wandering-trader", false); // Beachte den Tippfehler 'traider' aus deiner Vorlage
+        spawnPatrols = plugin.getConfig().getBoolean("spawn-patrols", false);
     }
 }
