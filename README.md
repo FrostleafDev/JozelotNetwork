@@ -38,5 +38,5 @@ _A more detailed breakdown will be added as the project evolves._
 
 ## Credits
 > Currently developed by me alone (`jozelot_`).  
-> Please don’t steal
+> Please don’t steal.
 > I hope this goes well
