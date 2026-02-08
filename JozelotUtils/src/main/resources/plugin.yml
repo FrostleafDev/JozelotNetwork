@@ -19,32 +19,43 @@ commands:
     description: Ändert den Gamemode in den Spec
     permission: network.utils.command.spec
 
+  heal:
+    description: Heale dich oder andere Spieler
+    permission: network.utils.command.heal
+
 permissions:
   network.utils.command.fly:
-    description: Permission for command
+    description: Permission für den /fly command
     default: op
 
   network.utils.command.fly.others:
-    description: Permission for command
+    description: Permission für den /fly <Spieler> command
     default: op
 
   network.utils.command.fly.all:
-    description: Permission for command
+    description: Permission für den /fly all command
     default: op
 
   network.utils.join.fly:
-    description: Permission for automatic flight on join
+    description: Permission damit man als Admin nach join fliegen kann
     default: op
 
   network.utils.command.flyspeed:
-    description: Permission for command
+    description: Permission für den /flyspeed command
     default: op
 
   network.utils.admin.build:
+    description: Permission um Bauen zu können im Creative
     default: op
 
   network.utils.admin.inventory:
+    description: Permission um Bauen zu können im Creative
     default: op
 
   network.utils.command.spec:
+    description: Permission für den /spec command
+    default: op
+
+  network.utils.command.heal:
+    description: Permission für den /heal command
     default: op

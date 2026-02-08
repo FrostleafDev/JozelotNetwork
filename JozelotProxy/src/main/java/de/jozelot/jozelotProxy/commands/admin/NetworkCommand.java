@@ -287,6 +287,7 @@ public class NetworkCommand implements SimpleCommand {
                         }
                     }
                 });
+                return;
             }
 
             if (args[0].equalsIgnoreCase("status")) {

@@ -1,12 +1,17 @@
-#
-# JozelotNetwork
-#
+# +-------------------------------------------------------+
+# |                                                       |
+# |                   JOZELOT PROXY                       |
+# |             Netzwerk Core Steuerung                   |
+# |                                                       |
+# +-------------------------------------------------------+
 
+# GENERAL
 network-name: 'jozelot.de'
 brand-name: '§b§ljozelot.de§r'
-
+lobby-server: 'lobby'
 tab-refresh-time: 1
 
+# LINKS & MEDIA
 server-links:
   - |
     <#f90036><b>Webseite
@@ -18,11 +23,13 @@ server-links:
     <#00A4FC><b>Hosting
     https://panel.jozelot.de
 
+# VERSION CONTROL
 protocol-versions:
-  min: 767
-  recommended: 773
-  max: 774
+  min: 767          # 1.20.4
+  recommended: 773  # 1.21.3
+  max: 774          # 1.21.4
 
+# PUNISHMENT SYSTEM
 punishment-reasons:
   - "101 Hacking"
   - "102 Killaura"
@@ -51,6 +58,7 @@ punishment-reasons:
   - "405 Vortäuschen von Rechten"
   - "406 Sicherheit-Bann"
 
+# SECURITY & COMMAND BLOCKER
 blocked-commands:
   hard-blocked:
     - "/op"
@@ -62,7 +70,6 @@ blocked-commands:
     - "/?"
     - "/help"
     - "/ver"
-    - "/version"
     - "/about"
     - "/icanhasbukkit"
     - "/luckperms"
@@ -76,55 +83,27 @@ blocked-commands:
     - "/pardon-ip"
     - "/w"
     - "/me"
-    - "/bellyflop"
-    - "/gbellyflop"
-    - "/gsit"
-    - "/gcrawl"
-    - "/glayback"
-    - "/spin"
-    - "/gspin"
-    - "/glay"
-    - "/layback"
     - "/voicechat"
     - "/voicechatproxy"
     - "/fastasyncworldedit"
     - "/we"
 
-  # Permission: network.commands.bypass.<gruppenname>
+  # Permission: network.commands.bypass.<group>
   groups:
     building:
-      commands:
-        - "/headdatabase"
-        - "/headdb"
-        - "/headmenu"
-        - "/hdb"
+      commands: ["/headdatabase", "/headdb", "/headmenu", "/hdb"]
     worldedit:
-      commands:
-        - "/worldedit"
-        - "/fawe"
+      commands: ["/worldedit", "/fawe"]
     admin:
-      commands:
-        - "/lp"
-        - "/lpv"
-        - "/plugins"
-        - "/pl"
-        - "/trigger"
+      commands: ["/lp", "/lpv", "/plugins", "/pl", "/trigger", "/mv"]
+    moderator:
+      commands: ["/version"]
 
+# INFRASTRUCTURE
 pterodactyl:
   url: "https://panel.jozelot.de"
   api-key: "KEY"
 
-
-color-settings:
-  primary: '#00A4FC'
-  secondary: '#00FC00'
-  tertiary: '#FCE300'
-  danger: '#f90036'
-  grey:  '#A8A8A8'
-
-lobby-server: 'lobby'
-
-# Setup MySQL and Redis Databases
 mysql:
   host: 'localhost'
   port: 3306
@@ -137,63 +116,37 @@ redis:
   port: 6379
   password: ''
 
-# Permissions:
-# network.command
-# network.command.reload
-# network.command.lobby
-# network.command.clearchat
-# network.command.find
+# DESIGN
+color-settings:
+  primary: '#00A4FC'
+  secondary: '#00FC00'
+  tertiary: '#FCE300'
+  danger: '#f90036'
+  grey: '#A8A8A8'
+
+# +-------------------------------------------------------+
+# |                 PERMISSION OVERVIEW                   |
+# +-------------------------------------------------------+
+# network.command.reload | .lobby | .clearchat | .find
 # network.get.logs
 # network.clearchat.bypass
-# network.network.manage
-# network.network.manage.server.start/stop/restart/status
-
-# network.maintenance.bypass.all
-# network.maintenance.bypass.<server>
-# network.forcedhost.all
-# network.forcedhost.<server>
-# network.command.ban
-# network.command.unban
-# network.command.banlist
-# network.command.kick
+# network.network.manage (.server.start/stop/restart/status)
+# network.maintenance.bypass.all | .<server>
+# network.forcedhost.all | .<server>
+# network.command.ban | .unban | .banlist | .kick
 # network.ban.bypass
-# network.command.tpo
-# network.command.tpohere
-# network.command.send
-# network.command.server
-# network.command.whitelist
-# network.whitelist.bypass
-# network.command.playtime
-# network.command.playtime.admin
+# network.command.tpo | .tpohere | .send | .server
+# network.command.whitelist | network.whitelist.bypass
+# network.command.playtime | .admin
 # network.command.broadcast
-# network.maxplayers.bypass.all
-# network.maxplayers.bypass.<server>
-
-# network.commands.bypass.<group>
-
-# network.command.msg
-# network.command.gmsg
-# network.command.global
-# network.command.reply
+# network.maxplayers.bypass.all | .<server>
+# network.command.msg | .gmsg | .global | .reply
 # network.chat.minimessage
-
-# BACKEND
-
-# network.utils.command.fly
-# network.utils.command.fly.others
+# network.command.playerinfo | .spy | .mods | .client | .version
+#
+# BACKEND UTILS:
+# network.utils.command.fly (.others / .all)
 # network.utils.join.fly
-# network.utils.command.fly.all
-# network.utils.command.gamemode
-# network.utils.command.heal
-# network.utils.command.god
-# network.utils.command.spec
-# network.utils.command.spec.others
-
-# network.utils.admin.build
-# network.utils.admin.inventory
-
-# network.utils.command.spawn
-# network.utils.command.setspawn
-
-# network.command.playerinfo
-# network.command.spy
+# network.utils.command.gamemode | .heal | .god | .spec (.others)
+# network.utils.admin.build | .inventory
+# network.utils.command.spawn | .setspawn

@@ -153,6 +153,7 @@ public class JozelotProxy {
         CommandMeta broadcastMeta = cm.metaBuilder("broadcast").build();
         CommandMeta playerInfoMeta = cm.metaBuilder("playerinfo").build();
         CommandMeta spyMeta = cm.metaBuilder("spy").build();
+        CommandMeta clientInfoMeta = cm.metaBuilder("client").aliases("version", "mods").build();
 
         cm.register(hubMeta, new LobbyCommand(this));
         cm.register(networkMeta, new NetworkCommand(this));
@@ -175,6 +176,7 @@ public class JozelotProxy {
         cm.register(broadcastMeta, new BroadcastCommand(this));
         cm.register(playerInfoMeta, new PlayerInfoCommand(this));
         cm.register(spyMeta, new SpyCommand(this));
+        cm.register(clientInfoMeta, new ClientInfoCommands(this));
 
         this.playtimeListener = new PlaytimeListener(this);
         consoleLogger.broadCastToConsole("Commands erstellt");

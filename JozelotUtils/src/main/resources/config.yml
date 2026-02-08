@@ -1,51 +1,66 @@
-automatic-flight-for-admins: true
+# +-------------------------------------------------------+
+# |                                                       |
+# |                    JOZELOT UTILS                      |
+# |             Netzwerk Management System                |
+# |                                                       |
+# +-------------------------------------------------------+
+
+# AUTOMATION
+automatic-flight-for-admins: false
 automatic-flight-for-player: false
 
+# WORLD SETTINGS
 default-gamemode: survival
-can-build: false
-inventory-locked: true
-can-take-damage: false
-can-hunger: false
-entities-focus-player: false
-entity-grief: false
-can-mob-spawn: false
+can-build: true
+inventory-locked: false
+can-take-damage: true
+can-hunger: true
+entities-focus-player: true
+entity-grief: true
+can-mob-spawn: true
 
-drop-items-on-death: false
-keep-inventory: true
-fire-spread: false
-leaf-decay: false
-natural-regeneration: false
-daylight-cycle: false
-weather-cycle: false
-announce-advancements: false
-advancements-enabled: false
-block-portals: true
+# GAMEPLAY & MECHANICS
+drop-items-on-death: true
+keep-inventory: false
+fire-spread: true
+leaf-decay: true
+natural-regeneration: true
+daylight-cycle: true
+weather-cycle: true
+announce-advancements: true
+advancements-enabled: true
+block-portals: false
 
-mob-griefing: false
-do-insomia: false
-block-drops: false
+# MOB & ENTITY CONTROL
+mob-griefing: true
+do-insomia: true
+block-drops: true
 player-sleeping-percentage: 100
-spawn-phantoms: false
-spawn-wandering-trader: false
-spawn-patrols: false
+spawn-phantoms: true
+spawn-wandering-trader: true
+spawn-patrols: true
 
-custom-experience-level: true # default, custom
-experience-level-set: 2026 # default, custom
-custom-bar-level: true
+# LEVELS & BARS
+custom-experience-level: false
+experience-level-set: 2026
+custom-bar-level: false
 bar-level-set: 100
+locator-bar: true
 
-locator-bar: false
+# CHAT & VISUALS
+disable-default-chat: false
+enable-player-name-tag: false
+join-messages: default # default, disabled, custom
+leave-messages: default
 
-disable-default-chat: true
+# SERVER PERFORMANCE
+tick-freeze: false
+tick-speed: 3
 
-tick-freeze: true
-tick-speed: 0
-
-enable-player-name-tag: true
-
-spawn-command: true
-spawn-on-join: true
-spawn-on-fall-off: true
+# SPAWN SYSTEM
+spawn-command: false
+spawn-on-join: false
+spawn-on-fall-off: false
 fall-off-height: -10
 spawn-position:
   - 0.0f
@@ -54,18 +69,18 @@ spawn-position:
   - 0.0f
   - 0.0f
 
-default-hotbar-slot: 4 # 0-9 , -1 to disable
+# HOTBAR
+default-hotbar-slot: -1 # -1 to disable
 
-join-messages: default # default, disabled, custom
-leave-messages: default # default, disabled, custom
-
+# COLORS
 color-settings:
   primary: '#00A4FC'
   secondary: '#00FC00'
   tertiary: '#FCE300'
   danger: '#f90036'
-  grey:  '#A8A8A8'
+  grey: '#A8A8A8'
 
+# DATABASE
 mysql:
   host: 'localhost'
   port: 3306
@@ -73,6 +88,7 @@ mysql:
   user: ''
   password: ''
 
+# CACHE
 redis:
   host: 'localhost'
   port: 6379

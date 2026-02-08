@@ -423,7 +423,18 @@ spy-chat: '{grey}[{danger}Spy{grey}] {tertiary}[{group}] {primary}{player-name} 
 spy-msg: '{grey}[{danger}Spy{grey}] {grey}[{primary}{sender} {grey}-> {primary}{receiver}{grey}] {grey}{message}'
 spy-gmsg: '{grey}[{danger}Spy{grey}] {tertiary}[Global] {grey}[{primary}{sender} {grey}-> {primary}{receiver}{grey}] {grey}{message}'
 
+command-client-usage: '{tertiary}/client <Spieler>'
+command-client-success: '{grey}Client von {primary}{player-name}{grey}: {secondary}{brand} {grey}(Version: {primary}{version}{grey}, Protocol: {primary}{protocol}{grey})'
 
+command-version-usage: '{tertiary}/version <Spieler>'
+command-version-success: '{grey}Spielversion von {primary}{player-name}{grey}: {secondary}{version} {grey}(Protocol {primary}{protocol}{grey})'
+
+command-mods-usage: '{tertiary}/mods <Spieler>'
+command-mods-none: '{danger}{player-name} {grey}nutzt keine Mods (Vanilla/Labymod Inject)'
+command-mods-list: '{grey}Mods von {primary}{player-name} {grey}({count}): {secondary}{mods}'
+
+command-heal-success: '{grey}Du wurdest erfolgreich {primary}geheilt{grey}'
+command-heal-others-success: '{grey}Du hast {primary}{target-name} {grey}erfolgreich geheilt'
 
 
 

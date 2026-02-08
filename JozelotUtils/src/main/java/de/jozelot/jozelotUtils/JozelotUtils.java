@@ -57,6 +57,7 @@ public final class JozelotUtils extends JavaPlugin {
         getCommand("flyspeed").setExecutor(new FlySpeedCommand(this));
         getCommand("flyspeed").setTabCompleter(new FlySpeedCommandTab());
         getCommand("spec").setExecutor(new SpecCommand(this));
+        getCommand("heal").setExecutor(new HealCommand(this));
 
         getServer().getPluginManager().registerEvents(new JoinListener(this), this);
         getServer().getPluginManager().registerEvents(new LeaveListener(this), this);
