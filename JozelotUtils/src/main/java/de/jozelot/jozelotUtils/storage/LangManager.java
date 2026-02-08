@@ -30,16 +30,29 @@ public class LangManager {
     }
 
     public void integrateRedisData(Map<String, String> redisData) {
-        if (redisData == null || langConfig == null) return;
+        if (redisData == null) return;
+
+        YamlConfiguration freshConfig = new YamlConfiguration();
+        if (langFile.exists()) {
+            try {
+                freshConfig.load(langFile);
+            } catch (Exception ignored) {}
+        }
+
         for (Map.Entry<String, String> entry : redisData.entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
+
             if (value.contains("<<line>>")) {
-                langConfig.set(key, Arrays.asList(value.split("<<line>>")));
+                freshConfig.set(key, Arrays.asList(value.split("<<line>>")));
             } else {
-                langConfig.set(key, value);
+                freshConfig.set(key, value);
             }
         }
+
+        this.langConfig = freshConfig;
+
+        //plugin.getLogger().info("Redis Daten integriert. Sound success: " + langConfig.getString("sounds.success"));
     }
 
     public String get(String path) {
@@ -88,5 +101,9 @@ public class LangManager {
         }
 
         return msg;
+    }
+
+    public String getRaw(String path) {
+        return langConfig.getString(path);
     }
 }

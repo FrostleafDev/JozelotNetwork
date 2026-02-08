@@ -1,5 +1,6 @@
 package de.jozelot.jozelotProxy.commands;
 
+import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
@@ -37,22 +38,7 @@ public class LobbyCommand implements SimpleCommand {
     public void execute(Invocation invocation) {
         if (!invocation.source().hasPermission("network.command.lobby")) {
             invocation.source().sendMessage(mm.deserialize(lang.getNoPermission()));
-            if (invocation.source() instanceof Player) {
-                String soundPath = lang.getRaw("sounds.error");
-                if (!soundPath.isEmpty()) {
-                    try {
-                        Sound successSound = Sound.sound(
-                                Key.key(soundPath),
-                                Sound.Source.UI,
-                                1.0f,
-                                1.0f
-                        );
-                        invocation.source().playSound(successSound, Sound.Emitter.self());
-                    } catch (Exception e) {
-                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
-                    }
-                }
-            }
+            playSound(invocation.source(), "error");
             return;
         }
 
@@ -65,40 +51,8 @@ public class LobbyCommand implements SimpleCommand {
 
         if (currentConnection.get().getServer().getServerInfo().getName().equals(config.getLobbyServer())) {
             player.sendMessage(mm.deserialize(lang.format("already-on-lobby", null)));
-            if (invocation.source() instanceof Player) {
-                String soundPath = lang.getRaw("sounds.error");
-                if (!soundPath.isEmpty()) {
-                    try {
-                        Sound successSound = Sound.sound(
-                                Key.key(soundPath),
-                                Sound.Source.UI,
-                                1.0f,
-                                1.0f
-                        );
-                        invocation.source().playSound(successSound, Sound.Emitter.self());
-                    } catch (Exception e) {
-                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
-                    }
-                }
-            }
+            playSound(invocation.source(), "error");
             return;
-        }
-
-        if (invocation.source() instanceof Player) {
-            String soundPath = lang.getRaw("sounds.success");
-            if (!soundPath.isEmpty()) {
-                try {
-                    Sound successSound = Sound.sound(
-                            Key.key(soundPath),
-                            Sound.Source.UI,
-                            1.0f,
-                            1.0f
-                    );
-                    invocation.source().playSound(successSound, Sound.Emitter.self());
-                } catch (Exception e) {
-                    plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
-                }
-            }
         }
 
         player.sendMessage(mm.deserialize(lang.format("send-to-lobby", null)));
@@ -109,4 +63,28 @@ public class LobbyCommand implements SimpleCommand {
     public boolean hasPermission(final Invocation invocation) {
         return invocation.source().hasPermission("network.command.lobby");
     }
+
+    private void playSound(CommandSource source, String soundKey) {
+        if (!(source instanceof Player player)) return;
+
+        String soundPath = lang.getRaw("sounds." + soundKey);
+        if (soundPath == null || soundPath.isEmpty()) return;
+
+        try {
+            String cleanedPath = soundPath.trim().toLowerCase();
+            if (!cleanedPath.contains(":")) {
+                cleanedPath = "minecraft:" + cleanedPath;
+            }
+
+            Sound sound = Sound.sound(
+                    Key.key(cleanedPath),
+                    Sound.Source.UI,
+                    1.0f,
+                    1.0f
+            );
+            player.playSound(sound, Sound.Emitter.self());
+        } catch (Exception e) {
+        }
+    }
+    // playSound(source, "error");
 }

@@ -34,22 +34,7 @@ public class ServerCommand implements SimpleCommand {
 
         if (!source.hasPermission("network.command.server")) {
             source.sendMessage(mm.deserialize(lang.getNoPermission()));
-            if (source instanceof Player) {
-                String soundPath = lang.getRaw("sounds.error");
-                if (!soundPath.isEmpty()) {
-                    try {
-                        Sound successSound = Sound.sound(
-                                Key.key(soundPath),
-                                Sound.Source.UI,
-                                1.0f,
-                                1.0f
-                        );
-                        source.playSound(successSound, Sound.Emitter.self());
-                    } catch (Exception e) {
-                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
-                    }
-                }
-            }
+            playSound(source, "error");
             return;
         }
 
@@ -60,22 +45,7 @@ public class ServerCommand implements SimpleCommand {
 
         if (args.length < 1) {
             player.sendMessage(mm.deserialize(lang.format("command-server-usage", null)));
-            if (source instanceof Player) {
-                String soundPath = lang.getRaw("sounds.error");
-                if (!soundPath.isEmpty()) {
-                    try {
-                        Sound successSound = Sound.sound(
-                                Key.key(soundPath),
-                                Sound.Source.UI,
-                                1.0f,
-                                1.0f
-                        );
-                        source.playSound(successSound, Sound.Emitter.self());
-                    } catch (Exception e) {
-                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
-                    }
-                }
-            }
+            playSound(source, "error");
             return;
         }
 
@@ -83,23 +53,6 @@ public class ServerCommand implements SimpleCommand {
 
         String displayName = plugin.getMySQLManager().getServerDisplayName(targetServerName);
         String finalName = (displayName != null && !displayName.isEmpty()) ? displayName : targetServerName;
-
-        if (source instanceof Player) {
-            String soundPath = lang.getRaw("sounds.success");
-            if (!soundPath.isEmpty()) {
-                try {
-                    Sound successSound = Sound.sound(
-                            Key.key(soundPath),
-                            Sound.Source.UI,
-                            1.0f,
-                            1.0f
-                    );
-                    source.playSound(successSound, Sound.Emitter.self());
-                } catch (Exception e) {
-                    plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
-                }
-            }
-        }
 
         player.sendMessage(mm.deserialize(lang.format("command-server-try", Map.of("server-name", finalName))));
 
@@ -126,4 +79,29 @@ public class ServerCommand implements SimpleCommand {
     public boolean hasPermission(Invocation invocation) {
         return invocation.source().hasPermission("network.command.server");
     }
+
+    private void playSound(CommandSource source, String soundKey) {
+        if (!(source instanceof Player player)) return;
+
+        String soundPath = lang.getRaw("sounds." + soundKey);
+        if (soundPath == null || soundPath.isEmpty()) return;
+
+        try {
+            String cleanedPath = soundPath.trim().toLowerCase();
+            if (!cleanedPath.contains(":")) {
+                cleanedPath = "minecraft:" + cleanedPath;
+            }
+
+            Sound sound = Sound.sound(
+                    Key.key(cleanedPath),
+                    Sound.Source.UI,
+                    1.0f,
+                    1.0f
+            );
+            player.playSound(sound, Sound.Emitter.self());
+        } catch (Exception e) {
+            plugin.getConsoleLogger().broadCastToConsole("§cUngültiger Sound-Key in lang.yml: '" + soundPath + "'");
+        }
+    }
+    // playSound(source, "error");
 }

@@ -32,12 +32,12 @@ public class GroupChatListener {
             return;
         }
 
-        String processedMessage = rawMessage;
-        if (!player.hasPermission("network.chat.minimessage")) {
-            processedMessage = mm.escapeTags(rawMessage);
-        }
+        String processedMessage = player.hasPermission("network.chat.minimessage")
+                ? rawMessage
+                : mm.escapeTags(rawMessage);
 
         String prefix = plugin.getLuckpermsUtils().getPlayerPrefix(player);
+
         String format = plugin.getLang().format("chat-format", Map.of(
                 "rank-prefix", prefix != null ? prefix : "",
                 "player-name", player.getUsername(),
@@ -48,5 +48,22 @@ public class GroupChatListener {
                 .filter(p -> p.getCurrentServer().isPresent())
                 .filter(p -> plugin.getGroupManager().getGroupId(p.getCurrentServer().get().getServerInfo().getName()) == groupId)
                 .forEach(p -> p.sendMessage(mm.deserialize(format)));
+
+        String groupDisplayName = plugin.getGroupManager().getGroupName(groupId);
+
+        String spyChatFormat = plugin.getLang().format("spy-chat", Map.of(
+                "group", groupDisplayName != null ? groupDisplayName : "Unbekannt",
+                "player-name", player.getUsername(),
+                "message", processedMessage
+        ));
+
+        plugin.getServer().getAllPlayers().stream()
+                .filter(p -> plugin.getSpyPlayers().contains(p.getUniqueId()))
+                .filter(p -> {
+                    return p.getCurrentServer()
+                            .map(s -> plugin.getGroupManager().getGroupId(s.getServerInfo().getName()) != groupId)
+                            .orElse(true);
+                })
+                .forEach(p -> p.sendMessage(mm.deserialize(spyChatFormat)));
     }
 }

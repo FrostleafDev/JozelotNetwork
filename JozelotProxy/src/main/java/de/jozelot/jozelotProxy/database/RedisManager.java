@@ -33,40 +33,38 @@ public class RedisManager {
         }
     }
 
-    public void uploadLanguage(Map<String, Object> allMessages) {
+    public void uploadLanguage(Map<String, Object> allData) {
         JedisPooled jedis = plugin.getRedisSetup().getJedis();
+        if (jedis == null) return;
 
-        if (jedis == null) {
-            consoleLogger.broadCastToConsole("Redis: Upload fehlgeschlagen - Keine aktive Verbindung!");
-            return;
-        }
+        Map<String, String> flatData = new HashMap<>();
 
-        if (allMessages == null || allMessages.isEmpty()) {
-            consoleLogger.broadCastToConsole("Redis: Keine Sprach-Daten zum Hochladen gefunden.");
-            return;
-        }
-
-        Map<String, String> dataToUpload = new HashMap<>();
-
-        for (Map.Entry<String, Object> entry : allMessages.entrySet()) {
-            String key = entry.getKey();
-            Object value = entry.getValue();
-
-            if (value instanceof String) {
-                dataToUpload.put(key, (String) value);
-            } else if (value instanceof List) {
-                @SuppressWarnings("unchecked")
-                List<String> list = (List<String>) value;
-                dataToUpload.put(key, String.join("<<line>>", list));
-            }
-        }
+        recursiveFlatten(flatData, "", allData);
 
         try {
             jedis.del(REDIS_KEY);
-            jedis.hset(REDIS_KEY, dataToUpload);
-            consoleLogger.broadCastToConsole("Redis: " + dataToUpload.size() + " Sprach-Einträge erfolgreich synchronisiert.");
+            if (!flatData.isEmpty()) {
+                jedis.hset(REDIS_KEY, flatData);
+                plugin.getConsoleLogger().broadCastToConsole("Redis: " + flatData.size() + " Einträge synchronisiert.");
+            }
         } catch (Exception e) {
-            consoleLogger.broadCastToConsole("Redis: Fehler beim Sprach-Upload: " + e.getMessage());
+            plugin.getConsoleLogger().broadCastToConsole("Redis Fehler: " + e.getMessage());
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void recursiveFlatten(Map<String, String> result, String prefix, Map<String, Object> source) {
+        for (Map.Entry<String, Object> entry : source.entrySet()) {
+            String key = prefix.isEmpty() ? entry.getKey() : prefix + "." + entry.getKey();
+            Object value = entry.getValue();
+
+            if (value instanceof Map) {
+                recursiveFlatten(result, key, (Map<String, Object>) value);
+            } else if (value instanceof List) {
+                result.put(key, String.join("<<line>>", (List<String>) value));
+            } else if (value != null) {
+                result.put(key, value.toString());
+            }
         }
     }
 

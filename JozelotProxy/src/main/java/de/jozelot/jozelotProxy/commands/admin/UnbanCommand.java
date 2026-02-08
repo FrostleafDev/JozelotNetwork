@@ -38,43 +38,13 @@ public class UnbanCommand implements SimpleCommand {
 
         if (!source.hasPermission("network.command.unban")) {
             source.sendMessage(mm.deserialize(lang.getNoPermission()));
-            if (source instanceof Player) {
-                String soundPath = lang.getRaw("sounds.error");
-                if (!soundPath.isEmpty()) {
-                    try {
-                        Sound successSound = Sound.sound(
-                                Key.key(soundPath),
-                                Sound.Source.UI,
-                                1.0f,
-                                1.0f
-                        );
-                        source.playSound(successSound, Sound.Emitter.self());
-                    } catch (Exception e) {
-                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
-                    }
-                }
-            }
+            playSound(source, "error");
             return;
         }
 
         if (args.length != 1) {
             source.sendMessage(mm.deserialize(lang.format("command-unban-usage", null)));
-            if (source instanceof Player) {
-                String soundPath = lang.getRaw("sounds.error");
-                if (!soundPath.isEmpty()) {
-                    try {
-                        Sound successSound = Sound.sound(
-                                Key.key(soundPath),
-                                Sound.Source.UI,
-                                1.0f,
-                                1.0f
-                        );
-                        source.playSound(successSound, Sound.Emitter.self());
-                    } catch (Exception e) {
-                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
-                    }
-                }
-            }
+            playSound(source, "error");
             return;
         }
 
@@ -84,22 +54,7 @@ public class UnbanCommand implements SimpleCommand {
 
         if (targetUUID == null) {
             source.sendMessage(mm.deserialize(lang.format("command-ban-player-not-found", Map.of("player-name", targetName))));
-            if (source instanceof Player) {
-                String soundPath = lang.getRaw("sounds.error");
-                if (!soundPath.isEmpty()) {
-                    try {
-                        Sound successSound = Sound.sound(
-                                Key.key(soundPath),
-                                Sound.Source.UI,
-                                1.0f,
-                                1.0f
-                        );
-                        source.playSound(successSound, Sound.Emitter.self());
-                    } catch (Exception e) {
-                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
-                    }
-                }
-            }
+            playSound(source, "error");
             return;
         }
 
@@ -118,40 +73,10 @@ public class UnbanCommand implements SimpleCommand {
             UUID operatorUUID = (source instanceof Player p) ? p.getUniqueId() : new UUID(0L, 0L);
             plugin.getMySQLManager().logAction(operatorUUID, "UNBAN", targetName, "");
 
-            if (source instanceof Player) {
-                String soundPath = lang.getRaw("sounds.success");
-                if (!soundPath.isEmpty()) {
-                    try {
-                        Sound successSound = Sound.sound(
-                                Key.key(soundPath),
-                                Sound.Source.UI,
-                                1.0f,
-                                1.0f
-                        );
-                        source.playSound(successSound, Sound.Emitter.self());
-                    } catch (Exception e) {
-                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
-                    }
-                }
-            }
+            playSound(source, "success");
         } else {
             source.sendMessage(mm.deserialize(lang.format("command-unban-not-banned", Map.of("player-name", targetName))));
-            if (source instanceof Player) {
-                String soundPath = lang.getRaw("sounds.error");
-                if (!soundPath.isEmpty()) {
-                    try {
-                        Sound successSound = Sound.sound(
-                                Key.key(soundPath),
-                                Sound.Source.UI,
-                                1.0f,
-                                1.0f
-                        );
-                        source.playSound(successSound, Sound.Emitter.self());
-                    } catch (Exception e) {
-                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
-                    }
-                }
-            }
+            playSound(source, "error");
         }
     }
 
@@ -175,4 +100,28 @@ public class UnbanCommand implements SimpleCommand {
     public boolean hasPermission(Invocation invocation) {
         return invocation.source().hasPermission("network.command.unban");
     }
+
+    private void playSound(CommandSource source, String soundKey) {
+        if (!(source instanceof Player player)) return;
+
+        String soundPath = lang.getRaw("sounds." + soundKey);
+        if (soundPath == null || soundPath.isEmpty()) return;
+
+        try {
+            String cleanedPath = soundPath.trim().toLowerCase();
+            if (!cleanedPath.contains(":")) {
+                cleanedPath = "minecraft:" + cleanedPath;
+            }
+
+            Sound sound = Sound.sound(
+                    Key.key(cleanedPath),
+                    Sound.Source.UI,
+                    1.0f,
+                    1.0f
+            );
+            player.playSound(sound, Sound.Emitter.self());
+        } catch (Exception e) {
+        }
+    }
+    // playSound(source, "error");
 }

@@ -31,21 +31,7 @@ public class FlySpeedCommand implements CommandExecutor {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
         if (!sender.hasPermission("network.utils.command.flyspeed")) {
             sender.sendMessage(mm.deserialize(lang.format("no-permission", null)));
-            if (sender instanceof Player) {
-                String soundPath = lang.get("sounds.error");
-                if (!soundPath.isEmpty()) {
-                    try {
-                        Sound successSound = Sound.sound(
-                                Key.key(soundPath),
-                                Sound.Source.UI,
-                                1.0f,
-                                1.0f
-                        );
-                        sender.playSound(successSound, Sound.Emitter.self());
-                    } catch (Exception e) {
-                    }
-                }
-            }
+            playSound(sender, "error");
             return true;
         }
         if (!(sender instanceof Player player)) {
@@ -55,21 +41,7 @@ public class FlySpeedCommand implements CommandExecutor {
 
         if (args.length < 1) {
             player.sendMessage(mm.deserialize(lang.format("command-flyspeed-usage", null)));
-            if (sender instanceof Player) {
-                String soundPath = lang.get("sounds.error");
-                if (!soundPath.isEmpty()) {
-                    try {
-                        Sound successSound = Sound.sound(
-                                Key.key(soundPath),
-                                Sound.Source.UI,
-                                1.0f,
-                                1.0f
-                        );
-                        sender.playSound(successSound, Sound.Emitter.self());
-                    } catch (Exception e) {
-                    }
-                }
-            }
+            playSound(sender, "error");
             return true;
         }
 
@@ -86,41 +58,37 @@ public class FlySpeedCommand implements CommandExecutor {
             player.sendMessage(mm.deserialize(lang.format("command-flyspeed-success",
                     Map.of("speed", String.valueOf(input)))));
 
-            if (sender instanceof Player) {
-                String soundPath = lang.get("sounds.success");
-                if (!soundPath.isEmpty()) {
-                    try {
-                        Sound successSound = Sound.sound(
-                                Key.key(soundPath),
-                                Sound.Source.UI,
-                                1.0f,
-                                1.0f
-                        );
-                        sender.playSound(successSound, Sound.Emitter.self());
-                    } catch (Exception e) {
-                    }
-                }
-            }
-
+            playSound(sender, "pling");
         } catch (NumberFormatException e) {
             player.sendMessage(mm.deserialize(lang.format("invalid-number", Map.of("input", args[0]))));
-            if (sender instanceof Player) {
-                String soundPath = lang.get("sounds.error");
-                if (!soundPath.isEmpty()) {
-                    try {
-                        Sound successSound = Sound.sound(
-                                Key.key(soundPath),
-                                Sound.Source.UI,
-                                1.0f,
-                                1.0f
-                        );
-                        sender.playSound(successSound, Sound.Emitter.self());
-                    } catch (Exception esa) {
-                    }
+
+            playSound(sender, "error");
+        }
+        return true;
+    }
+    private void playSound(CommandSender sender, String soundKey) {
+        if (!(sender instanceof Player player)) return;
+
+        String path = lang.getRaw("sounds." + soundKey);
+
+        if (path != null && !path.isEmpty()) {
+            try {
+                String cleanedPath = path.trim().toLowerCase();
+
+                if (!cleanedPath.contains(":")) {
+                    cleanedPath = "minecraft:" + cleanedPath;
                 }
+
+                Sound sound = Sound.sound(
+                        Key.key(cleanedPath),
+                        Sound.Source.UI,
+                        1.0f,
+                        1.0f
+                );
+                player.playSound(sound, Sound.Emitter.self());
+            } catch (Exception e) {
+                Bukkit.getConsoleSender().sendMessage("§cUngültiger Sound-Key in lang.yml: " + path);
             }
         }
-
-        return true;
     }
 }

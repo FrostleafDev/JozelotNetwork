@@ -1,5 +1,6 @@
 package de.jozelot.jozelotProxy.commands.messaging;
 
+import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
@@ -35,22 +36,7 @@ public class MsgCommand implements SimpleCommand {
     public void execute(Invocation invocation) {
         if (!invocation.source().hasPermission("network.command.msg")) {
             invocation.source().sendMessage(mm.deserialize(lang.getNoPermission()));
-            if (invocation.source() instanceof Player) {
-                String soundPath = lang.getRaw("sounds.error");
-                if (!soundPath.isEmpty()) {
-                    try {
-                        Sound successSound = Sound.sound(
-                                Key.key(soundPath),
-                                Sound.Source.UI,
-                                1.0f,
-                                1.0f
-                        );
-                        invocation.source().playSound(successSound, Sound.Emitter.self());
-                    } catch (Exception e) {
-                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
-                    }
-                }
-            }
+            playSound(invocation.source(), "error");
             return;
         }
 
@@ -62,22 +48,7 @@ public class MsgCommand implements SimpleCommand {
         String[] args = invocation.arguments();
         if (args.length < 2) {
             player.sendMessage(mm.deserialize(lang.format("command-msg-usage", Map.of())));
-            if (invocation.source() instanceof Player) {
-                String soundPath = lang.getRaw("sounds.error");
-                if (!soundPath.isEmpty()) {
-                    try {
-                        Sound successSound = Sound.sound(
-                                Key.key(soundPath),
-                                Sound.Source.UI,
-                                1.0f,
-                                1.0f
-                        );
-                        invocation.source().playSound(successSound, Sound.Emitter.self());
-                    } catch (Exception e) {
-                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
-                    }
-                }
-            }
+            playSound(invocation.source(), "error");
             return;
         }
 
@@ -87,44 +58,14 @@ public class MsgCommand implements SimpleCommand {
         if (targetOptional.isEmpty() || !isSameGroup(player, targetOptional.get())) {
             player.sendMessage(mm.deserialize(lang.format("command-msg-not-in-group",
                     Map.of("player-name", targetName))));
-            if (invocation.source() instanceof Player) {
-                String soundPath = lang.getRaw("sounds.error");
-                if (!soundPath.isEmpty()) {
-                    try {
-                        Sound successSound = Sound.sound(
-                                Key.key(soundPath),
-                                Sound.Source.UI,
-                                1.0f,
-                                1.0f
-                        );
-                        invocation.source().playSound(successSound, Sound.Emitter.self());
-                    } catch (Exception e) {
-                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
-                    }
-                }
-            }
+            playSound(invocation.source(), "error");
             return;
         }
 
         Player target = targetOptional.get();
         if (target.getUniqueId().equals(player.getUniqueId())) {
             player.sendMessage(mm.deserialize(lang.format("command-gmsg-self-msg", Map.of())));
-            if (invocation.source() instanceof Player) {
-                String soundPath = lang.getRaw("sounds.error");
-                if (!soundPath.isEmpty()) {
-                    try {
-                        Sound successSound = Sound.sound(
-                                Key.key(soundPath),
-                                Sound.Source.UI,
-                                1.0f,
-                                1.0f
-                        );
-                        invocation.source().playSound(successSound, Sound.Emitter.self());
-                    } catch (Exception e) {
-                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
-                    }
-                }
-            }
+            playSound(invocation.source(), "error");
             return;
         }
 
@@ -134,22 +75,8 @@ public class MsgCommand implements SimpleCommand {
         player.sendMessage(mm.deserialize(lang.format("msg-format-send", Map.of("target-name", target.getUsername(), "message", processedMessage))));
         target.sendMessage(mm.deserialize(lang.format("msg-format-receive", Map.of("player-name", player.getUsername(), "message", processedMessage))));
 
-        if (target instanceof Player) {
-            String soundPath = lang.getRaw("sounds.notify");
-            if (!soundPath.isEmpty()) {
-                try {
-                    Sound successSound = Sound.sound(
-                            Key.key(soundPath),
-                            Sound.Source.UI,
-                            1.0f,
-                            1.0f
-                    );
-                    target.playSound(successSound, Sound.Emitter.self());
-                } catch (Exception e) {
-                    plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
-                }
-            }
-        }
+        playSound(target, "notify");
+        sendSpyMessage(player, target, rawMessage, false);
 
         plugin.getReplyMap().put(target.getUniqueId(), new JozelotProxy.ReplyData(player.getUniqueId(), false));
         consoleLogger.broadCastToConsole("[Local-MSG] " + player.getUsername() + " -> " + target.getUsername() + ": " + rawMessage);
@@ -191,4 +118,46 @@ public class MsgCommand implements SimpleCommand {
     public boolean hasPermission(Invocation invocation) {
         return invocation.source().hasPermission("network.command.msg");
     }
+
+    private void sendSpyMessage(Player sender, Player receiver, String message, boolean global) {
+        String langKey = global ? "spy-gmsg" : "spy-msg";
+
+        String spyFormat = lang.format(langKey, Map.of(
+                "sender", sender.getUsername(),
+                "receiver", receiver.getUsername(),
+                "message", message
+        ));
+
+        for (Player admin : plugin.getServer().getAllPlayers()) {
+            if (plugin.getSpyPlayers().contains(admin.getUniqueId())) {
+                if (!admin.getUniqueId().equals(sender.getUniqueId()) && !admin.getUniqueId().equals(receiver.getUniqueId())) {
+                    admin.sendMessage(mm.deserialize(spyFormat));
+                }
+            }
+        }
+    }
+
+    private void playSound(CommandSource source, String soundKey) {
+        if (!(source instanceof Player player)) return;
+
+        String soundPath = lang.getRaw("sounds." + soundKey);
+        if (soundPath == null || soundPath.isEmpty()) return;
+
+        try {
+            String cleanedPath = soundPath.trim().toLowerCase();
+            if (!cleanedPath.contains(":")) {
+                cleanedPath = "minecraft:" + cleanedPath;
+            }
+
+            Sound sound = Sound.sound(
+                    Key.key(cleanedPath),
+                    Sound.Source.UI,
+                    1.0f,
+                    1.0f
+            );
+            player.playSound(sound, Sound.Emitter.self());
+        } catch (Exception e) {
+        }
+    }
+    // playSound(source, "error");
 }

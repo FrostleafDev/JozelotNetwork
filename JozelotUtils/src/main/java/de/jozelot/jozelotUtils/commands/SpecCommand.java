@@ -38,95 +38,24 @@ public class SpecCommand implements CommandExecutor, TabCompleter {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (!sender.hasPermission("network.utils.command.spec")) {
             sender.sendMessage(mm.deserialize(lang.format("no-permission", null)));
-            if (sender instanceof Player) {
-                String soundPath = lang.get("sounds.error");
-                if (!soundPath.isEmpty()) {
-                    try {
-                        Sound successSound = Sound.sound(
-                                Key.key(soundPath),
-                                Sound.Source.UI,
-                                1.0f,
-                                1.0f
-                        );
-                        sender.playSound(successSound, Sound.Emitter.self());
-                    } catch (Exception e) {
-                    }
-                }
-            }
+            playSound(sender, "error");
             return true;
         }
 
         if (args.length == 1) {
             if (!sender.hasPermission("network.utils.command.spec.others")) {
                 sender.sendMessage(mm.deserialize(lang.format("no-permission", null)));
-                if (sender instanceof Player) {
-                    String soundPath = lang.get("sounds.error");
-                    if (!soundPath.isEmpty()) {
-                        try {
-                            Sound successSound = Sound.sound(
-                                    Key.key(soundPath),
-                                    Sound.Source.UI,
-                                    1.0f,
-                                    1.0f
-                            );
-                            sender.playSound(successSound, Sound.Emitter.self());
-                        } catch (Exception e) {
-                        }
-                    }
-                }
+                playSound(sender, "error");
                 return true;
             }
             Player target = Bukkit.getPlayer(args[0]);
             if (target == null) {
                 sender.sendMessage(mm.deserialize(lang.format("player-not-found", Map.of("player-name", args[0]))));
-                if (sender instanceof Player) {
-                    String soundPath = lang.get("sounds.error");
-                    if (!soundPath.isEmpty()) {
-                        try {
-                            Sound successSound = Sound.sound(
-                                    Key.key(soundPath),
-                                    Sound.Source.UI,
-                                    1.0f,
-                                    1.0f
-                            );
-                            sender.playSound(successSound, Sound.Emitter.self());
-                        } catch (Exception e) {
-                        }
-                    }
-                }
+                playSound(sender, "error");
                 return true;
             }
             toggleSpectator(target, sender);
-            if (sender instanceof Player) {
-                String soundPath = lang.get("sounds.error");
-                if (!soundPath.isEmpty()) {
-                    try {
-                        Sound successSound = Sound.sound(
-                                Key.key(soundPath),
-                                Sound.Source.UI,
-                                1.0f,
-                                1.0f
-                        );
-                        sender.playSound(successSound, Sound.Emitter.self());
-                    } catch (Exception e) {
-                    }
-                }
-            }
-            if (target instanceof Player) {
-                String soundPath = lang.get("sounds.error");
-                if (!soundPath.isEmpty()) {
-                    try {
-                        Sound successSound = Sound.sound(
-                                Key.key(soundPath),
-                                Sound.Source.UI,
-                                1.0f,
-                                1.0f
-                        );
-                        target.playSound(successSound, Sound.Emitter.self());
-                    } catch (Exception e) {
-                    }
-                }
-            }
+            playSound(sender, "pling");
             return true;
         }
 
@@ -135,6 +64,7 @@ public class SpecCommand implements CommandExecutor, TabCompleter {
             return true;
         }
         toggleSpectator(player, player);
+        playSound(sender, "pling");
         return true;
     }
 
@@ -214,5 +144,31 @@ public class SpecCommand implements CommandExecutor, TabCompleter {
                     .toList();
         }
         return List.of();
+    }
+
+    private void playSound(CommandSender sender, String soundKey) {
+        if (!(sender instanceof Player player)) return;
+
+        String path = lang.getRaw("sounds." + soundKey);
+
+        if (path != null && !path.isEmpty()) {
+            try {
+                String cleanedPath = path.trim().toLowerCase();
+
+                if (!cleanedPath.contains(":")) {
+                    cleanedPath = "minecraft:" + cleanedPath;
+                }
+
+                Sound sound = Sound.sound(
+                        Key.key(cleanedPath),
+                        Sound.Source.UI,
+                        1.0f,
+                        1.0f
+                );
+                player.playSound(sound, Sound.Emitter.self());
+            } catch (Exception e) {
+                Bukkit.getConsoleSender().sendMessage("§cUngültiger Sound-Key in lang.yml: " + path);
+            }
+        }
     }
 }

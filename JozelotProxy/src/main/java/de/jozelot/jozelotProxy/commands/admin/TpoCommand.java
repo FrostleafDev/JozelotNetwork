@@ -35,22 +35,7 @@ public class TpoCommand implements SimpleCommand {
 
         if (!source.hasPermission("network.command.tpo")) {
             source.sendMessage(mm.deserialize(lang.getNoPermission()));
-            if (source instanceof Player) {
-                String soundPath = lang.getRaw("sounds.error");
-                if (!soundPath.isEmpty()) {
-                    try {
-                        Sound successSound = Sound.sound(
-                                Key.key(soundPath),
-                                Sound.Source.UI,
-                                1.0f,
-                                1.0f
-                        );
-                        source.playSound(successSound, Sound.Emitter.self());
-                    } catch (Exception e) {
-
-                    }
-                }
-            }
+            playSound(source, "error");
             return;
         }
 
@@ -61,21 +46,7 @@ public class TpoCommand implements SimpleCommand {
 
         if (args.length < 1) {
             player.sendMessage(mm.deserialize(lang.format("command-tpo-usage", null)));
-            if (source instanceof Player) {
-                String soundPath = lang.getRaw("sounds.error");
-                if (!soundPath.isEmpty()) {
-                    try {
-                        Sound successSound = Sound.sound(
-                                Key.key(soundPath),
-                                Sound.Source.UI,
-                                1.0f,
-                                1.0f
-                        );
-                        source.playSound(successSound, Sound.Emitter.self());
-                    } catch (Exception e) {
-                    }
-                }
-            }
+            playSound(source, "error");
             return;
         }
 
@@ -83,41 +54,11 @@ public class TpoCommand implements SimpleCommand {
 
         if (!target.isPresent()) {
             player.sendMessage(mm.deserialize(lang.format("command-tpo-player-not-found", Map.of("player-name", args[0]))));
-            if (source instanceof Player) {
-                String soundPath = lang.getRaw("sounds.error");
-                if (!soundPath.isEmpty()) {
-                    try {
-                        Sound successSound = Sound.sound(
-                                Key.key(soundPath),
-                                Sound.Source.UI,
-                                1.0f,
-                                1.0f
-                        );
-                        source.playSound(successSound, Sound.Emitter.self());
-                    } catch (Exception e) {
-                    }
-                }
-            }
+            playSound(source, "error");
             return;
         }
 
         Player targetFinal = target.get();
-
-        if (source instanceof Player) {
-            String soundPath = lang.getRaw("sounds.success");
-            if (!soundPath.isEmpty()) {
-                try {
-                    Sound successSound = Sound.sound(
-                            Key.key(soundPath),
-                            Sound.Source.UI,
-                            1.0f,
-                            1.0f
-                    );
-                    source.playSound(successSound, Sound.Emitter.self());
-                } catch (Exception e) {
-                }
-            }
-        }
 
         playerSends.sendPlayerToPlayer(player, targetFinal);
     }
@@ -143,4 +84,28 @@ public class TpoCommand implements SimpleCommand {
     public boolean hasPermission(Invocation invocation) {
         return invocation.source().hasPermission("network.command.tpo");
     }
+
+    private void playSound(CommandSource source, String soundKey) {
+        if (!(source instanceof Player player)) return;
+
+        String soundPath = lang.getRaw("sounds." + soundKey);
+        if (soundPath == null || soundPath.isEmpty()) return;
+
+        try {
+            String cleanedPath = soundPath.trim().toLowerCase();
+            if (!cleanedPath.contains(":")) {
+                cleanedPath = "minecraft:" + cleanedPath;
+            }
+
+            Sound sound = Sound.sound(
+                    Key.key(cleanedPath),
+                    Sound.Source.UI,
+                    1.0f,
+                    1.0f
+            );
+            player.playSound(sound, Sound.Emitter.self());
+        } catch (Exception e) {
+        }
+    }
+    // playSound(source, "error");
 }

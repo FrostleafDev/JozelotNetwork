@@ -1036,4 +1036,34 @@ public class MySQLManager {
         }
         return names;
     }
+
+    public void setSpyStatus(UUID uuid, boolean state) {
+        String sql = "INSERT INTO player_state (uuid, is_spy) VALUES (?, ?) " +
+                "ON DUPLICATE KEY UPDATE is_spy = ?;";
+        try (Connection conn = mySQLSetup.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, uuid.toString());
+            ps.setBoolean(2, state);
+            ps.setBoolean(3, state);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean getSpyStatus(UUID uuid) {
+        String sql = "SELECT is_spy FROM player_state WHERE uuid = ?";
+        try (Connection conn = mySQLSetup.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, uuid.toString());
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getBoolean("is_spy");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

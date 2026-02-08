@@ -237,15 +237,15 @@ tab-footer:
   - '{primary}{group-info} <dark_gray>| {grey}Ping: {secondary}{ping}ms'
 
 tab-player-format: '{rank-prefix}{player-name}'
-chat-format: '{rank-prefix}{player-name} {grey}» <white>{message}'
-global-chat-format: '<yellow>[Global] <reset>{rank-prefix}{player-name} {grey}» <white>{message}'
+chat-format: '<hover:show_text:"{primary}Klicke, um {player-name} privat zu schreiben"><click:suggest_command:"/msg {player-name} ">{rank-prefix}{player-name}</click></hover> {grey}» <white>{message}'
+global-chat-format: '{tertiary}[Global] <reset><hover:show_text:"{primary}Klicke, um {player-name} eine Nachricht zu schreiben"><click:suggest_command:"/gmsg {player-name} ">{rank-prefix}{player-name}</click></hover> {grey}» <white>{message}'
 
 command-gmsg-usage: '{tertiary}/gmsg <Spieler> <Nachricht>'
 command-gmsg-target-not-found: '{danger}{player-name} {grey}konnte nicht gefunden werden'
 command-gmsg-self-msg: '{danger}Du kannst dir selbst keine Nachrichten schreiben'
 
-gmsg-format-send: '<yellow>[Global] <reset>{grey}[{primary}Ich {grey}-> {primary}{target-name}{grey}] {grey}{message}'
-gmsg-format-receive: '<yellow>[Global] <reset>{grey}[{primary}{player-name} {grey}-> {primary}Ich{grey}] {grey}{message}'
+gmsg-format-send: '{tertiary}[Global] <reset>{grey}[{primary}Ich {grey}-> {primary}{target-name}{grey}] {grey}{message}'
+gmsg-format-receive: '{tertiary}[Global] <reset>{grey}[{primary}{player-name} {grey}-> {primary}Ich{grey}] {grey}{message}'
 
 command-msg-not-in-group: '{danger}{player-name} {grey}konnte nicht gefunden werden'
 command-msg-usage: '{tertiary}/msg <Spieler> <Nachricht>'
@@ -415,7 +415,13 @@ lobby-restart-kick:
   - ""
   - "<dark_gray>Status: <white>Wird neu geladen..."
 
+command-spy-enabled: '{grey}Spy Modus {primary}aktiviert{grey}. Du siehst nun alle privaten Nachrichten.'
+command-spy-disabled: '{grey}Spy Modus {danger}deaktiviert{grey}.'
+command-spy-usage: '{tertiary}/spy'
 
+spy-chat: '{grey}[{danger}Spy{grey}] {tertiary}[{group}] {primary}{player-name} {grey}» <white>{message}'
+spy-msg: '{grey}[{danger}Spy{grey}] {grey}[{primary}{sender} {grey}-> {primary}{receiver}{grey}] {grey}{message}'
+spy-gmsg: '{grey}[{danger}Spy{grey}] {tertiary}[Global] {grey}[{primary}{sender} {grey}-> {primary}{receiver}{grey}] {grey}{message}'
 
 
 

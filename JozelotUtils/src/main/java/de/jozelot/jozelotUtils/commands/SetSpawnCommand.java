@@ -6,6 +6,7 @@ import de.jozelot.jozelotUtils.storage.LangManager;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -40,41 +41,13 @@ public class SetSpawnCommand extends Command {
 
         if (!config.isSpawnCommand()) {
             sender.sendMessage(mm.deserialize(lang.format("blocked-command", Map.of("command", "/setspawn"))));
-            if (sender instanceof Player) {
-                String soundPath = lang.get("sounds.error");
-                if (!soundPath.isEmpty()) {
-                    try {
-                        Sound successSound = Sound.sound(
-                                Key.key(soundPath),
-                                Sound.Source.UI,
-                                1.0f,
-                                1.0f
-                        );
-                        sender.playSound(successSound, Sound.Emitter.self());
-                    } catch (Exception e) {
-                    }
-                }
-            }
+            playSound(sender, "error");
             return true;
         }
 
         if (!player.hasPermission(this.getPermission())) {
             sender.sendMessage(mm.deserialize(lang.format("no-permission", null)));
-            if (sender instanceof Player) {
-                String soundPath = lang.get("sounds.error");
-                if (!soundPath.isEmpty()) {
-                    try {
-                        Sound successSound = Sound.sound(
-                                Key.key(soundPath),
-                                Sound.Source.UI,
-                                1.0f,
-                                1.0f
-                        );
-                        sender.playSound(successSound, Sound.Emitter.self());
-                    } catch (Exception e) {
-                    }
-                }
-            }
+            playSound(sender, "error");
             return true;
         }
 
@@ -99,40 +72,12 @@ public class SetSpawnCommand extends Command {
                 newSpawn = new Location(player.getWorld(), x, y, z, yaw, pitch);
             } catch (NumberFormatException e) {
                 player.sendMessage(mm.deserialize(lang.format("command-setspawn-error", null)));
-                if (sender instanceof Player) {
-                    String soundPath = lang.get("sounds.error");
-                    if (!soundPath.isEmpty()) {
-                        try {
-                            Sound successSound = Sound.sound(
-                                    Key.key(soundPath),
-                                    Sound.Source.UI,
-                                    1.0f,
-                                    1.0f
-                            );
-                            sender.playSound(successSound, Sound.Emitter.self());
-                        } catch (Exception es) {
-                        }
-                    }
-                }
+                playSound(sender, "error");
                 return true;
             }
         } else {
             player.sendMessage(mm.deserialize(lang.format("command-setspawn-usage", null)));
-            if (sender instanceof Player) {
-                String soundPath = lang.get("sounds.error");
-                if (!soundPath.isEmpty()) {
-                    try {
-                        Sound successSound = Sound.sound(
-                                Key.key(soundPath),
-                                Sound.Source.UI,
-                                1.0f,
-                                1.0f
-                        );
-                        sender.playSound(successSound, Sound.Emitter.self());
-                    } catch (Exception e) {
-                    }
-                }
-            }
+            playSound(sender, "error");
             return true;
         }
 
@@ -143,21 +88,7 @@ public class SetSpawnCommand extends Command {
                 "z", String.format("%.2f", newSpawn.getZ())
         ))));
 
-        if (sender instanceof Player) {
-            String soundPath = lang.get("sounds.success");
-            if (!soundPath.isEmpty()) {
-                try {
-                    Sound successSound = Sound.sound(
-                            Key.key(soundPath),
-                            Sound.Source.UI,
-                            1.0f,
-                            1.0f
-                    );
-                    sender.playSound(successSound, Sound.Emitter.self());
-                } catch (Exception e) {
-                }
-            }
-        }
+        playSound(sender, "pling");
 
         return true;
     }
@@ -172,5 +103,31 @@ public class SetSpawnCommand extends Command {
         if (args.length == 3) list.add(String.valueOf(player.getLocation().getBlockX()));
 
         return list;
+    }
+
+    private void playSound(CommandSender sender, String soundKey) {
+        if (!(sender instanceof Player player)) return;
+
+        String path = lang.getRaw("sounds." + soundKey);
+
+        if (path != null && !path.isEmpty()) {
+            try {
+                String cleanedPath = path.trim().toLowerCase();
+
+                if (!cleanedPath.contains(":")) {
+                    cleanedPath = "minecraft:" + cleanedPath;
+                }
+
+                Sound sound = Sound.sound(
+                        Key.key(cleanedPath),
+                        Sound.Source.UI,
+                        1.0f,
+                        1.0f
+                );
+                player.playSound(sound, Sound.Emitter.self());
+            } catch (Exception e) {
+                Bukkit.getConsoleSender().sendMessage("§cUngültiger Sound-Key in lang.yml: " + path);
+            }
+        }
     }
 }

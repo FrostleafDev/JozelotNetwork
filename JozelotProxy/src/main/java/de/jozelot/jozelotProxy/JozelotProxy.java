@@ -152,6 +152,7 @@ public class JozelotProxy {
         CommandMeta playtimeMeta = cm.metaBuilder("playtime").build();
         CommandMeta broadcastMeta = cm.metaBuilder("broadcast").build();
         CommandMeta playerInfoMeta = cm.metaBuilder("playerinfo").build();
+        CommandMeta spyMeta = cm.metaBuilder("spy").build();
 
         cm.register(hubMeta, new LobbyCommand(this));
         cm.register(networkMeta, new NetworkCommand(this));
@@ -173,6 +174,7 @@ public class JozelotProxy {
         cm.register(playtimeMeta, new PlaytimeCommand(this));
         cm.register(broadcastMeta, new BroadcastCommand(this));
         cm.register(playerInfoMeta, new PlayerInfoCommand(this));
+        cm.register(spyMeta, new SpyCommand(this));
 
         this.playtimeListener = new PlaytimeListener(this);
         consoleLogger.broadCastToConsole("Commands erstellt");
@@ -296,5 +298,11 @@ public class JozelotProxy {
 
     public Map<UUID, Long> getLoginTimes() {
         return loginTimes;
+    }
+
+    private final Set<UUID> spyPlayers = new HashSet<>();
+
+    public Set<UUID> getSpyPlayers() {
+        return spyPlayers;
     }
 }

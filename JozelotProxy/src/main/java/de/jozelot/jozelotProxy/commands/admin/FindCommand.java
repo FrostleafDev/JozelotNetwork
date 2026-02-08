@@ -35,42 +35,12 @@ public class FindCommand implements SimpleCommand {
 
         if (!source.hasPermission("network.command.find")) {
             source.sendMessage(mm.deserialize(lang.getNoPermission()));
-            if (source instanceof Player) {
-                String soundPath = lang.getRaw("sounds.error");
-                if (!soundPath.isEmpty()) {
-                    try {
-                        Sound successSound = Sound.sound(
-                                Key.key(soundPath),
-                                Sound.Source.UI,
-                                1.0f,
-                                1.0f
-                        );
-                        source.playSound(successSound, Sound.Emitter.self());
-                    } catch (Exception e) {
-                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
-                    }
-                }
-            }
+            playSound(source, "error");
             return;
         }
         if (args.length == 0) {
             source.sendMessage(mm.deserialize(lang.format("command-find-missing-argument", null)));
-            if (source instanceof Player) {
-                String soundPath = lang.getRaw("sounds.error");
-                if (!soundPath.isEmpty()) {
-                    try {
-                        Sound successSound = Sound.sound(
-                                Key.key(soundPath),
-                                Sound.Source.UI,
-                                1.0f,
-                                1.0f
-                        );
-                        source.playSound(successSound, Sound.Emitter.self());
-                    } catch (Exception e) {
-                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
-                    }
-                }
-            }
+            playSound(source, "error");
             return;
         }
 
@@ -83,6 +53,7 @@ public class FindCommand implements SimpleCommand {
 
             if (data == null) {
                 source.sendMessage(mm.deserialize(lang.format("command-find-not-found", Map.of("player-name", targetName))));
+                playSound(source, "error");
                 return;
             }
 
@@ -93,43 +64,18 @@ public class FindCommand implements SimpleCommand {
                 onlineTarget.get().getCurrentServer().ifPresentOrElse(connection -> {
                     source.sendMessage(mm.deserialize(lang.format("command-find-success",
                             Map.of("player-name", playerName, "server-name", serverDisplayName))));
-                }, () -> source.sendMessage(mm.deserialize(lang.format("command-find-connecting", Map.of("player-name", playerName)))));
-            } else {
-                source.sendMessage(mm.deserialize(lang.format("command-find-offline",
-                        Map.of("player-name", playerName, "server-name", serverDisplayName))));
-                if (source instanceof Player) {
-                    String soundPath = lang.getRaw("sounds.error");
-                    if (!soundPath.isEmpty()) {
-                        try {
-                            Sound successSound = Sound.sound(
-                                    Key.key(soundPath),
-                                    Sound.Source.UI,
-                                    1.0f,
-                                    1.0f
-                            );
-                            source.playSound(successSound, Sound.Emitter.self());
-                        } catch (Exception e) {
-                            plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
-                        }
-                    }
-                }
+                    playSound(source, "pling");
+                }, () -> {
+                    source.sendMessage(mm.deserialize(lang.format("command-find-connecting", Map.of("player-name", playerName))));
+                    playSound(source, "error");
+                });
+                return;
             }
-            if (source instanceof Player) {
-                String soundPath = lang.getRaw("sounds.error");
-                if (!soundPath.isEmpty()) {
-                    try {
-                        Sound successSound = Sound.sound(
-                                Key.key(soundPath),
-                                Sound.Source.UI,
-                                1.0f,
-                                1.0f
-                        );
-                        source.playSound(successSound, Sound.Emitter.self());
-                    } catch (Exception e) {
-                        plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
-                    }
-                }
-            }
+
+            source.sendMessage(mm.deserialize(lang.format("command-find-offline",
+                    Map.of("player-name", playerName, "server-name", serverDisplayName))));
+            playSound(source, "pling");
+
         }).schedule();
     }
 
@@ -153,4 +99,29 @@ public class FindCommand implements SimpleCommand {
     public boolean hasPermission(final Invocation invocation) {
         return invocation.source().hasPermission("network.command.find");
     }
+
+    private void playSound(CommandSource source, String soundKey) {
+        if (!(source instanceof Player player)) return;
+
+        String soundPath = lang.getRaw("sounds." + soundKey);
+        if (soundPath == null || soundPath.isEmpty()) return;
+
+        try {
+            String cleanedPath = soundPath.trim().toLowerCase();
+            if (!cleanedPath.contains(":")) {
+                cleanedPath = "minecraft:" + cleanedPath;
+            }
+
+            Sound sound = Sound.sound(
+                    Key.key(cleanedPath),
+                    Sound.Source.UI,
+                    1.0f,
+                    1.0f
+            );
+            player.playSound(sound, Sound.Emitter.self());
+        } catch (Exception e) {
+            plugin.getConsoleLogger().broadCastToConsole("§cUngültiger Sound-Key in lang.yml: '" + soundPath + "'");
+        }
+    }
+    // playSound(source, "error");
 }

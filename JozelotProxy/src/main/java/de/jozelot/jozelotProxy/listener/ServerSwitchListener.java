@@ -1,5 +1,6 @@
 package de.jozelot.jozelotProxy.listener;
 
+import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.event.ResultedEvent;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
@@ -179,6 +180,18 @@ public class ServerSwitchListener {
         }).schedule();
 
         plugin.getLoginTimes().put(player.getUniqueId(), System.currentTimeMillis());
+        plugin.getServer().getScheduler().buildTask(plugin, () -> {
+            boolean isSpy = plugin.getMySQLManager().getSpyStatus(player.getUniqueId());
+
+            if (isSpy) {
+                if (player.hasPermission("network.command.spy")) {
+                    plugin.getSpyPlayers().add(player.getUniqueId());
+                    player.sendActionBar(mm.deserialize(plugin.getLang().format("command-spy-enabled", null)));
+                } else {
+                    plugin.getMySQLManager().setSpyStatus(player.getUniqueId(), false);
+                }
+            }
+        }).schedule();
     }
 
     // ==================================================================================
@@ -405,19 +418,30 @@ public class ServerSwitchListener {
     public void onPostServerConnect(ServerPostConnectEvent event) {
         Player player = event.getPlayer();
 
-        String soundPath = lang.getRaw("sounds.success");
-        if (!soundPath.isEmpty()) {
-            try {
-                Sound successSound = Sound.sound(
-                        Key.key(soundPath),
-                        Sound.Source.UI,
-                        1.0f,
-                        1.0f
-                );
-                player.playSound(successSound, Sound.Emitter.self());
-            } catch (Exception e) {
-                plugin.getConsoleLogger().broadCastToConsole("Fehlerhafter Sound-Key: '" + soundPath + "'");
+        playSound(event.getPlayer(), "success");
+    }
+
+    private void playSound(CommandSource source, String soundKey) {
+        if (!(source instanceof Player player)) return;
+
+        String soundPath = lang.getRaw("sounds." + soundKey);
+        if (soundPath == null || soundPath.isEmpty()) return;
+
+        try {
+            String cleanedPath = soundPath.trim().toLowerCase();
+            if (!cleanedPath.contains(":")) {
+                cleanedPath = "minecraft:" + cleanedPath;
             }
+
+            Sound sound = Sound.sound(
+                    Key.key(cleanedPath),
+                    Sound.Source.UI,
+                    1.0f,
+                    1.0f
+            );
+            player.playSound(sound, Sound.Emitter.self());
+        } catch (Exception e) {
         }
     }
+    // playSound(source, "error");
 }

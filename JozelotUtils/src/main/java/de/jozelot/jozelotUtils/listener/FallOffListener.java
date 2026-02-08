@@ -2,6 +2,11 @@ package de.jozelot.jozelotUtils.listener;
 
 import de.jozelot.jozelotUtils.JozelotUtils;
 import de.jozelot.jozelotUtils.storage.ConfigManager;
+import de.jozelot.jozelotUtils.storage.LangManager;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
+import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -11,9 +16,11 @@ import org.bukkit.event.player.PlayerMoveEvent;
 public class FallOffListener implements Listener {
 
     private final ConfigManager config;
+    private final LangManager lang;
 
     public FallOffListener(JozelotUtils plugin) {
         this.config = plugin.getConfigManager();
+        this.lang = plugin.getLang();
     }
 
     @EventHandler
@@ -34,6 +41,7 @@ public class FallOffListener implements Listener {
                 Player player = event.getPlayer();
                 player.teleport(config.getSpawnLocation());
                 player.setFallDistance(0);
+                playSound(event.getPlayer(), "success");
             }
         }
     }
@@ -50,6 +58,31 @@ public class FallOffListener implements Listener {
             //event.getPlayer().sendMessage("teleport");
             player.teleport(config.getSpawnLocation());
             player.setFallDistance(0);
+        }
+    }
+
+    private void playSound(Player player, String soundKey) {
+
+        String path = lang.getRaw("sounds." + soundKey);
+
+        if (path != null && !path.isEmpty()) {
+            try {
+                String cleanedPath = path.trim().toLowerCase();
+
+                if (!cleanedPath.contains(":")) {
+                    cleanedPath = "minecraft:" + cleanedPath;
+                }
+
+                Sound sound = Sound.sound(
+                        Key.key(cleanedPath),
+                        Sound.Source.UI,
+                        1.0f,
+                        1.0f
+                );
+                player.playSound(sound, Sound.Emitter.self());
+            } catch (Exception e) {
+                Bukkit.getConsoleSender().sendMessage("§cUngültiger Sound-Key in lang.yml: " + path);
+            }
         }
     }
 }
