@@ -234,7 +234,10 @@ tab-footer:
   - ''
   - '{grey}<strikethrough>                                                 </strikethrough>'
   - ''
-  - '{primary}{group-info} <dark_gray>| {grey}Ping: {secondary}{ping}ms'
+  - '<dark_gray>Spieler online: {secondary}{online-players} <dark_gray>| <dark_gray>Dein Ping: {secondary}{ping}ms'
+  - ''
+  - '{primary}{group-info}'
+  - ''
 
 tab-player-format: '{rank-prefix}{player-name}'
 chat-format: '<hover:show_text:"{primary}Klicke, um {player-name} privat zu schreiben"><click:suggest_command:"/msg {player-name} ">{rank-prefix}{player-name}</click></hover> {grey}» <white>{message}'
@@ -436,7 +439,15 @@ command-mods-list: '{grey}Mods von {primary}{player-name} {grey}({count}): {seco
 command-heal-success: '{grey}Du wurdest erfolgreich {primary}geheilt{grey}'
 command-heal-others-success: '{grey}Du hast {primary}{target-name} {grey}erfolgreich geheilt'
 
-
+server-kick-redirect:
+  - ""
+  - "  <gradient:#f90036:#f90011><b>VERBINDUNGS-INFO</b></gradient>"
+  - "  {grey}Du wurdest von {danger}{server} {grey}gekickt!"
+  - ""
+  - "  <dark_gray>» {grey}Grund: <white>{reason}"
+  - ""
+  - "  {grey}Du wurdest zur {primary}Lobby {grey}verschoben."
+  - ""
 
 
 

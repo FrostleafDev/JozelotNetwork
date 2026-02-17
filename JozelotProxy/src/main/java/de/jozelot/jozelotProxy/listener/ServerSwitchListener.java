@@ -6,6 +6,7 @@ import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
+import com.velocitypowered.api.event.player.KickedFromServerEvent;
 import com.velocitypowered.api.event.player.ServerConnectedEvent;
 import com.velocitypowered.api.event.player.ServerPostConnectEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
@@ -129,6 +130,45 @@ public class ServerSwitchListener {
     }
 
     @Subscribe
+    public void onServerKick(KickedFromServerEvent event) {
+        Player player = event.getPlayer();
+
+        if (player.getCurrentServer().isEmpty()) {
+            return;
+        }
+
+        String currentServerId = event.getServer().getServerInfo().getName();
+
+        if (currentServerId.equalsIgnoreCase(config.getLobbyServer())) {
+            return;
+        }
+
+        Optional<RegisteredServer> lobby = server.getServer(config.getLobbyServer());
+
+        if (lobby.isPresent()) {
+            String displayServerName = plugin.getMySQLManager().getServerDisplayName(currentServerId);
+            String finalServerName = (displayServerName != null) ? displayServerName : currentServerId;
+
+            String kickReason = event.getServerKickReason()
+                    .map(mm::serialize)
+                    .orElse("Unbekannter Fehler");
+
+            Map<String, String> placeholders = Map.of(
+                    "server", finalServerName,
+                    "reason", kickReason
+            );
+
+            event.setResult(KickedFromServerEvent.RedirectPlayer.create(lobby.get()));
+
+            server.getScheduler().buildTask(plugin, () -> {
+                player.sendMessage(mm.deserialize(String.join("<newline>",
+                        lang.formatList("server-kick-redirect", placeholders))));
+                playSound(player, "error");
+            }).delay(500, TimeUnit.MILLISECONDS).schedule();
+        }
+    }
+
+    @Subscribe
     public void onPostLogin(PostLoginEvent event) {
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
@@ -151,10 +191,6 @@ public class ServerSwitchListener {
         int protocolMax = config.getProtocalMax();
         String versionMax = ProtocolVersion.getProtocolVersion(protocolMax).getName();
 
-        if (protocolVersion < protocolReco) {
-            player.sendMessage(mm.deserialize(String.join("<newline>", lang.formatList("protocol-recomment", Map.of("current-version", versionPlayer, "reco-version", versionReco, "max-version", versionMax)))));
-        }
-
         // Datenbank-Aufgaben asynchron erledigen
         server.getScheduler().buildTask(plugin, () -> {
             // Spieler in die Liste eintragen und prüfen, ob er neu ist
@@ -176,6 +212,10 @@ public class ServerSwitchListener {
                                     "admin-name", ban.getOrDefault("operator", "Unbekannt")
                             )))));
                 }
+            }
+
+            if (protocolVersion < protocolReco) {
+                player.sendMessage(mm.deserialize(String.join("<newline>", lang.formatList("protocol-recomment", Map.of("current-version", versionPlayer, "reco-version", versionReco, "max-version", versionMax)))));
             }
         }).schedule();
 
@@ -235,17 +275,16 @@ public class ServerSwitchListener {
             event.setResult(ServerPreConnectEvent.ServerResult.denied());
             handleDenial(player, "server-full-message", Map.of("server-name", name, "max", String.valueOf(max)));
         }
-
-        // Tab Cleanup: Wenn der Spieler den Server wechselt, entfernen wir ihn aus den alten Tabs
-        if (player.getCurrentServer().isPresent()) {
-            removeFromAllTabs(player);
-        }
     }
 
     @Subscribe
     public void onServerConnected(ServerConnectedEvent event) {
         Player player = event.getPlayer();
         String serverName = event.getServer().getServerInfo().getName();
+
+        if (event.getPreviousServer().isPresent()) {
+            removeFromAllTabs(player);
+        }
 
         int groupId = plugin.getGroupManager().getGroupId(serverName);
         if (groupId != -1) {

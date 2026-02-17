@@ -4,6 +4,7 @@ import de.jozelot.jozelotUtils.JozelotUtils;
 import de.jozelot.jozelotUtils.storage.ConfigManager;
 import de.jozelot.jozelotUtils.storage.LangManager;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -53,11 +54,12 @@ public class JoinListener implements Listener {
         player.setFlySpeed(0.1f);
 
         if (config.getJoinMessageType().equalsIgnoreCase("default")) return;
-        else if (config.getJoinMessageType().equalsIgnoreCase("disabled")) {
-            event.setJoinMessage("");
-        } else if (config.getJoinMessageType().equalsIgnoreCase("custom")) {
-            event.joinMessage(mm.deserialize(lang.format("join-message", Map.of("player-name", player.getName()))));
+        else if (config.getJoinMessageType().equalsIgnoreCase("custom")) {
+            Bukkit.getOnlinePlayers().stream()
+                    .filter(p -> !p.getUniqueId().equals(player.getUniqueId()))
+                    .forEach(p -> p.sendMessage(mm.deserialize(lang.format("join-message", Map.of("player-name", player.getName())))));
         }
+        event.setJoinMessage("");
 
         if (config.isCustomExperienceLevel()) {
             player.setLevel(config.getCustomExperienceLevel());

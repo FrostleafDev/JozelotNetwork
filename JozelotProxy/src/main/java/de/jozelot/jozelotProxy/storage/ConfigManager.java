@@ -55,6 +55,7 @@ public class ConfigManager {
         if (!faviconDirectory.toFile().exists()) {
             faviconDirectory.toFile().mkdirs();
         }
+
     }
 
     public void loadDefaultConfig(InputStream defaultStream) {

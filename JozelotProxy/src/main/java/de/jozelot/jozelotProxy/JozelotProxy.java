@@ -68,14 +68,17 @@ public class JozelotProxy {
     private MySQLManager mySQLManager;
 
     private MiniMessage mm = MiniMessage.miniMessage();
-    public record ReplyData(UUID partnerId, boolean isGlobal) {}
+
+    public record ReplyData(UUID partnerId, boolean isGlobal) {
+    }
 
     private final Map<UUID, ReplyData> replyMap = new HashMap<>();
 
     /**
      * Plugin start - Loads the Datadirectory and the proxy server.
-     * @param server The proxy server where you can get verious infos about the velocity proxy
-     * @param logger Logger to log stuff
+     *
+     * @param server        The proxy server where you can get verious infos about the velocity proxy
+     * @param logger        Logger to log stuff
      * @param dataDirectory Directory of the plugin config and files
      */
     @Inject
@@ -90,6 +93,7 @@ public class JozelotProxy {
     /**
      * Server start
      * Loads all Object Classes and registers all Commands and Listeners
+     *
      * @param event
      */
     @Subscribe
@@ -114,7 +118,7 @@ public class JozelotProxy {
         this.redisSetup = new RedisSetup(this);
         redisSetup.setup();
         this.redisManager = new RedisManager(this);
-            redisManager.uploadLanguage(lang.getAllData());
+        redisManager.uploadLanguage(lang.getAllData());
         this.mySQLSetup = new MySQLSetup(this);
         mySQLSetup.setup();
         this.mySQLManager = new MySQLManager(this);
@@ -189,16 +193,19 @@ public class JozelotProxy {
         server.getEventManager().register(this, new CommandBlockListener(this));
         consoleLogger.broadCastToConsole("Listener erstellt");
 
-        consoleLogger.broadCastToConsole( "<" + config.getColorPrimary() + ">----------------------------------------------");
-        consoleLogger.broadCastToConsole( "<" + config.getColorPrimary() + ">Velocity läuft in der <" + config.getColorSecondary() + ">" + server.getVersion().getVersion());
-        consoleLogger.broadCastToConsole( "<" + config.getColorPrimary() + ">----------------------------------------------");
-        consoleLogger.broadCastToConsole( "<" + config.getColorPrimary() + ">   +==================+");
-        consoleLogger.broadCastToConsole( "<" + config.getColorPrimary() + ">   |  JozelotNetzwork |");
-        consoleLogger.broadCastToConsole( "<" + config.getColorPrimary() + ">   +==================+");
-        consoleLogger.broadCastToConsole( "<" + config.getColorPrimary() + ">----------------------------------------------");
-        consoleLogger.broadCastToConsole( "<" + config.getColorPrimary() + ">    Version: <" + config.getColorSecondary() + ">" + getVersion());
-        consoleLogger.broadCastToConsole( "<" + config.getColorPrimary() + ">----------------------------------------------");
+        pluginStartMessage();
+    }
 
+    private void pluginStartMessage() {
+        consoleLogger.broadCastToConsole("<" + config.getColorPrimary() + ">----------------------------------------------");
+        consoleLogger.broadCastToConsole("<" + config.getColorPrimary() + ">Velocity läuft in der <" + config.getColorSecondary() + ">" + server.getVersion().getVersion());
+        consoleLogger.broadCastToConsole("<" + config.getColorPrimary() + ">----------------------------------------------");
+        consoleLogger.broadCastToConsole("<" + config.getColorPrimary() + ">   +==================+");
+        consoleLogger.broadCastToConsole("<" + config.getColorPrimary() + ">   |  JozelotNetzwork |");
+        consoleLogger.broadCastToConsole("<" + config.getColorPrimary() + ">   +==================+");
+        consoleLogger.broadCastToConsole("<" + config.getColorPrimary() + ">----------------------------------------------");
+        consoleLogger.broadCastToConsole("<" + config.getColorPrimary() + ">    Version: <" + config.getColorSecondary() + ">" + getVersion());
+        consoleLogger.broadCastToConsole("<" + config.getColorPrimary() + ">----------------------------------------------");
     }
 
     /***
@@ -212,8 +219,6 @@ public class JozelotProxy {
         server.getAllPlayers().forEach(p -> playtimeListener.saveAndRemoveSession(p));
         mySQLSetup.close();
         redisSetup.close();
-
-
     }
 
     /*
@@ -286,8 +291,10 @@ public class JozelotProxy {
     public RedisManager getRedisManager() {
         return redisManager;
     }
+
     /**
      * Get the project version
+     *
      * @return String of the version
      */
     public String getVersion() {
