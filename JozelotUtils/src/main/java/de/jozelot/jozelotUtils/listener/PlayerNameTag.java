@@ -27,7 +27,6 @@ public class PlayerNameTag implements Listener {
         this.plugin = plugin;
         this.config = plugin.getConfigManager();
 
-        // LuckPerms Event Listener registrieren
         LuckPerms api = LuckPermsProvider.get();
         api.getEventBus().subscribe(plugin, net.luckperms.api.event.user.UserDataRecalculateEvent.class, e -> {
             Player player = Bukkit.getPlayer(e.getUser().getUniqueId());
@@ -81,12 +80,17 @@ public class PlayerNameTag implements Listener {
 
         Component prefixComponent = mm.deserialize(prefix);
         team.prefix(prefixComponent);
-        TextColor lastColor = findLastColor(prefixComponent);
 
-        if (lastColor != null) {
-            team.color(NamedTextColor.nearestTo(lastColor));
+        TextColor lastColor = findLastColor(prefixComponent);
+        NamedTextColor teamColor = (lastColor != null) ? NamedTextColor.nearestTo(lastColor) : NamedTextColor.WHITE;
+
+        if (plugin.getVanishManager().isVanished(player.getUniqueId())) {
+            team.suffix(mm.deserialize(" <green>[V]"));
+
+            team.color(teamColor);
         } else {
-            team.color(NamedTextColor.WHITE);
+            team.suffix(Component.empty());
+            team.color(teamColor);
         }
 
         if (!team.hasEntry(player.getName())) {
@@ -99,7 +103,6 @@ public class PlayerNameTag implements Listener {
 
     private TextColor findLastColor(Component component) {
         TextColor lastColor = component.color();
-
         for (Component child : component.children()) {
             TextColor childColor = findLastColor(child);
             if (childColor != null) {

@@ -9,6 +9,7 @@ import de.jozelot.jozelotUtils.storage.ConfigManager;
 import de.jozelot.jozelotUtils.storage.LangManager;
 import de.jozelot.jozelotUtils.utils.ConsoleLogger;
 import de.jozelot.jozelotUtils.utils.ReloadPlugin;
+import de.jozelot.jozelotUtils.utils.VanishManager;
 import org.apache.commons.codec.language.bm.Lang;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
@@ -31,12 +32,15 @@ public final class JozelotUtils extends JavaPlugin {
     private ReloadPlugin reloadPlugin;
     private PlayerNameTag playerNameTag;
     private ConsoleLogger consoleLogger;
+    private VanishManager vanishManager;
 
     @Override
     public void onEnable() {
         this.config = new ConfigManager(this);
         this.lang = new LangManager(this);
         this.lang.load();
+
+        this.vanishManager = new VanishManager(this);
 
         this.redisSetup = new RedisSetup(this);
         redisSetup.setup();
@@ -65,6 +69,7 @@ public final class JozelotUtils extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new WorldSettings(this), this);
         getServer().getPluginManager().registerEvents(new PlayerChatListener(this), this);
         getServer().getPluginManager().registerEvents(new FallOffListener(this), this);
+        getServer().getPluginManager().registerEvents(new VanishListener(this), this);
 
         playerNameTag = new PlayerNameTag(this);
         getServer().getPluginManager().registerEvents(playerNameTag, this);
@@ -151,6 +156,10 @@ public final class JozelotUtils extends JavaPlugin {
 
     public ConsoleLogger getConsoleLogger() {
         return consoleLogger;
+    }
+
+    public VanishManager getVanishManager() {
+        return vanishManager;
     }
 
 }

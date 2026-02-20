@@ -58,20 +58,24 @@ public class ServerSwitchListener {
         }
 
         server.getScheduler().buildTask(plugin, () -> {
-            for (Player player : server.getAllPlayers()) {
-                player.getCurrentServer().ifPresent(conn -> {
+            for (Player viewer : server.getAllPlayers()) {
+                // 1. Pings der Köpfe im Tab (TabListEntries)
+                updateTabEntryPings(viewer);
+
+                // 2. Header/Footer (Servername, Spieleranzahl, eigener Ping)
+                viewer.getCurrentServer().ifPresent(conn -> {
                     int groupId = plugin.getGroupManager().getGroupId(conn.getServerInfo().getName());
-                    boolean isEnabled = groupId != -1 && plugin.getGroupManager().isTabEnabled(groupId);
-                    if (isEnabled) {
-                        updateTabHeaderForPlayer(player, groupId);
-                        updateTabEntryPings(player);
-                    } else {
-                        player.sendPlayerListHeaderAndFooter(mm.deserialize(""),mm.deserialize( ""));
+                    if (groupId != -1) {
+                        updateTabHeaderForPlayer(viewer, groupId);
+                        // 3. Namen & Vanish-Status
+                        updateTabForGroup(viewer, conn.getServer());
                     }
                 });
             }
         }).repeat(Duration.ofSeconds(config.getTabRefreshTime())).schedule();
     }
+
+
 
     // ==================================================================================
     // 1. LOGIN-PHASE (VOR DEM BEITRITT)
@@ -82,7 +86,7 @@ public class ServerSwitchListener {
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
 
-        // 1. Ban-Check: Wer gebannt ist, kommt nicht rein (außer er hat die Bypass-Permission)
+        // 1. Ban-Check
         Map<String, String> banInfo = plugin.getMySQLManager().getActiveBan(uuid);
         if (banInfo != null && !player.hasPermission("network.ban.bypass")) {
             event.setResult(ResultedEvent.ComponentResult.denied(mm.deserialize(
@@ -90,7 +94,7 @@ public class ServerSwitchListener {
             return;
         }
 
-        // 2. Netzwerk-Wartung: Ist der Proxy im Wartungsmodus?
+        // 2. Netzwerk-Wartung
         if (plugin.getMySQLManager().isServerInMaintenance("proxy") &&
                 !player.hasPermission("network.maintenance.bypass.proxy")) {
             event.setResult(ResultedEvent.ComponentResult.denied(mm.deserialize(
@@ -121,7 +125,7 @@ public class ServerSwitchListener {
             return;
         }
 
-        // 4. Proxy-Kapazität: Ist das gesamte Netzwerk voll?
+        // 4. Proxy-Kapazität
         int maxProxy = plugin.getMySQLManager().getMaxPlayers("proxy");
         if (maxProxy > 0 && server.getPlayerCount() >= maxProxy && !player.hasPermission("network.maxplayers.bypass.proxy")) {
             event.setResult(ResultedEvent.ComponentResult.denied(mm.deserialize(
@@ -132,37 +136,22 @@ public class ServerSwitchListener {
     @Subscribe
     public void onServerKick(KickedFromServerEvent event) {
         Player player = event.getPlayer();
-
-        if (player.getCurrentServer().isEmpty()) {
-            return;
-        }
+        if (player.getCurrentServer().isEmpty()) return;
 
         String currentServerId = event.getServer().getServerInfo().getName();
-
-        if (currentServerId.equalsIgnoreCase(config.getLobbyServer())) {
-            return;
-        }
+        if (currentServerId.equalsIgnoreCase(config.getLobbyServer())) return;
 
         Optional<RegisteredServer> lobby = server.getServer(config.getLobbyServer());
-
         if (lobby.isPresent()) {
             String displayServerName = plugin.getMySQLManager().getServerDisplayName(currentServerId);
             String finalServerName = (displayServerName != null) ? displayServerName : currentServerId;
+            String kickReason = event.getServerKickReason().map(mm::serialize).orElse("Unbekannter Fehler");
 
-            String kickReason = event.getServerKickReason()
-                    .map(mm::serialize)
-                    .orElse("Unbekannter Fehler");
-
-            Map<String, String> placeholders = Map.of(
-                    "server", finalServerName,
-                    "reason", kickReason
-            );
-
+            Map<String, String> placeholders = Map.of("server", finalServerName, "reason", kickReason);
             event.setResult(KickedFromServerEvent.RedirectPlayer.create(lobby.get()));
 
             server.getScheduler().buildTask(plugin, () -> {
-                player.sendMessage(mm.deserialize(String.join("<newline>",
-                        lang.formatList("server-kick-redirect", placeholders))));
+                player.sendMessage(mm.deserialize(String.join("<newline>", lang.formatList("server-kick-redirect", placeholders))));
                 playSound(player, "error");
             }).delay(500, TimeUnit.MILLISECONDS).schedule();
         }
@@ -175,11 +164,8 @@ public class ServerSwitchListener {
         String username = player.getUsername();
 
         List<ServerLink> links = config.getServerLinks();
-        if (!links.isEmpty()) {
-            player.setServerLinks(links);
-        }
+        if (!links.isEmpty()) player.setServerLinks(links);
 
-        // Brand Name senden
         server.getScheduler().buildTask(plugin, () -> {
             plugin.getBrandNameChanger().sendBrandName(player, config.getBrandName());
         }).delay(250, TimeUnit.MILLISECONDS).schedule();
@@ -191,16 +177,43 @@ public class ServerSwitchListener {
         int protocolMax = config.getProtocalMax();
         String versionMax = ProtocolVersion.getProtocolVersion(protocolMax).getName();
 
-        // Datenbank-Aufgaben asynchron erledigen
         server.getScheduler().buildTask(plugin, () -> {
-            // Spieler in die Liste eintragen und prüfen, ob er neu ist
             boolean isNew = plugin.getMySQLManager().addToPlayerList(uuid, username, player.getRemoteAddress().getAddress().getHostAddress());
+
+            // 1. Vanish Status laden & setzen
+            boolean wasVanished = plugin.getMySQLManager().getVanishStatus(uuid);
+            if (wasVanished) {
+                // Korrektur: Nutze die neue Methode statt .getVanishedPlayers().add()
+                plugin.getVanishManager().setVanished(uuid, false);
+                plugin.getRedisManager().publish("network:vanish", uuid + ":true:false");
+                refreshGroupTab(null);
+            }
+
+            // 2. Spy Status laden & setzen
+            boolean isSpy = plugin.getMySQLManager().getSpyStatus(uuid) && player.hasPermission("network.command.spy");
+            if (isSpy) {
+                plugin.getSpyPlayers().add(uuid);
+            } else if (plugin.getMySQLManager().getSpyStatus(uuid)) {
+                plugin.getMySQLManager().setSpyStatus(uuid, false);
+            }
+
+            // 3. Action Bar Logik (Null-Safe & Sequenziell)
+            if (wasVanished && isSpy) {
+                player.sendActionBar(mm.deserialize(lang.format("command-vanish-enabled", Map.of("player", username))));
+                server.getScheduler().buildTask(plugin, () -> {
+                    player.sendActionBar(mm.deserialize(lang.format("command-spy-enabled", Map.of())));
+                }).delay(3, TimeUnit.SECONDS).schedule();
+            } else if (wasVanished) {
+                player.sendActionBar(mm.deserialize(lang.format("command-vanish-enabled", Map.of("player", username))));
+            } else if (isSpy) {
+                player.sendActionBar(mm.deserialize(lang.format("command-spy-enabled", Map.of())));
+            }
+
             if (isNew) {
                 lang.formatList("first-join", Map.of("player-name", username))
                         .forEach(line -> player.sendMessage(mm.deserialize(line)));
             }
 
-            // Info für Admins, wenn sie trotz eines aktiven Bans joinen
             if (player.hasPermission("network.ban.bypass")) {
                 Map<String, String> ban = plugin.getMySQLManager().getActiveBan(uuid);
                 if (ban != null) {
@@ -219,19 +232,7 @@ public class ServerSwitchListener {
             }
         }).schedule();
 
-        plugin.getLoginTimes().put(player.getUniqueId(), System.currentTimeMillis());
-        plugin.getServer().getScheduler().buildTask(plugin, () -> {
-            boolean isSpy = plugin.getMySQLManager().getSpyStatus(player.getUniqueId());
-
-            if (isSpy) {
-                if (player.hasPermission("network.command.spy")) {
-                    plugin.getSpyPlayers().add(player.getUniqueId());
-                    player.sendActionBar(mm.deserialize(plugin.getLang().format("command-spy-enabled", null)));
-                } else {
-                    plugin.getMySQLManager().setSpyStatus(player.getUniqueId(), false);
-                }
-            }
-        }).schedule();
+        plugin.getLoginTimes().put(uuid, System.currentTimeMillis());
     }
 
     // ==================================================================================
@@ -244,7 +245,6 @@ public class ServerSwitchListener {
         RegisteredServer target = event.getOriginalServer();
         String name = target.getServerInfo().getName();
 
-        // 1. Forced-Host Check (Nur beim ersten Betreten des Proxys)
         if (player.getCurrentServer().isEmpty()) {
             player.getVirtualHost().ifPresent(host -> {
                 if (host.getHostName().contains(".") && !player.hasPermission("network.forcedhost.all") && !player.hasPermission("network.forcedhost." + name)) {
@@ -255,21 +255,18 @@ public class ServerSwitchListener {
             if (!event.getResult().isAllowed()) return;
         }
 
-        // 2. Whitelist Check (Proxy weit oder Gruppen spezifisch)
         if (!isWhitelisted(player, name)) {
             event.setResult(ServerPreConnectEvent.ServerResult.denied());
             handleDenial(player, "command-whitelist-kick", Map.of("group", name));
             return;
         }
 
-        // 3. Wartungsarneiten für den Zielserver
         if (plugin.getMySQLManager().isServerInMaintenance(name) && !player.hasPermission("network.maintenance.bypass." + name)) {
             event.setResult(ServerPreConnectEvent.ServerResult.denied());
             handleDenial(player, "server-maintenance-no-access", Map.of("server-name", name));
             return;
         }
 
-        // 4. Max Player Check für den Zielserver
         int max = plugin.getMySQLManager().getMaxPlayers(name);
         if (max > 0 && target.getPlayersConnected().size() >= max && !player.hasPermission("network.maxplayers.bypass." + name)) {
             event.setResult(ServerPreConnectEvent.ServerResult.denied());
@@ -298,7 +295,6 @@ public class ServerSwitchListener {
         server.getScheduler().buildTask(plugin, () -> {
             plugin.getMySQLManager().updatePlayerServer(player.getUniqueId(), serverName);
             refreshGroupTab(serverName);
-
         }).delay(Duration.ofMillis(200)).schedule();
     }
 
@@ -317,14 +313,10 @@ public class ServerSwitchListener {
 
     private boolean isWhitelisted(Player p, String serverName) {
         if (p.hasPermission("network.whitelist.bypass")) return true;
-
-        // Globale Whitelist prüfen
         if (plugin.getMySQLManager().isWhitelistActive("proxy")) {
             int gid = plugin.getMySQLManager().getGroupIdByIdentifier("proxy");
             if (!plugin.getMySQLManager().isWhitelisted(p.getUniqueId(), gid)) return false;
         }
-
-        // Spezifische Gruppen Whitelist prüfen
         int gid = plugin.getGroupManager().getGroupId(serverName);
         if (gid != -1) {
             String identifier = plugin.getGroupManager().getGroupIdentifier(gid);
@@ -347,56 +339,64 @@ public class ServerSwitchListener {
     // 4. TABLISTEN-STYLING
     // ==================================================================================
 
-    public void updateTabForGroup(Player player, RegisteredServer connectedServer) {
+    // ==================================================================================
+    // 4. TABLISTEN-STYLING
+    // ==================================================================================
+
+    public void updateTabForGroup(Player viewer, RegisteredServer connectedServer) {
         int groupId = plugin.getGroupManager().getGroupId(connectedServer.getServerInfo().getName());
-        if (groupId == -1) return;
+        if (groupId == -1 || !plugin.getGroupManager().isTabEnabled(groupId)) return;
 
-        boolean tabEnabled = plugin.getGroupManager().isTabEnabled(groupId);
-
-        // WICHTIG: Wenn Tab AUS ist, machen wir einfach NICHTS.
-        // Wir löschen nichts, wir adden nichts.
-        // Dadurch "sieht" der Client nur die Pakete, die direkt vom Unterserver kommen.
-        if (!tabEnabled) {
-            return;
-        }
-
-        // Ab hier: Proxy-Tab-Logik (wenn aktiviert)
-        List<Player> groupPlayers = server.getAllPlayers().stream()
+        List<Player> playersInGroup = server.getAllPlayers().stream()
                 .filter(p -> p.getCurrentServer().isPresent())
                 .filter(p -> plugin.getGroupManager().getGroupId(p.getCurrentServer().get().getServerInfo().getName()) == groupId)
                 .collect(Collectors.toList());
 
-        for (Player viewer : groupPlayers) {
-            // Falls der Viewer auf einem Server ist, der KEIN Proxy-Tab will, überspringen
-            int viewerGroupId = viewer.getCurrentServer()
-                    .map(c -> plugin.getGroupManager().getGroupId(c.getServerInfo().getName()))
-                    .orElse(-1);
-            if (viewerGroupId == -1 || !plugin.getGroupManager().isTabEnabled(viewerGroupId)) continue;
-
-            for (Player target : groupPlayers) {
-                String prefix = plugin.getLuckpermsUtils().getPlayerPrefix(target);
-                int weight = plugin.getLuckpermsUtils().getWeight(target); // Sortierung wie gewünscht direkt
-
-                String displayNameRaw = "<reset><italic:false>" + lang.format("tab-player-format", Map.of(
-                        "rank-prefix", prefix != null ? prefix : "",
-                        "player-name", target.getUsername()
-                ));
-
-                viewer.getTabList().getEntry(target.getUniqueId()).ifPresentOrElse(entry -> {
-                    entry.setDisplayName(mm.deserialize(displayNameRaw));
-                    entry.setLatency((int) target.getPing());
-                    entry.setListOrder(weight);
-                }, () -> {
-                    viewer.getTabList().addEntry(TabListEntry.builder()
-                            .profile(target.getGameProfile())
-                            .tabList(viewer.getTabList())
-                            .latency((int) target.getPing())
-                            .displayName(mm.deserialize(displayNameRaw))
-                            .listOrder(weight)
-                            .build());
-                });
+        for (Player target : playersInGroup) {
+            // Vanish Check
+            if (!plugin.getVanishManager().canSee(viewer, target)) {
+                viewer.getTabList().removeEntry(target.getUniqueId());
+                continue;
             }
+
+            String prefix = plugin.getLuckpermsUtils().getPlayerPrefix(target);
+            int weight = plugin.getLuckpermsUtils().getWeight(target);
+            String name = target.getUsername();
+
+            // Vanish Suffix: [V] in Lime hinter dem Namen
+            String vanishSuffix = plugin.getVanishManager().isVanished(target.getUniqueId()) ? " <green>[V]" : "";
+
+            String displayNameRaw = "<reset><italic:false>" + lang.format("tab-player-format", Map.of(
+                    "rank-prefix", prefix != null ? prefix : "",
+                    "player-name", name
+            )) + vanishSuffix;
+
+            viewer.getTabList().getEntry(target.getUniqueId()).ifPresentOrElse(entry -> {
+                entry.setDisplayName(mm.deserialize(displayNameRaw));
+                // WICHTIG: Hier den aktuellen Ping setzen
+                entry.setLatency((int) target.getPing());
+                entry.setListOrder(weight);
+            }, () -> {
+                viewer.getTabList().addEntry(TabListEntry.builder()
+                        .profile(target.getGameProfile())
+                        .tabList(viewer.getTabList())
+                        .latency((int) target.getPing())
+                        .displayName(mm.deserialize(displayNameRaw))
+                        .listOrder(weight)
+                        .build());
+            });
         }
+
+        // Cleanup: Spieler entfernen, die nicht mehr in der Gruppe sind
+        Set<UUID> groupPlayerUuids = playersInGroup.stream()
+                .map(Player::getUniqueId)
+                .collect(Collectors.toSet());
+
+        viewer.getTabList().getEntries().forEach(entry -> {
+            if (!groupPlayerUuids.contains(entry.getProfile().getId())) {
+                viewer.getTabList().removeEntry(entry.getProfile().getId());
+            }
+        });
     }
 
     private void updateTabEntryPings(Player viewer) {
@@ -412,7 +412,6 @@ public class ServerSwitchListener {
     public void updateTabHeaderForPlayer(Player p, int groupId) {
         String groupName = plugin.getGroupManager().getGroupName(groupId);
         List<String> serversInGroup = plugin.getGroupManager().getServersInGroup(groupId);
-
         String currentServerInternal = p.getCurrentServer().map(conn -> conn.getServerInfo().getName()).orElse("Unbekannt");
         String currentServerDisplay = plugin.getMySQLManager().getServerDisplayName(currentServerInternal);
         String serverNameToShow = (currentServerDisplay != null) ? currentServerDisplay : currentServerInternal;
@@ -423,7 +422,7 @@ public class ServerSwitchListener {
                 "group-info", infoLine,
                 "group-name", groupName,
                 "server-name", serverNameToShow,
-                "online-players", String.valueOf(plugin.getServer().getAllPlayers().size()),
+                "online-players", String.valueOf(server.getAllPlayers().size()),
                 "ping", String.valueOf(p.getPing())
         );
 
@@ -440,47 +439,46 @@ public class ServerSwitchListener {
     }
 
     private void refreshGroupTab(String serverName) {
+        if (serverName == null) {
+            updateAllTabs();
+            return;
+        }
+
         int groupId = plugin.getGroupManager().getGroupId(serverName);
         if (groupId == -1) return;
 
-        List<Player> groupPlayers = server.getAllPlayers().stream()
-                .filter(p -> p.getCurrentServer().isPresent())
-                .filter(p -> plugin.getGroupManager().getGroupId(p.getCurrentServer().get().getServerInfo().getName()) == groupId)
-                .collect(Collectors.toList());
-
-        for (Player p : groupPlayers) {
-            p.getCurrentServer().ifPresent(conn -> updateTabForGroup(p, conn.getServer()));
+        for (Player p : server.getAllPlayers()) {
+            p.getCurrentServer().ifPresent(conn -> {
+                if (plugin.getGroupManager().getGroupId(conn.getServerInfo().getName()) == groupId) {
+                    updateTabForGroup(p, conn.getServer());
+                }
+            });
         }
     }
 
     @Subscribe
     public void onPostServerConnect(ServerPostConnectEvent event) {
-        Player player = event.getPlayer();
-
         playSound(event.getPlayer(), "success");
     }
 
     private void playSound(CommandSource source, String soundKey) {
         if (!(source instanceof Player player)) return;
-
         String soundPath = lang.getRaw("sounds." + soundKey);
         if (soundPath == null || soundPath.isEmpty()) return;
-
         try {
             String cleanedPath = soundPath.trim().toLowerCase();
-            if (!cleanedPath.contains(":")) {
-                cleanedPath = "minecraft:" + cleanedPath;
-            }
+            if (!cleanedPath.contains(":")) cleanedPath = "minecraft:" + cleanedPath;
+            player.playSound(Sound.sound(Key.key(cleanedPath), Sound.Source.UI, 1.0f, 1.0f), Sound.Emitter.self());
+        } catch (Exception ignored) {}
+    }
 
-            Sound sound = Sound.sound(
-                    Key.key(cleanedPath),
-                    Sound.Source.UI,
-                    1.0f,
-                    1.0f
-            );
-            player.playSound(sound, Sound.Emitter.self());
-        } catch (Exception e) {
+    public void updateAllTabs() {
+        for (Player all : server.getAllPlayers()) {
+            all.getCurrentServer().ifPresent(conn -> {
+                updateTabForGroup(all, conn.getServer());
+            });
         }
     }
-    // playSound(source, "error");
+
+
 }

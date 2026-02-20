@@ -98,13 +98,13 @@ public class BanCommand implements SimpleCommand {
                 return;
             }
 
-            source.sendMessage(mm.deserialize(lang.format("command-ban-success", Map.of("player-name", args[0], "reason", reason))));
+            source.sendMessage(mm.deserialize(lang.format("command-ban-success", Map.of("player-name", args[0], "reason", reason, "duration", timeArgs))));
             String name = (source instanceof Player player) ? player.getUsername() : "Konsole";
 
             consoleLogger.broadCastToConsole("<" + config.getColorSecondary() + ">" + name + "<" + config.getColorPrimary() + "> hat " + args[0] + " gebannt. Länge: " + timeArgs  + " - " + " Grund: " + reason);
             for (Player player : server.getAllPlayers()) {
                 if (player.hasPermission("network.get.logs") && !player.equals(source)) {
-                    player.sendMessage(mm.deserialize(lang.format("command-ban-success-admin", Map.of("player-name", name, "ban-name", args[0], "duration", timeArgs))));
+                    player.sendMessage(mm.deserialize(lang.format("command-ban-success-admin", Map.of("player-name", name, "target-name", args[0], "duration", timeArgs, "reason", reason))));
                 }
             }
 

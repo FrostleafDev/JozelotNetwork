@@ -8,17 +8,17 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 import java.util.Map;
 
-
 public class JoinListener implements Listener {
 
     private final ConfigManager config;
     private final LangManager lang;
-    private MiniMessage mm = MiniMessage.miniMessage();
+    private final MiniMessage mm = MiniMessage.miniMessage();
     private final JozelotUtils plugin;
 
     public JoinListener(JozelotUtils plugin) {
@@ -27,10 +27,23 @@ public class JoinListener implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOW)
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
+        boolean isVanished = plugin.getVanishManager().isVanished(player.getUniqueId());
 
+        // 1. Vanish Sichtbarkeit & Join-Message
+        if (isVanished) {
+            event.joinMessage(null); // Nachricht komplett unterdrücken
+            plugin.getVanishManager().updatePlayerVanish(player);
+        } else {
+            handleJoinMessage(event, player);
+        }
+
+        // 2. Alle anderen versteckten Spieler für den neuen Spieler ausblenden
+        plugin.getVanishManager().updateAllForPlayer(player);
+
+        // 3. Spielmodus setzen
         try {
             GameMode gm = GameMode.valueOf(config.getDefaultGamemode().toUpperCase());
             player.setGameMode(gm);
@@ -38,14 +51,11 @@ public class JoinListener implements Listener {
             player.setGameMode(GameMode.SURVIVAL);
         }
 
+        // 4. Flugmodus (verzögert wegen Teleportation/Join-Lags)
         plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
-            if (player.hasPermission("network.utils.join.fly") && config.isAutomaticFlight()) {
+            if ((player.hasPermission("network.utils.join.fly") && config.isAutomaticFlight()) || config.isAutomaticFlightPlayer()) {
                 enableFly(player);
-            }
-            else if (config.isAutomaticFlightPlayer()) {
-                enableFly(player);
-            }
-            else {
+            } else {
                 player.setFlying(false);
                 player.setAllowFlight(false);
             }
@@ -53,33 +63,34 @@ public class JoinListener implements Listener {
 
         player.setFlySpeed(0.1f);
 
-        if (config.getJoinMessageType().equalsIgnoreCase("default")) return;
-        else if (config.getJoinMessageType().equalsIgnoreCase("custom")) {
-            Bukkit.getOnlinePlayers().stream()
-                    .filter(p -> !p.getUniqueId().equals(player.getUniqueId()))
-                    .forEach(p -> p.sendMessage(mm.deserialize(lang.format("join-message", Map.of("player-name", player.getName())))));
-        }
-        event.setJoinMessage("");
-
+        // 5. XP & Hotbar
         if (config.isCustomExperienceLevel()) {
             player.setLevel(config.getCustomExperienceLevel());
-            // player.setExp(0.0F);
         }
         if (config.isCustomBarLevel()) {
-            int procent = config.getCustomBarLevel();
-            float xp = procent / 100.0f;
-            player.setExp(xp);
+            player.setExp(config.getCustomBarLevel() / 100.0f);
         }
-
         if (config.getDefaultHotbarSlot() != -1) {
             player.getInventory().setHeldItemSlot(config.getDefaultHotbarSlot());
         }
     }
 
+    private void handleJoinMessage(PlayerJoinEvent event, Player player) {
+        if (config.getJoinMessageType().equalsIgnoreCase("disabled")) {
+            event.joinMessage(null);
+        } else if (config.getJoinMessageType().equalsIgnoreCase("custom")) {
+            event.joinMessage(null); // Standardnachricht weg
+            String msg = lang.format("join-message", Map.of("player-name", player.getName()));
+            if (msg != null && !msg.isEmpty()) {
+                Bukkit.broadcast(mm.deserialize(msg));
+            }
+        }
+        // Bei "default" lassen wir Bukkit die Nachricht einfach schicken
+    }
+
     private void enableFly(Player player) {
         player.setAllowFlight(true);
         player.setFlying(true);
-
         if (player.isOnGround()) {
             player.teleport(player.getLocation().add(0, 0.1, 0));
         }

@@ -66,7 +66,7 @@ public class MySQLManager {
                         "id INT AUTO_INCREMENT PRIMARY KEY," +
                         "player_uuid CHAR(36)," +
                         "operator_uuid CHAR(36)," +
-                        "type ENUM('BAN', 'KICK')," +
+                        "type ENUM('BAN', 'KICK', 'MUTE', 'SHADOWMUTE')," +
                         "reason VARCHAR(400)," +
                         "start_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
                         "end_at TIMESTAMP NULL," +
@@ -1066,4 +1066,124 @@ public class MySQLManager {
         }
         return false;
     }
+
+
+    public Map<String, String> getActivePunishment(UUID uuid, String type) {
+        String cleanupSql = "UPDATE punishment SET is_active = FALSE WHERE player_uuid = ? AND type = ? AND is_active = TRUE AND end_at <= CURRENT_TIMESTAMP;";
+        String selectSql = "SELECT p.reason, p.end_at, pl.username AS operator_name " +
+                "FROM punishment p " +
+                "LEFT JOIN player pl ON p.operator_uuid = pl.uuid " +
+                "WHERE p.player_uuid = ? AND p.type = ? AND p.is_active = TRUE LIMIT 1;";
+
+        try (Connection conn = mySQLSetup.getConnection()) {
+            try (PreparedStatement cleanupStmt = conn.prepareStatement(cleanupSql)) {
+                cleanupStmt.setString(1, uuid.toString());
+                cleanupStmt.setString(2, type);
+                cleanupStmt.executeUpdate();
+            }
+
+            try (PreparedStatement pstmt = conn.prepareStatement(selectSql)) {
+                pstmt.setString(1, uuid.toString());
+                pstmt.setString(2, type);
+                try (ResultSet rs = pstmt.executeQuery()) {
+                    if (rs.next()) {
+                        Map<String, String> info = new HashMap<>();
+                        info.put("reason", rs.getString("reason"));
+                        Timestamp endAt = rs.getTimestamp("end_at");
+                        info.put("duration", (endAt == null) ? "Permanent" : new java.text.SimpleDateFormat("dd.MM.yyyy HH:mm").format(endAt));
+                        info.put("operator", rs.getString("operator_name") != null ? rs.getString("operator_name") : "Konsole");
+                        return info;
+                    }
+                }
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return null;
+    }
+
+    public List<String> getMutedPlayerNames() {
+        List<String> mutedPlayers = new ArrayList<>();
+        String sql = "SELECT DISTINCT p.username FROM player p " +
+                "JOIN punishment pun ON p.uuid = pun.player_uuid " +
+                "WHERE pun.is_active = TRUE AND (pun.type = 'MUTE' OR pun.type = 'SHADOWMUTE') " +
+                "AND (pun.end_at > CURRENT_TIMESTAMP OR pun.end_at IS NULL);";
+
+        try (Connection conn = mySQLSetup.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                mutedPlayers.add(rs.getString("username"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return mutedPlayers;
+    }
+
+    public List<Map<String, String>> getAllActiveMutes() {
+        List<Map<String, String>> mutes = new ArrayList<>();
+        String sql = "SELECT p.username AS target_name, op.username AS operator_name, pun.reason, pun.end_at, pun.operator_uuid, pun.type " +
+                "FROM punishment pun " +
+                "JOIN player p ON pun.player_uuid = p.uuid " +
+                "LEFT JOIN player op ON pun.operator_uuid = op.uuid " +
+                "WHERE pun.is_active = TRUE AND (pun.type = 'MUTE' OR pun.type = 'SHADOWMUTE') " +
+                "AND (pun.end_at > CURRENT_TIMESTAMP OR pun.end_at IS NULL) " +
+                "ORDER BY pun.start_at DESC;";
+
+        try (Connection conn = mySQLSetup.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                Map<String, String> mute = new HashMap<>();
+
+                String type = rs.getString("type");
+                String targetName = rs.getString("target_name");
+                mute.put("target", type.equalsIgnoreCase("SHADOWMUTE") ? targetName + " (S)" : targetName);
+
+                String opUuid = rs.getString("operator_uuid");
+                String opName = rs.getString("operator_name");
+                mute.put("operator", opUuid.equals("00000000-0000-0000-0000-000000000000") ? "Konsole" : (opName != null ? opName : "Unbekannt"));
+
+                mute.put("reason", rs.getString("reason"));
+
+                Timestamp endAt = rs.getTimestamp("end_at");
+                mute.put("duration", endAt == null ? "Permanent" : new java.text.SimpleDateFormat("dd.MM.yyyy HH:mm").format(endAt));
+
+                mutes.add(mute);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return mutes;
+    }
+
+    public void updateVanishStatus(UUID uuid, boolean state) {
+        String sql = "UPDATE player_state SET is_vanish = ? WHERE uuid = ?;";
+        try (Connection conn = mySQLSetup.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setBoolean(1, state);
+            pstmt.setString(2, uuid.toString());
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean getVanishStatus(UUID uuid) {
+        String sql = "SELECT is_vanish FROM player_state WHERE uuid = ?;";
+        try (Connection conn = mySQLSetup.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, uuid.toString());
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getBoolean("is_vanish");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 }

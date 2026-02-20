@@ -113,8 +113,8 @@ command-ban-player-not-found: '{grey}Der Spieler {danger}{player-name}{grey} war
 command-ban-invalid-time: '{grey}Das Format für die Banlänge ist falsch: {danger}{input}'
 command-ban-already-banned: '{danger}{player-name} {grey}ist bereits gebannt'
 command-ban-hierarchy-error: '{grey}Du kannst {danger}{player-name}{grey} nicht bannen!'
-command-ban-success: '{grey}Du hast {primary}{player-name}{grey} erfolgreich gebannt. Grund: {primary}{reason}'
-command-ban-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat {primary}{ban-name} {grey}gebannt. Länge:{primary} {duration}'
+command-ban-success: '{grey}Du hast {primary}{player-name}{grey} erfolgreich gebannt. Grund: {primary}{reason} {grey}| Dauer: {primary}{duration}'
+command-ban-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat {primary}{target-name} {grey}gebannt. Grund: {primary}{reason} {grey}| Dauer: {primary}{duration}'
 
 ban-kick-screen:
   - "<gradient:#f90036:#f90011><b>AUSSCHLUSS VOM NETZWERK</b></gradient>"
@@ -164,7 +164,7 @@ command-kick-usage: '{tertiary}/kick <Spieler> <Grund>'
 command-kick-player-not-online: '{danger}{player-name}{grey} ist nicht online'
 command-kick-hierarchy-error: '{grey}Du kannst {danger}{player-name} {grey}nicht kicken'
 command-kick-success: '{grey}Du hast {primary}{player-name}{grey} erfolgreich gekickt. Grund: {primary}{reason}'
-command-kick-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat {primary}{ban-name} {grey}gekickt.'
+command-kick-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat {primary}{target-name} {grey}gekickt. Grund: {primary}{reason}'
 
 kick-screen:
   - "<gradient:#f90036:#f90011><b>VERBINDUNG GETRENNT</b></gradient>"
@@ -391,7 +391,7 @@ command-playerinfo-sucess:
   - "  <dark_gray>» {secondary}Allgemein:"
   - "    {grey}UUID: <white><click:copy_to_clipboard:'{uuid}'><hover:show_text:'{primary}Klicken zum Kopieren'>{uuid}</hover></click></white>"
   - "    {grey}Version: <white>{version}</white>"
-  - "    {grey}Client: <white>{client]</white>"
+  - "    {grey}Client: <white>{client}</white>"
   - "    {grey}Online seit: <white>{online_time}</white>"
   - ""
   - "  <dark_gray>» {secondary}Verbindung:"
@@ -449,8 +449,42 @@ server-kick-redirect:
   - "  {grey}Du wurdest zur {primary}Lobby {grey}verschoben."
   - ""
 
+command-mute-usage: '{tertiary}/mute <Spieler> <Zeit> <Grund>'
+command-mute-player-not-found: '{grey}Der Spieler {danger}{player-name}{grey} war noch nie auf dem Netzwerk'
+command-mute-invalid-time: '{grey}Das Format für die Mutelänge ist falsch: {danger}{input}'
+command-mute-already-muted: '{danger}{player-name} {grey}ist bereits gemutet'
+command-mute-hierarchy-error: '{grey}Du kannst {danger}{player-name}{grey} nicht muten!'
+command-mute-success: '{grey}Du hast {primary}{player-name}{grey} erfolgreich gemutet ({type}). Grund: {primary}{reason} {grey}| Dauer: {primary}{duration}'
+command-mute-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat {primary}{mute-name} {grey}gemutet. Grund: {primary}{reason} {grey}| Dauer: {primary}{duration}'
 
+mute-notification:
+  - ""
+  - "<gradient:#f90036:#f90011><b>CHATAUSSCHLUSS</b></gradient>"
+  - "{grey}Du wurdest soeben vom Chat ausgeschlossen."
+  - ""
+  - "{grey}Grund: <white>{reason}"
+  - "{grey}Dauer: <white>{duration}"
+  - ""
+  - "{grey}Verhalte dich künftig regelkonform."
+  - ""
 
+mute-chat-info:
+  - "{danger}Du bist gemutet! {grey}Grund: <white>{reason} {grey}| Dauer: <white>{duration}"
 
+command-unmute-usage: '{tertiary}/unmute <Spieler>'
+command-unmute-success: '{primary}{player-name} {grey}wurde entmutet'
+command-unmute-not-muted: '{danger}{player-name} {grey}ist nicht gemutet'
+command-unmute-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat {primary}{mute-name} {grey}entmutet'
 
+command-mutelist-empty: '{grey}Es sind aktuell keine Spieler gemutet.'
+command-mutelist-header: '{grey}--- {danger}Aktive Mutes {grey}({primary}{count}{grey}) ---'
+command-mutelist-entry: '{grey}• {primary}{target} {grey}| Grund: {primary}{reason} {grey}| Von: {danger}{operator} {grey}({primary}{duration}{grey})'
+command-mutelist-footer: '{grey}---------------------'
 
+command-vanish-enabled: "{grey}Dein Vanish wurde {primary}aktiviert{grey}"
+command-vanish-disabled: "{grey}Dein Vanish wurde {danger}deaktiviert{grey}"
+
+command-vanish-target-enabled: "{grey}Dein Vanish wurde {primary}aktiviert{grey}"
+command-vanish-target-disabled: "{grey}Dein Vanish wurde {danger}deaktiviert{grey}"
+
+command-vanish-log: "{grey}[<gradient:#f90036:#f90011><b>LOG</b></gradient>{grey}] {primary}{player} {grey}hat Vanish {secondary}{state} {tertiary}{info}"

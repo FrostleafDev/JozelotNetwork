@@ -59,6 +59,8 @@ public class JozelotProxy {
     private LuckPerms luckPerms;
     private LuckpermsUtils luckpermsUtils;
     private BrandNameChanger brandNameChanger;
+    private VanishManager vanishManager;
+    private ServerSwitchListener serverSwitchListener;
 
     private PlaytimeListener playtimeListener;
 
@@ -114,6 +116,7 @@ public class JozelotProxy {
         this.pteroManager = new PteroManager(this);
         logger.info("Utils geladen");
         consoleLogger.broadCastToConsole("Plugin Logger gestartet");
+        this.vanishManager = new VanishManager(this);
 
         this.redisSetup = new RedisSetup(this);
         redisSetup.setup();
@@ -133,6 +136,7 @@ public class JozelotProxy {
         }
         this.luckpermsUtils = new LuckpermsUtils(this);
         brandNameChanger = new BrandNameChanger();
+
 
         // REGISTER COMMANDS
         CommandManager cm = server.getCommandManager();
@@ -159,6 +163,12 @@ public class JozelotProxy {
         CommandMeta spyMeta = cm.metaBuilder("spy").build();
         CommandMeta clientInfoMeta = cm.metaBuilder("client").aliases("version", "mods").build();
 
+        CommandMeta vanishMeta = cm.metaBuilder("vanish").aliases("v").build();
+
+        CommandMeta muteMeta = cm.metaBuilder("mute").aliases("shadowmute").build();
+        CommandMeta mutelistMeta = cm.metaBuilder("mutelist").build();
+        CommandMeta unmuteMeta = cm.metaBuilder("unmute").build();
+
         cm.register(hubMeta, new LobbyCommand(this));
         cm.register(networkMeta, new NetworkCommand(this));
         cm.register(clearchatMeta, new ClearChatCommand(this));
@@ -182,11 +192,19 @@ public class JozelotProxy {
         cm.register(spyMeta, new SpyCommand(this));
         cm.register(clientInfoMeta, new ClientInfoCommands(this));
 
+
+        cm.register(muteMeta, new MuteCommand(this));
+        cm.register(mutelistMeta, new MuteListCommand(this));
+        cm.register(unmuteMeta, new UnmuteCommand(this));
+        cm.register(vanishMeta, new VanishCommand(this));
+
         this.playtimeListener = new PlaytimeListener(this);
         consoleLogger.broadCastToConsole("Commands erstellt");
 
+        this.serverSwitchListener = new ServerSwitchListener(this);
+
         // REGISTER LISTENER
-        server.getEventManager().register(this, new ServerSwitchListener(this));
+        server.getEventManager().register(this, serverSwitchListener);
         server.getEventManager().register(this, new ProxyPingListener(this));
         server.getEventManager().register(this, new GroupChatListener(this));
         server.getEventManager().register(this, playtimeListener);
@@ -313,5 +331,13 @@ public class JozelotProxy {
 
     public Set<UUID> getSpyPlayers() {
         return spyPlayers;
+    }
+
+    public VanishManager getVanishManager() {
+        return vanishManager;
+    }
+
+    public ServerSwitchListener getServerSwitchListener() {
+        return serverSwitchListener;
     }
 }

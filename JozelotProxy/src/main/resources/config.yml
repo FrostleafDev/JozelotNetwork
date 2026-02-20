@@ -133,7 +133,10 @@ color-settings:
 # network.network.manage (.server.start/stop/restart/status)
 # network.maintenance.bypass.all | .<server>
 # network.forcedhost.all | .<server>
-# network.command.ban | .unban | .banlist | .kick
+# network.command.ban | .unban | .banlist | .kick | .mute | .unmute | .mutelist
+# network.command.vanish | .vanish.other
+# network.vanish.see-all
+# network.vanish.see-team
 # network.ban.bypass
 # network.command.tpo | .tpohere | .send | .server
 # network.command.whitelist | network.whitelist.bypass
