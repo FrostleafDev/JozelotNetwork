@@ -1,0 +1,31 @@
+# DATABASE
+mysql:
+  host: 'localhost'
+  port: 3306
+  database: 'jozelot_network'
+  user: ''
+  password: ''
+
+# CACHE
+redis:
+  host: 'localhost'
+  port: 6379
+  password: ''
+
+
+color-settings:
+  primary: '#00A4FC'
+  secondary: '#00FC00'
+  tertiary: '#FCE300'
+  danger: '#f90036'
+  grey: '#A8A8A8'
+
+items:
+  navigator:
+    name: '<reset><gold>Navigator'
+    item: COMPASS
+    slot: 4
+    description:
+      - ''
+      - '<reset><gray>Hier kannst du auswählen'
+      - 'auf welchen Server du spielen möchtest'
