@@ -416,13 +416,17 @@ public class ServerSwitchListener {
         String currentServerDisplay = plugin.getMySQLManager().getServerDisplayName(currentServerInternal);
         String serverNameToShow = (currentServerDisplay != null) ? currentServerDisplay : currentServerInternal;
 
+        long visiblePlayersCount = server.getAllPlayers().stream()
+                .filter(target -> plugin.getVanishManager().canSee(p, target))
+                .count();
+
         String infoLine = (serversInGroup.size() <= 1) ? "(Lokal)" : groupName + " (Netzwerk)";
 
         Map<String, String> placeholders = Map.of(
                 "group-info", infoLine,
                 "group-name", groupName,
                 "server-name", serverNameToShow,
-                "online-players", String.valueOf(server.getAllPlayers().size()),
+                "online-players", String.valueOf(visiblePlayersCount),
                 "ping", String.valueOf(p.getPing())
         );
 

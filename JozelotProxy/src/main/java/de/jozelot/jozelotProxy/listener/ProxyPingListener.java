@@ -6,19 +6,17 @@ import com.velocitypowered.api.proxy.server.ServerPing;
 import com.velocitypowered.api.util.Favicon;
 import de.jozelot.jozelotProxy.JozelotProxy;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import java.util.concurrent.ConcurrentHashMap;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ProxyPingListener {
 
     private final JozelotProxy plugin;
     private final MiniMessage mm = MiniMessage.miniMessage();
-
     private final Map<String, Favicon> faviconCache = new ConcurrentHashMap<>();
 
     public ProxyPingListener(JozelotProxy plugin) {
@@ -53,12 +51,25 @@ public class ProxyPingListener {
 
         boolean proxyMaintenance = plugin.getMySQLManager().isServerInMaintenance("proxy");
         boolean specificMaintenance = plugin.getMySQLManager().isServerInMaintenance(serverIdentifier);
-
         boolean showMaintenanceMode = proxyMaintenance || specificMaintenance;
 
-        int onlineCount = serverIdentifier.equals("proxy")
-                ? plugin.getServer().getPlayerCount()
-                : plugin.getServer().getServer(serverIdentifier).map(s -> s.getPlayersConnected().size()).orElse(0);
+        // BERECHNUNG DER SPIELERZAHL (Vanish abziehen)
+        int onlineCount;
+        if (serverIdentifier.equals("proxy")) {
+            long vanishedCount = plugin.getServer().getAllPlayers().stream()
+                    .filter(p -> plugin.getVanishManager().isVanished(p.getUniqueId()))
+                    .count();
+            onlineCount = (int) (plugin.getServer().getPlayerCount() - vanishedCount);
+        } else {
+            onlineCount = plugin.getServer().getServer(serverIdentifier).map(s -> {
+                long vanishedOnServer = s.getPlayersConnected().stream()
+                        .filter(p -> plugin.getVanishManager().isVanished(p.getUniqueId()))
+                        .count();
+                return (int) (s.getPlayersConnected().size() - vanishedOnServer);
+            }).orElse(0);
+        }
+
+        onlineCount = Math.max(0, onlineCount);
 
         if (rawMotd == null || rawMotd.isEmpty()) return;
 
@@ -71,8 +82,11 @@ public class ProxyPingListener {
             Favicon icon = faviconCache.computeIfAbsent(faviconName, name -> {
                 File file = plugin.getConfig().getFaviconDirectory().resolve(name).toFile();
                 if (file.exists()) {
-                    try { return Favicon.create(file.toPath()); }
-                    catch (IOException e) { e.printStackTrace(); }
+                    try {
+                        return Favicon.create(file.toPath());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
                 return null;
             });

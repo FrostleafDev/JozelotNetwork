@@ -4,9 +4,14 @@ import de.jozelot.jozelotUtils.JozelotUtils;
 import de.jozelot.jozelotUtils.storage.ConfigManager;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Container;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -14,13 +19,16 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.inventory.InventoryHolder;
 
 public class GriefPrevention implements Listener {
 
     private final ConfigManager config;
+    private JozelotUtils plugin;
 
     public GriefPrevention(JozelotUtils plugin) {
         this.config = plugin.getConfigManager();
+        this.plugin = plugin;
     }
 
     private boolean canBypass(Player player) {
@@ -41,12 +49,42 @@ public class GriefPrevention implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onInteract(PlayerInteractEvent event) {
-        if (config.canBuild()) return;
-        if (canBypass(event.getPlayer())) return;
+        Player player = event.getPlayer();
+        Block block = event.getClickedBlock();
 
-        event.setCancelled(true);
+        if (plugin.getVanishManager().isVanished(player.getUniqueId())) {
+            if (event.getAction() == Action.RIGHT_CLICK_BLOCK && block != null) {
+                Material type = block.getType();
+
+                if (type == Material.CHEST || type == Material.TRAPPED_CHEST ||
+                        type == Material.BARREL || type.name().contains("SHULKER_BOX") ||
+                        type == Material.ENDER_CHEST) {
+
+                    event.setUseInteractedBlock(Event.Result.DENY);
+                    event.setUseItemInHand(Event.Result.DENY);
+                    event.setCancelled(true);
+
+                    if (type == Material.ENDER_CHEST) {
+                        player.openInventory(player.getEnderChest());
+                    } else {
+                        BlockState state = block.getState();
+                        if (state instanceof Container) {
+                            Container container = (Container) state;
+                            player.openInventory(container.getInventory());
+                        }
+                    }
+                    return;
+                }
+            }
+        }
+
+        if (canBypass(player)) return;
+
+        if (!config.canBuild()) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler
