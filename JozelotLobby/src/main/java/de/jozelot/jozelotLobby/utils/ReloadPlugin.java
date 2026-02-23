@@ -30,5 +30,7 @@ public class ReloadPlugin {
         if (redisData != null) {
             lang.integrateRedisData(redisData);
         }
+        plugin.getHotbarManager().loadItems();
+        plugin.getHotbarManager().handleReload();
     }
 }

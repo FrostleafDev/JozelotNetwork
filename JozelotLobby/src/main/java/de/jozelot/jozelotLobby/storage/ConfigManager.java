@@ -68,10 +68,10 @@ public class ConfigManager {
         redisPassword = plugin.getConfig().getString("redis.password");
         redisPort = plugin.getConfig().getInt("redis.port");
 
-        colorPrimary = plugin.getConfig().getString("color-settings.primary");
-        colorSecondary = plugin.getConfig().getString("color-settings.secondary");
-        colorTertiary = plugin.getConfig().getString("color-settings.tertiary");
-        colorDanger = plugin.getConfig().getString("color-settings.danger");
-        colorGrey = plugin.getConfig().getString("color-settings.grey");
+        colorPrimary = plugin.getConfig().getString("color_settings.primary");
+        colorSecondary = plugin.getConfig().getString("color_settings.secondary");
+        colorTertiary = plugin.getConfig().getString("color_settings.tertiary");
+        colorDanger = plugin.getConfig().getString("color_settings.danger");
+        colorGrey = plugin.getConfig().getString("color_settings.grey");
     }
 }

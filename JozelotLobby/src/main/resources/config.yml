@@ -13,7 +13,7 @@ redis:
   password: ''
 
 
-color-settings:
+color_settings:
   primary: '#00A4FC'
   secondary: '#00FC00'
   tertiary: '#FCE300'
@@ -27,5 +27,26 @@ items:
     slot: 4
     description:
       - ''
-      - '<reset><gray>Hier kannst du auswählen'
-      - 'auf welchen Server du spielen möchtest'
+      - '<!italic><gray>Hier kannst du auswählen'
+      - '<!italic><gray>auf welchen Server du spielen möchtest'
+
+  profile:
+    name: '<reset><purple>Profil'
+    item: PLAYER_HEAD
+    slot: 1
+    description:
+      - ''
+      - '<!italic><gray>Das Profil zeigt dir deine Secret funde'
+      - '<!italic><gray>und weitere Einstellungen an'
+
+  player_hider:
+    visible_name: '<reset><green>Spieler sichtbar'
+    hidden_name: '<reset><red>Spieler versteckt'
+    team_name: '<reset><purple>Server Team sichtbar'
+    visible_item: LEATHER_HELMET
+    hidden_item: LEATHER_HELMET
+    team_item: LEATHER_HELMET
+    slot: 7
+    description:
+      - ''
+      - '<!italic><gray>Verstecke andere Spieler'
