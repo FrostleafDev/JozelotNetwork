@@ -16,8 +16,11 @@ public class LobbyPlayerManager {
         this.plugin = plugin;
     }
 
-    public void createPlayer(Player player) {
-        players.put(player.getUniqueId(), new LobbyPlayer(player.getUniqueId(), HotbarItems.HiderState.VISIBLE));
+    public LobbyPlayer createPlayer(Player player) {
+        LobbyPlayer lobbyPlayer = new LobbyPlayer(player.getUniqueId(), HotbarItems.HiderState.VISIBLE);
+        players.put(player.getUniqueId(), lobbyPlayer);
+
+        return lobbyPlayer;
     }
 
     public LobbyPlayer getPlayer(Player player) {
