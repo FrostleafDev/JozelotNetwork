@@ -22,14 +22,11 @@ public class HotbarItems {
     private final JozelotLobby plugin;
     private MiniMessage mm = MiniMessage.miniMessage();
 
+    public static final NamespacedKey ITEM_ID = new NamespacedKey("jozelotlobby", "item_id");
+    public static final NamespacedKey IS_PROTECTED = new NamespacedKey("jozelotlobby", "protected");
+
     public HotbarItems(JozelotLobby plugin) {
         this.plugin = plugin;
-    }
-
-    public enum HiderState {
-        VISIBLE,
-        TEAM,
-        HIDDEN
     }
 
     public ItemStack getNavigator() {
@@ -52,7 +49,7 @@ public class HotbarItems {
 
         ItemMeta navigatorMeta = itemStack.getItemMeta();
 
-        navigatorMeta.itemName(mm.deserialize(itemName));
+        navigatorMeta.displayName(mm.deserialize(itemName));
         navigatorMeta.addItemFlags(ItemFlag.values());
 
         List<Component> lore = itemDescription.stream()
@@ -60,7 +57,8 @@ public class HotbarItems {
                 .toList();
 
         navigatorMeta.lore(lore);
-        navigatorMeta.getPersistentDataContainer().set(new NamespacedKey("jozelotlobby", "item_id"), PersistentDataType.STRING, "navigator");
+        navigatorMeta.getPersistentDataContainer().set(ITEM_ID, PersistentDataType.STRING, "navigator");
+        navigatorMeta.getPersistentDataContainer().set(IS_PROTECTED, PersistentDataType.BOOLEAN, true);
 
         itemStack.setItemMeta(navigatorMeta);
 
@@ -89,7 +87,7 @@ public class HotbarItems {
 
         ItemMeta itemMeta = itemStack.getItemMeta();
 
-        itemMeta.itemName(mm.deserialize(itemName));
+        itemMeta.displayName(mm.deserialize(itemName));
         itemMeta.addItemFlags(ItemFlag.values());
 
         List<Component> lore = itemDescription.stream()
@@ -97,7 +95,8 @@ public class HotbarItems {
                 .toList();
 
         itemMeta.lore(lore);
-        itemMeta.getPersistentDataContainer().set(new NamespacedKey("jozelotlobby", "item_id"), PersistentDataType.STRING, "player_hider");
+        itemMeta.getPersistentDataContainer().set(ITEM_ID, PersistentDataType.STRING, "player_hider");
+        itemMeta.getPersistentDataContainer().set(IS_PROTECTED, PersistentDataType.BOOLEAN, true);
 
         if (itemMeta instanceof LeatherArmorMeta leatherMeta) {
             switch (state) {
@@ -109,6 +108,10 @@ public class HotbarItems {
                     break;
                 case HIDDEN:
                     leatherMeta.setColor(Color.RED);
+                    break;
+                default:
+                    leatherMeta.setColor(Color.GRAY);
+                    break;
             }
         }
 
@@ -117,7 +120,7 @@ public class HotbarItems {
         return itemStack;
     }
 
-    public ItemStack getProfil(Player player) {
+    public ItemStack getProfile(Player player) {
         String itemName = plugin.getConfig().getString("items.profile.name");
         String item = plugin.getConfig().getString("items.profile.item");
         List<String> itemDescription = plugin.getConfig().getStringList("items.profile.description");
@@ -145,12 +148,12 @@ public class HotbarItems {
                 .toList();
 
         itemMeta.lore(lore);
-        itemMeta.itemName(mm.deserialize(itemName));
-        itemMeta.getPersistentDataContainer().set(new NamespacedKey("jozelotlobby", "item_id"), PersistentDataType.STRING, "profile");
+        itemMeta.displayName(mm.deserialize(itemName));
+        itemMeta.getPersistentDataContainer().set(ITEM_ID, PersistentDataType.STRING, "profile");
+        itemMeta.getPersistentDataContainer().set(IS_PROTECTED, PersistentDataType.BOOLEAN, true);
 
         if (itemMeta instanceof SkullMeta skullMeta) {
             skullMeta.setOwningPlayer(player);
-            skullMeta.itemName(mm.deserialize(itemName));
         }
 
         itemStack.setItemMeta(itemMeta);

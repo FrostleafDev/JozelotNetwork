@@ -30,7 +30,10 @@ public class ReloadPlugin {
         if (redisData != null) {
             lang.integrateRedisData(redisData);
         }
-        plugin.getHotbarManager().loadItems();
+
+        plugin.getLobbyPlayerManager().removeAllPlayers();
+        plugin.getLobbyPlayerManager().registerAllPlayers();
+
         plugin.getHotbarManager().handleReload();
     }
 }

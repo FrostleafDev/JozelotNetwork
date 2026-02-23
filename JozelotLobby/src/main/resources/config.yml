@@ -22,7 +22,7 @@ color_settings:
 
 items:
   navigator:
-    name: '<reset><gold>Navigator'
+    name: '<!italic><gold>Navigator'
     item: COMPASS
     slot: 4
     description:
@@ -31,7 +31,7 @@ items:
       - '<!italic><gray>auf welchen Server du spielen möchtest'
 
   profile:
-    name: '<reset><purple>Profil'
+    name: '<!italic><dark_purple>Profil'
     item: PLAYER_HEAD
     slot: 1
     description:
@@ -40,9 +40,9 @@ items:
       - '<!italic><gray>und weitere Einstellungen an'
 
   player_hider:
-    visible_name: '<reset><green>Spieler sichtbar'
-    hidden_name: '<reset><red>Spieler versteckt'
-    team_name: '<reset><purple>Server Team sichtbar'
+    visible_name: '<!italic><green>Spieler sichtbar'
+    hidden_name: '<!italic><red>Spieler versteckt'
+    team_name: '<!italic><dark_purple>Server Team sichtbar'
     visible_item: LEATHER_HELMET
     hidden_item: LEATHER_HELMET
     team_item: LEATHER_HELMET

@@ -153,3 +153,5 @@ color-settings:
 # network.utils.command.gamemode | .heal | .god | .spec (.others)
 # network.utils.admin.build | .inventory
 # network.utils.command.spawn | .setspawn
+
+# network.lobby.player_hider.team

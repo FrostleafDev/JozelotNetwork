@@ -3,9 +3,11 @@ package de.jozelot.jozelotLobby;
 import de.jozelot.jozelotLobby.database.RedisListener;
 import de.jozelot.jozelotLobby.database.RedisManager;
 import de.jozelot.jozelotLobby.database.RedisSetup;
+import de.jozelot.jozelotLobby.items.ClickHandler;
 import de.jozelot.jozelotLobby.items.HotbarItems;
 import de.jozelot.jozelotLobby.items.HotbarManager;
 import de.jozelot.jozelotLobby.player.LobbyPlayerManager;
+import de.jozelot.jozelotLobby.player.PlayerConnectionListener;
 import de.jozelot.jozelotLobby.storage.ConfigManager;
 import de.jozelot.jozelotLobby.storage.LangManager;
 import de.jozelot.jozelotLobby.utils.ReloadPlugin;
@@ -40,12 +42,12 @@ public final class JozelotLobby extends JavaPlugin {
         this.reloadPlugin = new ReloadPlugin(this);
 
         new RedisListener(this);
-
+        this.lobbyPlayerManager = new LobbyPlayerManager(this);
         this.hotbarItems = new HotbarItems(this);
         this.hotbarManager = new HotbarManager(this);
-        this.lobbyPlayerManager = new LobbyPlayerManager(this);
 
-        getServer().getPluginManager().registerEvents(hotbarManager, this);
+        getServer().getPluginManager().registerEvents(new PlayerConnectionListener(this), this);
+        getServer().getPluginManager().registerEvents(new ClickHandler(this), this);
 
         Map<String, String> redisData = redisManager.fetchLanguageData();
         if (redisData != null) {
