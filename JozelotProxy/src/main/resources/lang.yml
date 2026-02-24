@@ -234,7 +234,7 @@ tab-footer:
   - ''
   - '{grey}<strikethrough>                                                 </strikethrough>'
   - ''
-  - '<dark_gray>Online: {secondary}{online-players} <dark_gray>| <dark_gray>Ping: {secondary}{ping}ms'
+  - '<gray>Online: {secondary}{online-players} <gray>| <gray>Ping: {secondary}{ping}ms'
   - ''
   - '<#FCD46F>{group-info}'
   - ''

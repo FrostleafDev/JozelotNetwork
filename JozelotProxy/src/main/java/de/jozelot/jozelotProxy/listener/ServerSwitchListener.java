@@ -364,7 +364,7 @@ public class ServerSwitchListener {
             String name = target.getUsername();
 
             // Vanish Suffix: [V] in Lime hinter dem Namen
-            String vanishSuffix = plugin.getVanishManager().isVanished(target.getUniqueId()) ? " <green>[V]" : "";
+            String vanishSuffix = plugin.getVanishManager().isVanished(target.getUniqueId()) ? " <#00FC00>[V]" : "";
 
             String displayNameRaw = "<reset><italic:false>" + lang.format("tab-player-format", Map.of(
                     "rank-prefix", prefix != null ? prefix : "",

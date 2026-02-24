@@ -120,7 +120,7 @@ public class NetworkCommand implements SimpleCommand {
             }
 
             // START
-            if (args[0].equalsIgnoreCase("restart") || args[0].equalsIgnoreCase("start") || args[0].equalsIgnoreCase("stop")) {
+            if ((args[0].equalsIgnoreCase("restart") || args[0].equalsIgnoreCase("start") || args[0].equalsIgnoreCase("stop")) && source.hasPermission("network.command.manage")) {
                 if (args.length < 2) { showHelp(source); return; }
 
                 String action = args[0].toLowerCase();
@@ -290,7 +290,7 @@ public class NetworkCommand implements SimpleCommand {
                 return;
             }
 
-            if (args[0].equalsIgnoreCase("status")) {
+            if (args[0].equalsIgnoreCase("status") && source.hasPermission("network.command.manage.status")) {
                 if (args.length < 2) { showHelp(source); return; }
                 String serverName = args[1];
                 String pteroId = plugin.getMySQLManager().getPteroIdentifier(serverName);

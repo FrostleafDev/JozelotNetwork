@@ -85,7 +85,7 @@ public class PlayerNameTag implements Listener {
         NamedTextColor teamColor = (lastColor != null) ? NamedTextColor.nearestTo(lastColor) : NamedTextColor.WHITE;
 
         if (plugin.getVanishManager().isVanished(player.getUniqueId())) {
-            team.suffix(mm.deserialize(" <green>[V]"));
+            team.suffix(mm.deserialize(" <#00FC00>[V]"));
 
             team.color(teamColor);
         } else {

@@ -1,6 +1,7 @@
 package de.jozelot.jozelotLobby.items;
 
 import de.jozelot.jozelotLobby.JozelotLobby;
+import de.jozelot.jozelotLobby.player.LobbyPlayer;
 import de.jozelot.jozelotLobby.player.LobbyPlayerManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -47,6 +48,7 @@ public class HotbarManager{
         Bukkit.getOnlinePlayers().forEach(p -> {
             clearHotbar(p);
             giveItems(p);
+            lobbyPlayerManager.getAllPlayers().forEach(LobbyPlayer::updateVisibility);
         });
     }
 }

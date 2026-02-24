@@ -5,8 +5,7 @@ import de.jozelot.jozelotLobby.items.HiderState;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
 
 public class LobbyPlayerManager {
 
@@ -45,6 +44,10 @@ public class LobbyPlayerManager {
         if (lobbyPlayer != null) {
             players.remove(lobbyPlayer.getUuid());
         }
+    }
+
+    public Collection<LobbyPlayer> getAllPlayers() {
+        return Collections.unmodifiableCollection(players.values());
     }
     
     public void removePlayer(Player player) {
