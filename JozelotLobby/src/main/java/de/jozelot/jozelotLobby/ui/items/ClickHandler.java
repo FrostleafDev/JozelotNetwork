@@ -89,9 +89,7 @@ public class ClickHandler implements Listener {
                 player.closeInventory();
                 return;
             case "back_button":
-                if (inventory.getHolder() instanceof NavigatorMenu) {
-                    player.closeInventory();
-                }
+                if (inventory.getHolder() instanceof NavigatorMenu) player.closeInventory();
                 break;
         }
 
