@@ -50,3 +50,14 @@ items:
     description:
       - ''
       - '<!italic><gray>Verstecke andere Spieler'
+
+  back_arrow:
+    name: '<!italic><gray>Zurück'
+
+  spawn_button:
+    name: '<!italic><gold>Spawn'
+    item: MAGMA_CREAM
+
+inventories:
+  navigator:
+    title: 'Navigator'

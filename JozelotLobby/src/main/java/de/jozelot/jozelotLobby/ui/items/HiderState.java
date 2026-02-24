@@ -1,4 +1,4 @@
-package de.jozelot.jozelotLobby.items;
+package de.jozelot.jozelotLobby.ui.items;
 
 public enum HiderState {
     VISIBLE,

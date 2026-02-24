@@ -1,14 +1,18 @@
 package de.jozelot.jozelotLobby.player;
 
 import de.jozelot.jozelotLobby.JozelotLobby;
-import de.jozelot.jozelotLobby.items.HiderState;
-import de.jozelot.jozelotLobby.items.HotbarItems;
+import de.jozelot.jozelotLobby.player.settings.ColorPreference;
+import de.jozelot.jozelotLobby.player.settings.Setting;
+import de.jozelot.jozelotLobby.ui.inventories.InventoryType;
+import de.jozelot.jozelotLobby.ui.inventories.navigation.NavigatorMenu;
+import de.jozelot.jozelotLobby.ui.items.HiderState;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class LobbyPlayer {
@@ -16,6 +20,8 @@ public class LobbyPlayer {
     private final UUID uuid;
     private final JozelotLobby plugin;
     private HiderState hiderState;
+    private Map<Setting, String> settings = new HashMap<>();
+
 
     public LobbyPlayer(UUID uuid, HiderState hiderState, JozelotLobby plugin) {
         this.hiderState = hiderState;
@@ -95,6 +101,40 @@ public class LobbyPlayer {
             } catch (Exception e) {
                 Bukkit.getConsoleSender().sendMessage("§cUngültiger Sound-Key in lang.yml: " + path);
             }
+        }
+    }
+
+    /////////// SETTINGS ///////////
+    public String getRawSetting(Setting setting) {
+        return settings.getOrDefault(setting, setting.getDefaultValue());
+    }
+
+    public boolean getBoolean(Setting setting) {
+        return Boolean.parseBoolean(getRawSetting(setting));
+    }
+
+    public int getInt(Setting setting) {
+        return Integer.parseInt(getRawSetting(setting));
+    }
+
+    public ColorPreference getColor() {
+        String colorValue = getRawSetting(Setting.COLOR_PREFERENCE);
+        ColorPreference pref = ColorPreference.getByName(colorValue);
+        return (pref != null) ? pref : ColorPreference.WHITE;
+    }
+
+    public void setSetting(Setting setting, String value) {
+        this.settings.put(setting, value);
+    }
+
+    public void openInventory(InventoryType inventory) {
+        Player player = getPlayer();
+        switch (inventory) {
+            case PROFILE:
+                break;
+            case NAVIGATOR:
+                player.openInventory(new NavigatorMenu(plugin, player).getInventory());
+                break;
         }
     }
 }

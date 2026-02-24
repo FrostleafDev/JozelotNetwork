@@ -1,6 +1,5 @@
-package de.jozelot.jozelotLobby.items;
+package de.jozelot.jozelotLobby.ui.items;
 
-import com.sun.jna.platform.unix.X11;
 import de.jozelot.jozelotLobby.JozelotLobby;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;

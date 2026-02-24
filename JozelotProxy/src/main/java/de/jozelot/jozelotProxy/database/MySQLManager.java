@@ -62,6 +62,14 @@ public class MySQLManager {
                         "FOREIGN KEY (uuid) REFERENCES player(uuid) ON DELETE CASCADE" +
                         ");",
 
+                "CREATE TABLE IF NOT EXISTS player_settings (" +
+                        "uuid CHAR(36)," +
+                        "setting_key VARCHAR(32)," +
+                        "setting_value VARCHAR(255)," +
+                        "PRIMARY KEY (uuid, setting_key)," +
+                        "FOREIGN KEY (uuid) REFERENCES player(uuid) ON DELETE CASCADE" +
+                        ");",
+
                 // 4. Punishment
                 "CREATE TABLE IF NOT EXISTS punishment (" +
                         "id INT AUTO_INCREMENT PRIMARY KEY," +
@@ -99,7 +107,20 @@ public class MySQLManager {
                 "CREATE TABLE IF NOT EXISTS secret (" +
                         "id INT AUTO_INCREMENT PRIMARY KEY," +
                         "name VARCHAR(32)," +
-                        "description VARCHAR(64)" +
+                        "description VARCHAR(255)," +
+                        "block VARCHAR(64)" +
+                        ");",
+
+                "CREATE TABLE IF NOT EXISTS secret_region (" +
+                        "id INT AUTO_INCREMENT PRIMARY KEY," +
+                        "secret_id INT," +
+                        "min_x INT," +
+                        "min_y INT," +
+                        "min_z INT," +
+                        "max_x INT," +
+                        "max_y INT," +
+                        "max_z INT," +
+                        "PRIMARY KEY (secret_id) REFERENCES secret(id) ON DELETE CASCADE" +
                         ");",
 
                 // 8. Secrets Found

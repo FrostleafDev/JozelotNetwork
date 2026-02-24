@@ -1,7 +1,7 @@
 package de.jozelot.jozelotLobby.player;
 
 import de.jozelot.jozelotLobby.JozelotLobby;
-import de.jozelot.jozelotLobby.items.HotbarManager;
+import de.jozelot.jozelotLobby.ui.items.HotbarManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

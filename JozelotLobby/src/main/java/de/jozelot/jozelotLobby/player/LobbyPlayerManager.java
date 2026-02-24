@@ -1,7 +1,7 @@
 package de.jozelot.jozelotLobby.player;
 
 import de.jozelot.jozelotLobby.JozelotLobby;
-import de.jozelot.jozelotLobby.items.HiderState;
+import de.jozelot.jozelotLobby.ui.items.HiderState;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 

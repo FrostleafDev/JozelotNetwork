@@ -4,9 +4,10 @@ import de.jozelot.jozelotLobby.database.MySQLSetup;
 import de.jozelot.jozelotLobby.database.RedisListener;
 import de.jozelot.jozelotLobby.database.RedisManager;
 import de.jozelot.jozelotLobby.database.RedisSetup;
-import de.jozelot.jozelotLobby.items.ClickHandler;
-import de.jozelot.jozelotLobby.items.HotbarItems;
-import de.jozelot.jozelotLobby.items.HotbarManager;
+import de.jozelot.jozelotLobby.ui.inventories.InventoryManager;
+import de.jozelot.jozelotLobby.ui.items.ClickHandler;
+import de.jozelot.jozelotLobby.ui.items.HotbarItems;
+import de.jozelot.jozelotLobby.ui.items.HotbarManager;
 import de.jozelot.jozelotLobby.player.LobbyPlayerDatabase;
 import de.jozelot.jozelotLobby.player.LobbyPlayerManager;
 import de.jozelot.jozelotLobby.player.PlayerConnectionListener;
@@ -33,6 +34,7 @@ public final class JozelotLobby extends JavaPlugin {
     private LobbyPlayerDatabase lobbyPlayerDatabase;
 
     private MySQLSetup mySQLSetup;
+    private InventoryManager inventoryManager;
 
     @Override
     public void onEnable() {
@@ -54,6 +56,8 @@ public final class JozelotLobby extends JavaPlugin {
         this.hotbarItems = new HotbarItems(this);
         this.hotbarManager = new HotbarManager(this);
 
+        this.inventoryManager = new InventoryManager(this);
+
         getServer().getPluginManager().registerEvents(new PlayerConnectionListener(this), this);
         getServer().getPluginManager().registerEvents(new ClickHandler(this), this);
 
@@ -64,14 +68,14 @@ public final class JozelotLobby extends JavaPlugin {
         }
 
 
-        getServer().getConsoleSender().sendMessage("§a[§6JoUtils§a]§a Minecraft läuft in der " + Bukkit.getBukkitVersion());
-        getServer().getConsoleSender().sendMessage("§a[§6JoUtils§a]§a ----------------------------------------------");
-        getServer().getConsoleSender().sendMessage("§a[§6JoUtils§a]§a    +==================+");
-        getServer().getConsoleSender().sendMessage("§a[§6JoUtils§a]§a    |      JoLobby     |");
-        getServer().getConsoleSender().sendMessage("§a[§6JoUtils§a]§a    +==================+");
-        getServer().getConsoleSender().sendMessage("§a[§6JoUtils§a]§a ----------------------------------------------");
-        getServer().getConsoleSender().sendMessage("§a[§6JoUtils§a]§6    Version: §e" + getVersion());
-        getServer().getConsoleSender().sendMessage("§a[§6JoUtils§a]§a ----------------------------------------------");
+        getServer().getConsoleSender().sendMessage("§a[§JoLobby§a]§a Minecraft läuft in der " + Bukkit.getBukkitVersion());
+        getServer().getConsoleSender().sendMessage("§a[§JoLobby§a]§a ----------------------------------------------");
+        getServer().getConsoleSender().sendMessage("§a[§JoLobby§a]§a    +==================+");
+        getServer().getConsoleSender().sendMessage("§a[§JoLobby§a]§a    |      JoLobby     |");
+        getServer().getConsoleSender().sendMessage("§a[§JoLobby§a]§a    +==================+");
+        getServer().getConsoleSender().sendMessage("§a[§JoLobby§a]§a ----------------------------------------------");
+        getServer().getConsoleSender().sendMessage("§a[§JoLobby§a]§6    Version: §e" + getVersion());
+        getServer().getConsoleSender().sendMessage("§a[§JoLobby§a]§a ----------------------------------------------");
     }
 
     @Override
@@ -121,5 +125,9 @@ public final class JozelotLobby extends JavaPlugin {
 
     public LobbyPlayerDatabase getLobbyPlayerDatabase() {
         return lobbyPlayerDatabase;
+    }
+
+    public InventoryManager getInventoryManager() {
+        return inventoryManager;
     }
 }
