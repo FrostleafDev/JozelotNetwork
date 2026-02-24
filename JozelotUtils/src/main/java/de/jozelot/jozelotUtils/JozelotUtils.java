@@ -1,6 +1,7 @@
 package de.jozelot.jozelotUtils;
 
 import de.jozelot.jozelotUtils.commands.*;
+import de.jozelot.jozelotUtils.database.MySQLSetup;
 import de.jozelot.jozelotUtils.database.RedisListener;
 import de.jozelot.jozelotUtils.database.RedisManager;
 import de.jozelot.jozelotUtils.database.RedisSetup;
@@ -28,6 +29,7 @@ public final class JozelotUtils extends JavaPlugin {
     private ConfigManager config;
     private RedisSetup redisSetup;
     private RedisManager redisManager;
+    private MySQLSetup mySQLSetup;
     private LangManager lang;
     private ReloadPlugin reloadPlugin;
     private PlayerNameTag playerNameTag;
@@ -40,6 +42,7 @@ public final class JozelotUtils extends JavaPlugin {
         this.lang = new LangManager(this);
         this.lang.load();
 
+        this.mySQLSetup = new MySQLSetup(this);
         this.vanishManager = new VanishManager(this);
 
         this.redisSetup = new RedisSetup(this);
@@ -162,4 +165,7 @@ public final class JozelotUtils extends JavaPlugin {
         return vanishManager;
     }
 
+    public MySQLSetup getMySQLSetup() {
+        return mySQLSetup;
+    }
 }

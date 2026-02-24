@@ -2,8 +2,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.jozelot</groupId>
-  <artifactId>JozelotUtils</artifactId>
-  <name>JozelotUtils</name>
+  <artifactId>JozelotLobby</artifactId>
+  <name>JozelotLobby</name>
   <version>1.0.0</version>
   <build>
     <defaultGoal>clean package</defaultGoal>
@@ -65,7 +65,7 @@
         <version>3.6.3</version>
         <configuration>
           <reportOutputDirectory>${project.basedir}/../docs</reportOutputDirectory>
-          <destDir>JozelotUtils</destDir>
+          <destDir>JozelotLobby</destDir>
           <top>&lt;link rel="icon" href="https://cdn.jozelot.de/assets/images/favicons/favicon_64x64.png" type="image/png"&gt;</top>
           <additionalOptions>
             <additionalOption>-Xdoclint:none</additionalOption>
@@ -86,12 +86,6 @@
       <groupId>io.papermc.paper</groupId>
       <artifactId>paper-api</artifactId>
       <version>1.21.11-R0.1-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>net.luckperms</groupId>
-      <artifactId>api</artifactId>
-      <version>5.4</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>

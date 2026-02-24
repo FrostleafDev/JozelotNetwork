@@ -6,6 +6,12 @@ import de.jozelot.jozelotUtils.storage.LangManager;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -22,6 +28,8 @@ public class VanishManager {
         this.plugin = plugin;
         this.config = plugin.getConfigManager();
         this.lang = plugin.getLang();
+
+        this.vanishedPlayers.putAll(loadAllVanishedPlayers());
     }
 
     public boolean isVanished(UUID uuid) {
@@ -105,5 +113,23 @@ public class VanishManager {
 
         boolean isTeamVanish = vanishedPlayers.getOrDefault(targetUUID, false);
         return isTeamVanish && viewer.hasPermission("network.vanish.see-team");
+    }
+
+    public Map<UUID, Boolean> loadAllVanishedPlayers() {
+        Map<UUID, Boolean> results = new HashMap<>();
+        String sql = "SELECT uuid FROM player_state WHERE is_vanish = 1;";
+
+        try (Connection conn = plugin.getMySQLSetup().getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                UUID uuid = UUID.fromString(rs.getString("uuid"));
+                results.put(uuid, false);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return results;
     }
 }

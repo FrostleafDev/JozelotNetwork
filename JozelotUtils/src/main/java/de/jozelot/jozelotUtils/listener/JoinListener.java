@@ -32,13 +32,21 @@ public class JoinListener implements Listener {
         Player player = event.getPlayer();
         boolean isVanished = plugin.getVanishManager().isVanished(player.getUniqueId());
 
-        // 1. Vanish Sichtbarkeit & Join-Message
         if (isVanished) {
-            event.joinMessage(null); // Nachricht komplett unterdrücken
-            plugin.getVanishManager().updatePlayerVanish(player);
+            event.joinMessage(null);
         } else {
             handleJoinMessage(event, player);
         }
+
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            plugin.getVanishManager().updatePlayerVanish(player);
+
+            if (!isVanished) {
+                player.setInvulnerable(false);
+                player.setGlowing(false);
+                player.setCollidable(true);
+            }
+        }, 1L);
 
         // 2. Alle anderen versteckten Spieler für den neuen Spieler ausblenden
         plugin.getVanishManager().updateAllForPlayer(player);

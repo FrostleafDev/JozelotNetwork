@@ -17,6 +17,12 @@ public class ConfigManager {
     private String redisPassword;
     private int redisPort;
 
+    private String mysqlHost;
+    private String mysqlUser;
+    private String mysqlPassword;
+    private String mysqlDatabase;
+    private int mysqlPort;
+
     private String colorPrimary;
     private String colorSecondary;
     private String colorTertiary;
@@ -282,6 +288,26 @@ public class ConfigManager {
     public boolean isSpawnWanderingTrader() { return spawnWanderingTrader; }
     public boolean isSpawnPatrols() { return spawnPatrols; }
 
+    public int getMysqlPort() {
+        return mysqlPort;
+    }
+
+    public String getMysqlDatabase() {
+        return mysqlDatabase;
+    }
+
+    public String getMysqlPassword() {
+        return mysqlPassword;
+    }
+
+    public String getMysqlUser() {
+        return mysqlUser;
+    }
+
+    public String getMysqlHost() {
+        return mysqlHost;
+    }
+
     public void loadConfig() {
         plugin.saveDefaultConfig();
 
@@ -370,5 +396,11 @@ public class ConfigManager {
         spawnPhantoms = plugin.getConfig().getBoolean("spawn-phantoms", false);
         spawnWanderingTrader = plugin.getConfig().getBoolean("spawn-wandering-trader", false); // Beachte den Tippfehler 'traider' aus deiner Vorlage
         spawnPatrols = plugin.getConfig().getBoolean("spawn-patrols", false);
+
+        mysqlDatabase = plugin.getConfig().getString("mysql.database");
+        mysqlPassword = plugin.getConfig().getString("mysql.password");
+        mysqlUser = plugin.getConfig().getString("mysql.user");
+        mysqlHost = plugin.getConfig().getString("mysql.host");
+        mysqlPort = plugin.getConfig().getInt("mysql.port");
     }
 }
