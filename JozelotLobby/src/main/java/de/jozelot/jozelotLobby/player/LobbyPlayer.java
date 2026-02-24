@@ -25,6 +25,9 @@ public class LobbyPlayer {
 
     public void setHiderState(HiderState hiderState) {
         this.hiderState = hiderState;
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            plugin.getLobbyPlayerDatabase().setHiderState(this, hiderState);
+        });
     }
 
     public HiderState getHiderState() {

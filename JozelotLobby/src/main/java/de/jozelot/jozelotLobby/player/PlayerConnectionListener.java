@@ -51,7 +51,9 @@ public class PlayerConnectionListener implements Listener {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
+        LobbyPlayer lobbyPlayer = lobbyPlayerManager.getPlayer(player);
 
+        plugin.getLobbyPlayerDatabase().setHiderState(lobbyPlayer, lobbyPlayer.getHiderState());
         lobbyPlayerManager.removePlayer(player);
     }
 }

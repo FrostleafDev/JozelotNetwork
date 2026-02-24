@@ -58,6 +58,7 @@ public class MySQLManager {
                         "uuid CHAR(36) PRIMARY KEY," +
                         "is_vanish BOOLEAN DEFAULT FALSE," +
                         "is_spy BOOLEAN DEFAULT FALSE," +
+                        "player_hider ENUM('VISIBLE', 'TEAM', 'HIDDEN') DEFAULT 'VISIBLE'," +
                         "FOREIGN KEY (uuid) REFERENCES player(uuid) ON DELETE CASCADE" +
                         ");",
 

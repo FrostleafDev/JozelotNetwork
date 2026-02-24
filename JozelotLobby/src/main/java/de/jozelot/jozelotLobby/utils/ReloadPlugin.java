@@ -25,6 +25,8 @@ public class ReloadPlugin {
         config.loadConfig();
         lang.load();
         plugin.getRedisSetup().close();
+        plugin.getMySQLSetup().close();
+        plugin.getMySQLSetup().setup();
         plugin.getRedisSetup().setup();
         Map<String, String> redisData = plugin.getRedisManager().fetchLanguageData();
         if (redisData != null) {

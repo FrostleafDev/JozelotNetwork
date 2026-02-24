@@ -23,6 +23,12 @@ public class ConfigManager {
     private String colorDanger;
     private String colorGrey;
 
+    private String mysqlHost;
+    private String mysqlUser;
+    private String mysqlPassword;
+    private String mysqlDatabase;
+    private int mysqlPort;
+
     public ConfigManager(JozelotLobby plugin) {
         this.plugin = plugin;
         loadConfig();
@@ -61,6 +67,26 @@ public class ConfigManager {
     }
 
 
+    public int getMysqlPort() {
+        return mysqlPort;
+    }
+
+    public String getMysqlDatabase() {
+        return mysqlDatabase;
+    }
+
+    public String getMysqlPassword() {
+        return mysqlPassword;
+    }
+
+    public String getMysqlUser() {
+        return mysqlUser;
+    }
+
+    public String getMysqlHost() {
+        return mysqlHost;
+    }
+
     public void loadConfig() {
         plugin.saveDefaultConfig();
 
@@ -73,5 +99,12 @@ public class ConfigManager {
         colorTertiary = plugin.getConfig().getString("color_settings.tertiary");
         colorDanger = plugin.getConfig().getString("color_settings.danger");
         colorGrey = plugin.getConfig().getString("color_settings.grey");
+
+        mysqlDatabase = plugin.getConfig().getString("mysql.database");
+        mysqlPassword = plugin.getConfig().getString("mysql.password");
+        mysqlUser = plugin.getConfig().getString("mysql.user");
+        mysqlHost = plugin.getConfig().getString("mysql.host");
+        mysqlPort = plugin.getConfig().getInt("mysql.port");
+
     }
 }

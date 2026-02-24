@@ -28,6 +28,47 @@
                     <target>${java.version}</target>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.5.3</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <relocations>
+                                <relocation>
+                                    <pattern>com.zaxxer.hikari</pattern>
+                                    <shadedPattern>de.jozelot.jozelotLobby.libs.hikari</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.mariadb.jdbc</pattern>
+                                    <shadedPattern>de.jozelot.jozelotLobby.libs.mariadb</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>redis.clients.jedis</pattern>
+                                    <shadedPattern>de.jozelot.jozelotLobby.libs.jedis</shadedPattern>
+                                </relocation>
+                            </relocations>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -35,13 +76,10 @@
                 <configuration>
                     <reportOutputDirectory>${project.basedir}/../docs</reportOutputDirectory>
                     <destDir>JozelotLobby</destDir>
-
                     <top>&lt;link rel="icon" href="https://cdn.jozelot.de/assets/images/favicons/favicon_64x64.png" type="image/png"&gt;</top>
-
                     <additionalOptions>
                         <additionalOption>-Xdoclint:none</additionalOption>
                     </additionalOptions>
-
                     <failOnError>false</failOnError>
                 </configuration>
             </plugin>
@@ -77,6 +115,11 @@
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
             <version>7.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>5.1.0</version>
         </dependency>
     </dependencies>
 </project>

@@ -1,11 +1,13 @@
 package de.jozelot.jozelotLobby;
 
+import de.jozelot.jozelotLobby.database.MySQLSetup;
 import de.jozelot.jozelotLobby.database.RedisListener;
 import de.jozelot.jozelotLobby.database.RedisManager;
 import de.jozelot.jozelotLobby.database.RedisSetup;
 import de.jozelot.jozelotLobby.items.ClickHandler;
 import de.jozelot.jozelotLobby.items.HotbarItems;
 import de.jozelot.jozelotLobby.items.HotbarManager;
+import de.jozelot.jozelotLobby.player.LobbyPlayerDatabase;
 import de.jozelot.jozelotLobby.player.LobbyPlayerManager;
 import de.jozelot.jozelotLobby.player.PlayerConnectionListener;
 import de.jozelot.jozelotLobby.storage.ConfigManager;
@@ -28,6 +30,9 @@ public final class JozelotLobby extends JavaPlugin {
     private HotbarManager hotbarManager;
 
     private LobbyPlayerManager lobbyPlayerManager;
+    private LobbyPlayerDatabase lobbyPlayerDatabase;
+
+    private MySQLSetup mySQLSetup;
 
     @Override
     public void onEnable() {
@@ -39,9 +44,12 @@ public final class JozelotLobby extends JavaPlugin {
         this.redisSetup = new RedisSetup(this);
         redisSetup.setup();
         this.redisManager = new RedisManager(this);
+        this.mySQLSetup = new MySQLSetup(this);
+        mySQLSetup.setup();
         this.reloadPlugin = new ReloadPlugin(this);
 
         new RedisListener(this);
+        this.lobbyPlayerDatabase = new LobbyPlayerDatabase(this);
         this.lobbyPlayerManager = new LobbyPlayerManager(this);
         this.hotbarItems = new HotbarItems(this);
         this.hotbarManager = new HotbarManager(this);
@@ -105,5 +113,13 @@ public final class JozelotLobby extends JavaPlugin {
 
     public LobbyPlayerManager getLobbyPlayerManager() {
         return lobbyPlayerManager;
+    }
+
+    public MySQLSetup getMySQLSetup() {
+        return mySQLSetup;
+    }
+
+    public LobbyPlayerDatabase getLobbyPlayerDatabase() {
+        return lobbyPlayerDatabase;
     }
 }
