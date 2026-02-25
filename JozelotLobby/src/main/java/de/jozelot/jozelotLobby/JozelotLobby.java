@@ -81,6 +81,7 @@ public final class JozelotLobby extends JavaPlugin {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
+        lobbyPlayerDatabase.saveAllPlayerSettings(lobbyPlayerManager.getAllPlayers());
     }
 
     public String getVersion() {

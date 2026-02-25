@@ -28,6 +28,10 @@ public class LobbyPlayerManager {
         LobbyPlayer lobbyPlayer = new LobbyPlayer(player.getUniqueId(), lpd.getHiderState(player), plugin);
         players.put(player.getUniqueId(), lobbyPlayer);
 
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            lobbyPlayer.setSettings(lpd.getAllSettings(lobbyPlayer));
+        });
+
         return lobbyPlayer;
     }
 
@@ -43,11 +47,16 @@ public class LobbyPlayerManager {
 
     public void removePlayer(LobbyPlayer lobbyPlayer) {
         if (lobbyPlayer != null) {
+            plugin.getLobbyPlayerDatabase().setHiderState(lobbyPlayer, lobbyPlayer.getHiderState());
+            plugin.getLobbyPlayerDatabase().setSettings(lobbyPlayer, lobbyPlayer.getSettings());
             players.remove(lobbyPlayer.getUuid());
         }
     }
 
     public void removePlayer(Player player) {
+        LobbyPlayer lobbyPlayer = players.get(player.getUniqueId());
+        plugin.getLobbyPlayerDatabase().setHiderState(lobbyPlayer, lobbyPlayer.getHiderState());
+        plugin.getLobbyPlayerDatabase().setSettings(lobbyPlayer, lobbyPlayer.getSettings());
         players.remove(player.getUniqueId());
     }
 

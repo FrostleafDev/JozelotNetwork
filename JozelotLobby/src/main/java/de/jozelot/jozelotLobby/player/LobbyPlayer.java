@@ -125,6 +125,17 @@ public class LobbyPlayer {
 
     public void setSetting(Setting setting, String value) {
         this.settings.put(setting, value);
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            plugin.getLobbyPlayerDatabase().setSetting(this, setting, value);
+        });
+    }
+
+    public void setSettings(Map<Setting, String> settingStringMap) {
+        settings.putAll(settingStringMap);
+    }
+
+    public Map<Setting, String> getSettings() {
+        return settings;
     }
 
     public void openInventory(InventoryType inventory) {

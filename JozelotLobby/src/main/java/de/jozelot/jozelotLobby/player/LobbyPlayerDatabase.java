@@ -1,6 +1,7 @@
 package de.jozelot.jozelotLobby.player;
 
 import de.jozelot.jozelotLobby.JozelotLobby;
+import de.jozelot.jozelotLobby.player.settings.Setting;
 import de.jozelot.jozelotLobby.ui.items.HiderState;
 import org.bukkit.entity.Player;
 
@@ -100,5 +101,154 @@ public class LobbyPlayerDatabase {
             e.printStackTrace();
         }
         return results;
+    }
+
+    public void setSetting(LobbyPlayer player, Setting setting, String value) {
+        UUID uuid = player.getUuid();
+        if (setting.getDefaultValue().equalsIgnoreCase(value)) {
+            String sql = "DELETE FROM player_settings WHERE uuid = ? AND setting_key = ?;";
+
+            try (Connection conn = plugin.getMySQLSetup().getConnection();
+                 PreparedStatement deleteStmt = conn.prepareStatement(sql)) {
+                deleteStmt.setString(1, uuid.toString());
+                deleteStmt.setString(2, setting.getKey());
+                deleteStmt.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return;
+        }
+
+        String sql = "INSERT INTO player_settings (uuid, setting_key, settings_value) VALUES (?, ?, ?) " +
+                "ON DUPLICATE KEY UPDATE settings_value = VALUES(settings_value);";
+
+        try (Connection conn = plugin.getMySQLSetup().getConnection();
+             PreparedStatement insertStmt = conn.prepareStatement(sql)) {
+
+            insertStmt.setString(1, uuid.toString());
+            insertStmt.setString(2, setting.getKey());
+            insertStmt.setString(3, value);
+
+            insertStmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setSettings(LobbyPlayer player, Map<Setting, String> settingStringMap) {
+        if (settingStringMap == null || settingStringMap.isEmpty()) return;
+
+        String uuidStr = player.getUuid().toString();
+
+        String sqlInsert = "INSERT INTO player_settings (uuid, setting_key, settings_value) VALUES (?, ?, ?) " +
+                "ON DUPLICATE KEY UPDATE settings_value = VALUES(settings_value);";
+        String sqlDelete = "DELETE FROM player_settings WHERE uuid = ? AND setting_key = ?;";
+
+        try (Connection conn = plugin.getMySQLSetup().getConnection()) {
+            conn.setAutoCommit(false);
+
+            try (PreparedStatement insertStmt = conn.prepareStatement(sqlInsert);
+                 PreparedStatement deleteStmt = conn.prepareStatement(sqlDelete)) {
+
+                for (Map.Entry<Setting, String> entry : settingStringMap.entrySet()) {
+                    Setting setting = entry.getKey();
+                    String value = entry.getValue();
+
+                    if (setting.getDefaultValue().equalsIgnoreCase(value)) {
+                        // Zum Löschen vormerken
+                        deleteStmt.setString(1, uuidStr);
+                        deleteStmt.setString(2, setting.getKey());
+                        deleteStmt.addBatch();
+                    } else {
+                        // Zum Speichern vormerken
+                        insertStmt.setString(1, uuidStr);
+                        insertStmt.setString(2, setting.getKey());
+                        insertStmt.setString(3, value);
+                        insertStmt.addBatch();
+                    }
+                }
+
+                insertStmt.executeBatch();
+                deleteStmt.executeBatch();
+
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                e.printStackTrace();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String getSetting(LobbyPlayer player, Setting setting) {
+        /* if (ergebnis.equals(setting.getDefaultValue()) {
+            return setting.getDefaultValue();
+        }
+        */
+        return setting.getDefaultValue();
+    }
+
+    public Map<Setting, String> getAllSettings(LobbyPlayer player) {
+        return Map.of();
+    }
+
+    public void saveAllPlayerSettings(Collection<LobbyPlayer> players) {
+        if (players == null || players.isEmpty()) return;
+
+        String sqlHider = "INSERT INTO player_state (uuid, player_hider) VALUES (?, ?) " +
+                "ON DUPLICATE KEY UPDATE player_hider = VALUES(player_hider);";
+
+        String sqlInsertSetting = "INSERT INTO player_settings (uuid, setting_key, settings_value) VALUES (?, ?, ?) " +
+                "ON DUPLICATE KEY UPDATE settings_value = VALUES(settings_value);";
+
+        String sqlDeleteSetting = "DELETE FROM player_settings WHERE uuid = ? AND setting_key = ?;";
+
+        try (Connection conn = plugin.getMySQLSetup().getConnection()) {
+            conn.setAutoCommit(false);
+
+            try (PreparedStatement hiderStmt = conn.prepareStatement(sqlHider);
+                 PreparedStatement insertSetStmt = conn.prepareStatement(sqlInsertSetting);
+                 PreparedStatement deleteSetStmt = conn.prepareStatement(sqlDeleteSetting)) {
+
+                for (LobbyPlayer lp : players) {
+                    String uuidStr = lp.getUuid().toString();
+
+                    // 1. Hider State zum Batch hinzufügen
+                    hiderStmt.setString(1, uuidStr);
+                    hiderStmt.setString(2, lp.getHiderState().name());
+                    hiderStmt.addBatch();
+
+                    // 2. Alle Settings des Spielers durchgehen
+                    for (Map.Entry<Setting, String> entry : lp.getSettings().entrySet()) {
+                        Setting setting = entry.getKey();
+                        String value = entry.getValue();
+
+                        if (setting.getDefaultValue().equalsIgnoreCase(value)) {
+                            deleteSetStmt.setString(1, uuidStr);
+                            deleteSetStmt.setString(2, setting.getKey());
+                            deleteSetStmt.addBatch();
+                        } else {
+                            insertSetStmt.setString(1, uuidStr);
+                            insertSetStmt.setString(2, setting.getKey());
+                            insertSetStmt.setString(3, value);
+                            insertSetStmt.addBatch();
+                        }
+                    }
+                }
+
+                // Alles abschicken
+                hiderStmt.executeBatch();
+                insertSetStmt.executeBatch();
+                deleteSetStmt.executeBatch();
+
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                e.printStackTrace();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
