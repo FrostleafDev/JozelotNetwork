@@ -51,7 +51,6 @@ public class PlayerConnectionListener implements Listener {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        LobbyPlayer lobbyPlayer = lobbyPlayerManager.getPlayer(player);
 
         lobbyPlayerManager.removePlayer(player);
     }

@@ -119,8 +119,8 @@ public class MySQLManager {
                         "min_z INT," +
                         "max_x INT," +
                         "max_y INT," +
-                        "max_z INT," +
-                        "PRIMARY KEY (secret_id) REFERENCES secret(id) ON DELETE CASCADE" +
+                        "max_z INT," + // Komma hinzugefügt
+                        "FOREIGN KEY (secret_id) REFERENCES secret(id) ON DELETE CASCADE" +
                         ");",
 
                 // 8. Secrets Found

@@ -70,6 +70,10 @@ public class ClickHandler implements Listener {
             return;
         }
 
+        if (itemStack == null) {
+            return;
+        }
+
         ItemMeta itemMeta = itemStack.getItemMeta();
         boolean isProtected = itemMeta.getPersistentDataContainer().get(HotbarItems.IS_PROTECTED, PersistentDataType.BOOLEAN);
 

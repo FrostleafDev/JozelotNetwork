@@ -58,6 +58,14 @@ items:
     name: '<!italic><gold>Spawn'
     item: MAGMA_CREAM
 
+  challenge_server:
+    item: GOLDEN_AXE
+    name: '<!italic><gradient:#fca801:#fc3701><bold>Challenges'
+    lore:
+      - ''
+      - '<!italic><gray>Status: {online_servers}<gray>/<#00FC00>{max_servers}'
+      - '<!italic><gray>Spieler: {online_players}'
+
 inventories:
   navigator:
     title: 'Navigator'

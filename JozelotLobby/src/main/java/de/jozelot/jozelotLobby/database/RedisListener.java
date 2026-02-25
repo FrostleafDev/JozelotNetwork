@@ -45,4 +45,18 @@ public class RedisListener {
             plugin.getLogger().info("Redis: Plugin-Reload abgeschlossen.");
         });
     }
+
+    public void startStatusUpdater() {
+        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
+            try {
+                Map<String, String> states = plugin.getRedisSetup().getJedis().hgetAll("network_status");
+
+                if (states != null) {
+                    plugin.getNetworkStateManager().updateAll(states);
+                }
+            } catch (Exception e) {
+                plugin.getLogger().warning("Redis: Fehler beim Update der Server-Status-Daten: " + e.getMessage());
+            }
+        }, 0L, 100L);
+    }
 }

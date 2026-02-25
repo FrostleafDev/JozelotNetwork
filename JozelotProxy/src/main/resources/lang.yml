@@ -411,12 +411,13 @@ server-restart-move: '{grey}Der Server {danger}{server-name}{grey} startet neu. 
 lobby-restart-kick:
   - "<gradient:#f90036:#f90011><b>LOBBY NEUSTART</b></gradient>"
   - ""
-  - "{grey}Die Lobby wird aktuell {danger}neu gestartet{grey}."
+  - "{grey}Die Lobby wird {danger}neu gestartet{grey}."
   - "{grey}Da dies der Haupt Server ist, wurde deine Verbindung getrennt."
   - ""
-  - "{grey}Bitte verbinde dich in wenigen Sekunden erneut."
+  - "{grey}Bitte gedulde dich einen kleinen Moment."
+  - "{grey}Du kannst in Kürze wieder {secondary}beitreten{grey}."
   - ""
-  - "<dark_gray>Status: <white>Wird neu geladen..."
+  - "<dark_gray>Versuche es in ca. <white>10 Sekunden</white> erneut."
 
 command-spy-enabled: '{grey}Spy Modus {primary}aktiviert{grey}. Du siehst nun alle privaten Nachrichten.'
 command-spy-disabled: '{grey}Spy Modus {danger}deaktiviert{grey}.'

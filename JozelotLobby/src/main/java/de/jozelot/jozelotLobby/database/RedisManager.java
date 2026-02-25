@@ -22,7 +22,6 @@ public class RedisManager {
         }
 
         try {
-            // Holt den kompletten Hash aus Redis
             Map<String, String> data = jedis.hgetAll(REDIS_KEY);
             if (data == null || data.isEmpty()) {
                 plugin.getLogger().warning("Redis: Keine Sprachdaten unter '" + REDIS_KEY + "' gefunden.");

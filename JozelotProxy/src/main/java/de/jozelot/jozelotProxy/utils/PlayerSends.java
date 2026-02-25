@@ -11,6 +11,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class PlayerSends {
@@ -62,6 +63,11 @@ public class PlayerSends {
                         Map.of("server-name", finalName))));
             }
         });
+    }
+
+    public void connectPlayerSimple(UUID uuid, String serverName) {
+        Optional<Player> player = server.getPlayer(uuid);
+        player.ifPresent(value -> connectPlayerSimple(value, serverName));
     }
 
     /**

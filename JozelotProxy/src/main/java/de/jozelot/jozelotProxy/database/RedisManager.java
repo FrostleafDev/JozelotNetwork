@@ -2,6 +2,7 @@ package de.jozelot.jozelotProxy.database;
 
 import de.jozelot.jozelotProxy.JozelotProxy;
 import de.jozelot.jozelotProxy.utils.ConsoleLogger;
+import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPooled;
 
 import java.util.HashMap;
@@ -73,6 +74,16 @@ public class RedisManager {
         if (jedis != null) {
             jedis.publish("network:control", "reload");
             plugin.getConsoleLogger().broadCastToConsole("Redis: Reload-Signal an alle Server gesendet.");
+        }
+    }
+
+    public void updateStatus(String serverName, int onlinePlayers, boolean isOnline) {
+        try (JedisPooled jedis = plugin.getRedisSetup().getJedis()) {
+            String statusValue = onlinePlayers + ":" + (isOnline ? "online" : "offline");
+
+            jedis.hset("network_status", serverName, statusValue);
+
+            jedis.expire("network_status", 10);
         }
     }
 }

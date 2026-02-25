@@ -148,4 +148,8 @@ public class LobbyPlayer {
                 break;
         }
     }
+
+    public void sendToServer(String serverName) {
+        plugin.getRedisPublish().sendPlayerToServer(getUuid(), serverName);
+    }
 }

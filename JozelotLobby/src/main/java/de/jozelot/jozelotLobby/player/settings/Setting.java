@@ -16,4 +16,13 @@ public enum Setting {
 
     public String getKey() { return key; }
     public String getDefaultValue() { return defaultValue; }
+
+    public static Setting fromKey(String key) {
+        for (Setting setting : values()) {
+            if (setting.getKey().equalsIgnoreCase(key)) {
+                return setting;
+            }
+        }
+        return null;
+    }
 }

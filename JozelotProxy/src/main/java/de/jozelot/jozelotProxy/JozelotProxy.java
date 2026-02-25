@@ -10,6 +10,7 @@ import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
+import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.jozelot.jozelotProxy.apis.GroupManager;
 import de.jozelot.jozelotProxy.apis.PteroManager;
 import de.jozelot.jozelotProxy.commands.*;
@@ -34,6 +35,7 @@ import org.slf4j.Logger;
 import java.nio.file.Path;
 import java.sql.Array;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Plugin(
         id = "jozelotproxy",
@@ -212,6 +214,20 @@ public class JozelotProxy {
         consoleLogger.broadCastToConsole("Listener erstellt");
 
         pluginStartMessage();
+
+        server.getScheduler().buildTask(this, () -> {
+            for (RegisteredServer rs : server.getAllServers()) {
+                String name = rs.getServerInfo().getName();
+                int playerCount = rs.getPlayersConnected().size();
+
+                rs.ping().thenAccept(pingResult -> {
+                    redisManager.updateStatus(name, playerCount, true);
+                }).exceptionally(ex -> {
+                    redisManager.updateStatus(name, 0, false);
+                    return null;
+                });
+            }
+        }).repeat(5, TimeUnit.SECONDS).schedule();
     }
 
     private void pluginStartMessage() {

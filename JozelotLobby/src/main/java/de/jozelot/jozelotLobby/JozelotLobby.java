@@ -1,9 +1,6 @@
 package de.jozelot.jozelotLobby;
 
-import de.jozelot.jozelotLobby.database.MySQLSetup;
-import de.jozelot.jozelotLobby.database.RedisListener;
-import de.jozelot.jozelotLobby.database.RedisManager;
-import de.jozelot.jozelotLobby.database.RedisSetup;
+import de.jozelot.jozelotLobby.database.*;
 import de.jozelot.jozelotLobby.ui.inventories.InventoryManager;
 import de.jozelot.jozelotLobby.ui.items.ClickHandler;
 import de.jozelot.jozelotLobby.ui.items.HotbarItems;
@@ -16,6 +13,7 @@ import de.jozelot.jozelotLobby.storage.LangManager;
 import de.jozelot.jozelotLobby.utils.ReloadPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.checkerframework.checker.units.qual.N;
 
 import java.util.Map;
 
@@ -24,6 +22,7 @@ public final class JozelotLobby extends JavaPlugin {
     private ConfigManager config;
     private RedisSetup redisSetup;
     private RedisManager redisManager;
+    private RedisPublish redisPublish;
     private LangManager lang;
     private ReloadPlugin reloadPlugin;
 
@@ -35,6 +34,8 @@ public final class JozelotLobby extends JavaPlugin {
 
     private MySQLSetup mySQLSetup;
     private InventoryManager inventoryManager;
+
+    private NetworkStateManager networkStateManager;
 
     @Override
     public void onEnable() {
@@ -49,6 +50,7 @@ public final class JozelotLobby extends JavaPlugin {
         this.mySQLSetup = new MySQLSetup(this);
         mySQLSetup.setup();
         this.reloadPlugin = new ReloadPlugin(this);
+        this.redisPublish = new RedisPublish(this);
 
         new RedisListener(this);
         this.lobbyPlayerDatabase = new LobbyPlayerDatabase(this);
@@ -57,6 +59,7 @@ public final class JozelotLobby extends JavaPlugin {
         this.hotbarManager = new HotbarManager(this);
 
         this.inventoryManager = new InventoryManager(this);
+        this.networkStateManager = new NetworkStateManager();
 
         getServer().getPluginManager().registerEvents(new PlayerConnectionListener(this), this);
         getServer().getPluginManager().registerEvents(new ClickHandler(this), this);
@@ -99,6 +102,9 @@ public final class JozelotLobby extends JavaPlugin {
     public RedisManager getRedisManager() {
         return redisManager;
     }
+    public RedisPublish getRedisPublish() {
+        return redisPublish;
+    }
 
     public RedisSetup getRedisSetup() {
         return redisSetup;
@@ -130,5 +136,9 @@ public final class JozelotLobby extends JavaPlugin {
 
     public InventoryManager getInventoryManager() {
         return inventoryManager;
+    }
+
+    public NetworkStateManager getNetworkStateManager() {
+        return networkStateManager;
     }
 }

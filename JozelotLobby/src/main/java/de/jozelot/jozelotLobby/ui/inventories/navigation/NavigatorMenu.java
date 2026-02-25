@@ -5,6 +5,7 @@ import com.destroystokyo.paper.profile.ProfileProperty;
 import de.jozelot.jozelotLobby.JozelotLobby;
 import de.jozelot.jozelotLobby.player.LobbyPlayer;
 import de.jozelot.jozelotLobby.ui.items.HotbarItems;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -15,11 +16,13 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ItemType;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.UUID;
 
 public class NavigatorMenu implements InventoryHolder {
@@ -88,6 +91,29 @@ public class NavigatorMenu implements InventoryHolder {
     }
 
     public void update() {
+        Material challengeServerMaterial = Material.getMaterial(plugin.getConfig().getString("items.challenges_button.item"));
+
+        if (challengeServerMaterial == null) {
+            challengeServerMaterial = Material.BARRIER;
+        }
+
+        ItemStack challengeServer = new ItemStack(challengeServerMaterial);
+
+        challengeServer.editMeta(meta -> {
+            meta.displayName(mm.deserialize(plugin.getConfig().getString("items.challenges_button.name")));
+            meta.getPersistentDataContainer().set(HotbarItems.IS_PROTECTED, PersistentDataType.BOOLEAN, true);
+            meta.getPersistentDataContainer().set(HotbarItems.ITEM_ID, PersistentDataType.STRING, "challenge_server");
+
+            List<String> itemDescription = plugin.getConfig().getStringList("items.challenges_button.lore");
+
+            List<Component> lore = itemDescription.stream()
+                    .map(line -> line.replace("{online_players}", String.valueOf(count)))
+                    .map(mm::deserialize)
+                    .toList();
+
+            meta.lore(lore);
+        });
+
 
     }
 

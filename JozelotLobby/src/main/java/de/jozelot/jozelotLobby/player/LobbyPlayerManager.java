@@ -47,9 +47,7 @@ public class LobbyPlayerManager {
 
     public void removePlayer(LobbyPlayer lobbyPlayer) {
         if (lobbyPlayer != null) {
-            plugin.getLobbyPlayerDatabase().setHiderState(lobbyPlayer, lobbyPlayer.getHiderState());
-            plugin.getLobbyPlayerDatabase().setSettings(lobbyPlayer, lobbyPlayer.getSettings());
-            players.remove(lobbyPlayer.getUuid());
+            removePlayer(lobbyPlayer.getPlayer());
         }
     }
 
@@ -65,6 +63,7 @@ public class LobbyPlayerManager {
     }
 
     public void removeAllPlayers() {
+        lpd.saveAllPlayerSettings(players.values());
         players.clear();
     }
 
@@ -77,6 +76,10 @@ public class LobbyPlayerManager {
         states.forEach((uuid, hiderState) -> {
             LobbyPlayer lobbyPlayer = new LobbyPlayer(uuid, hiderState, plugin);
             players.put(uuid, lobbyPlayer);
+
+            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                lobbyPlayer.setSettings(lpd.getAllSettings(lobbyPlayer));
+            });
         });
     }
 }

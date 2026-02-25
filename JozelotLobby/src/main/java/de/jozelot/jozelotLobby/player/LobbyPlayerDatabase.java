@@ -119,8 +119,8 @@ public class LobbyPlayerDatabase {
             return;
         }
 
-        String sql = "INSERT INTO player_settings (uuid, setting_key, settings_value) VALUES (?, ?, ?) " +
-                "ON DUPLICATE KEY UPDATE settings_value = VALUES(settings_value);";
+        String sql = "INSERT INTO player_settings (uuid, setting_key, setting_value) VALUES (?, ?, ?) " +
+                "ON DUPLICATE KEY UPDATE settings_value = VALUES(setting_value);";
 
         try (Connection conn = plugin.getMySQLSetup().getConnection();
              PreparedStatement insertStmt = conn.prepareStatement(sql)) {
@@ -140,8 +140,8 @@ public class LobbyPlayerDatabase {
 
         String uuidStr = player.getUuid().toString();
 
-        String sqlInsert = "INSERT INTO player_settings (uuid, setting_key, settings_value) VALUES (?, ?, ?) " +
-                "ON DUPLICATE KEY UPDATE settings_value = VALUES(settings_value);";
+        String sqlInsert = "INSERT INTO player_settings (uuid, setting_key, setting_value) VALUES (?, ?, ?) " +
+                "ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value);";
         String sqlDelete = "DELETE FROM player_settings WHERE uuid = ? AND setting_key = ?;";
 
         try (Connection conn = plugin.getMySQLSetup().getConnection()) {
@@ -190,7 +190,29 @@ public class LobbyPlayerDatabase {
     }
 
     public Map<Setting, String> getAllSettings(LobbyPlayer player) {
-        return Map.of();
+        Map<Setting, String> settingsMap = new HashMap<>();
+        String sql = "SELECT setting_key, setting_value FROM player_settings WHERE uuid = ?;";
+
+        try (Connection conn = plugin.getMySQLSetup().getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, player.getUuid().toString());
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    String key = rs.getString("setting_key");
+                    String value = rs.getString("setting_value");
+
+                    Setting setting = Setting.fromKey(key);
+                    if (setting != null) {
+                        settingsMap.put(setting, value);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return settingsMap;
     }
 
     public void saveAllPlayerSettings(Collection<LobbyPlayer> players) {
@@ -199,8 +221,8 @@ public class LobbyPlayerDatabase {
         String sqlHider = "INSERT INTO player_state (uuid, player_hider) VALUES (?, ?) " +
                 "ON DUPLICATE KEY UPDATE player_hider = VALUES(player_hider);";
 
-        String sqlInsertSetting = "INSERT INTO player_settings (uuid, setting_key, settings_value) VALUES (?, ?, ?) " +
-                "ON DUPLICATE KEY UPDATE settings_value = VALUES(settings_value);";
+        String sqlInsertSetting = "INSERT INTO player_settings (uuid, setting_key, setting_value) VALUES (?, ?, ?) " +
+                "ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value);";
 
         String sqlDeleteSetting = "DELETE FROM player_settings WHERE uuid = ? AND setting_key = ?;";
 
