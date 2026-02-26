@@ -12,10 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Skull;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.ItemType;
+import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataType;
@@ -91,7 +88,7 @@ public class NavigatorMenu implements InventoryHolder {
     }
 
     public void update() {
-        Material challengeServerMaterial = Material.getMaterial(plugin.getConfig().getString("items.challenges_button.item"));
+        Material challengeServerMaterial = Material.getMaterial(plugin.getConfig().getString("items.challenge_server.item"));
 
         if (challengeServerMaterial == null) {
             challengeServerMaterial = Material.BARRIER;
@@ -99,21 +96,42 @@ public class NavigatorMenu implements InventoryHolder {
 
         ItemStack challengeServer = new ItemStack(challengeServerMaterial);
 
+        int challengeServerPlayerCount = 0;
+
+        challengeServerPlayerCount += plugin.getNetworkStateManager().getServer("challenge-1").players();
+        challengeServerPlayerCount += plugin.getNetworkStateManager().getServer("challenge-2").players();
+        challengeServerPlayerCount += plugin.getNetworkStateManager().getServer("challenge-3").players();
+
+        String finalChallengeServerPlayerCount = challengeServerPlayerCount < 0 ? "<#00FC00>" + challengeServerPlayerCount : "<#f90036>" + challengeServerPlayerCount;
+
+        int challengeServerCount = 0;
+        int maxChallengeServerCount = 3;
+
+        challengeServerCount += plugin.getNetworkStateManager().getServer("challenge-1").online() ? 1 : 0;
+        challengeServerCount += plugin.getNetworkStateManager().getServer("challenge-2").online() ? 1 : 0;
+        challengeServerCount += plugin.getNetworkStateManager().getServer("challenge-3").online() ? 1 : 0;
+
+        String finalChallegeServerCount = challengeServerCount < maxChallengeServerCount ? "<#00FC00>" + challengeServerCount : "<#f90036>" + challengeServerCount;
+
         challengeServer.editMeta(meta -> {
-            meta.displayName(mm.deserialize(plugin.getConfig().getString("items.challenges_button.name")));
+            meta.displayName(mm.deserialize(plugin.getConfig().getString("items.challenge_server.name")));
             meta.getPersistentDataContainer().set(HotbarItems.IS_PROTECTED, PersistentDataType.BOOLEAN, true);
             meta.getPersistentDataContainer().set(HotbarItems.ITEM_ID, PersistentDataType.STRING, "challenge_server");
 
-            List<String> itemDescription = plugin.getConfig().getStringList("items.challenges_button.lore");
+            List<String> itemDescription = plugin.getConfig().getStringList("items.challenge_server.lore");
 
             List<Component> lore = itemDescription.stream()
-                    .map(line -> line.replace("{online_players}", String.valueOf(count)))
+                    .map(line -> line.replace("{online_players}", finalChallengeServerPlayerCount))
+                    .map(line -> line.replace("{online_servers}", finalChallegeServerCount))
+                    .map(line -> line.replace("{max_servers}", String.valueOf(maxChallengeServerCount)))
                     .map(mm::deserialize)
                     .toList();
 
             meta.lore(lore);
+            meta.addItemFlags(ItemFlag.values());
         });
 
+        inventory.setItem(13, challengeServer);
 
     }
 

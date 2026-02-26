@@ -417,7 +417,7 @@ lobby-restart-kick:
   - "{grey}Bitte gedulde dich einen kleinen Moment."
   - "{grey}Du kannst in Kürze wieder {secondary}beitreten{grey}."
   - ""
-  - "<dark_gray>Versuche es in ca. <white>10 Sekunden</white> erneut."
+  - "<dark_gray>Versuche es in ca. <white>60 Sekunden</white> erneut."
 
 command-spy-enabled: '{grey}Spy Modus {primary}aktiviert{grey}. Du siehst nun alle privaten Nachrichten.'
 command-spy-disabled: '{grey}Spy Modus {danger}deaktiviert{grey}.'
