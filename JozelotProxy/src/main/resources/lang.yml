@@ -489,3 +489,5 @@ command-vanish-target-enabled: "{grey}Dein Vanish wurde {primary}aktiviert{grey}
 command-vanish-target-disabled: "{grey}Dein Vanish wurde {danger}deaktiviert{grey}"
 
 command-vanish-log: "{grey}[<gradient:#f90036:#f90011><b>LOG</b></gradient>{grey}] {primary}{player} {grey}hat Vanish {secondary}{state} {tertiary}{info}"
+
+event-server-no-event: "{grey}Aktuell findet kein Event statt!"

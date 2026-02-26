@@ -216,18 +216,21 @@ public class JozelotProxy {
         pluginStartMessage();
 
         server.getScheduler().buildTask(this, () -> {
-            for (RegisteredServer rs : server.getAllServers()) {
-                String name = rs.getServerInfo().getName();
-                int playerCount = rs.getPlayersConnected().size();
 
-                rs.ping().thenAccept(pingResult -> {
-                    redisManager.updateStatus(name, playerCount, true);
-                }).exceptionally(ex -> {
-                    redisManager.updateStatus(name, 0, false);
-                    return null;
-                });
-            }
-        }).repeat(5, TimeUnit.SECONDS).schedule();
+                    for (RegisteredServer rs : server.getAllServers()) {
+                        String name = rs.getServerInfo().getName();
+                        int players = rs.getPlayersConnected().size();
+
+                        rs.ping().thenAccept(pingResult -> {
+                            redisManager.updateStatus(name, players, true);
+                        }).exceptionally(ex -> {
+                            redisManager.updateStatus(name, 0, false);
+                            return null;
+                        });
+                    }
+                })
+                .repeat(3, TimeUnit.SECONDS)
+                .schedule();
     }
 
     private void pluginStartMessage() {

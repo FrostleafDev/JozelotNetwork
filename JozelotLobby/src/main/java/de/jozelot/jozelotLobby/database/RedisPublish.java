@@ -21,7 +21,7 @@ public class RedisPublish {
         if (jedis != null) {
             String message = uuid + ";" + serverName;
 
-            jedis.publish("move_player", message);
+            jedis.publish("network:move", message);
         }
     }
 }

@@ -78,12 +78,17 @@ public class RedisManager {
     }
 
     public void updateStatus(String serverName, int onlinePlayers, boolean isOnline) {
-        try (JedisPooled jedis = plugin.getRedisSetup().getJedis()) {
+        JedisPooled jedis = plugin.getRedisSetup().getJedis();
+        if (jedis == null) return;
+
+        try {
             String statusValue = onlinePlayers + ":" + (isOnline ? "online" : "offline");
 
             jedis.hset("network_status", serverName, statusValue);
 
-            jedis.expire("network_status", 10);
+            jedis.expire("network_status", 60);
+        } catch (Exception e) {
+            consoleLogger.broadCastToConsole("Redis Fehler beim Status-Update für " + serverName + ": " + e.getMessage());
         }
     }
 }

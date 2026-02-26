@@ -63,9 +63,63 @@ items:
     name: '<!italic><gradient:#fca801:#fc3701><bold>Challenges'
     lore:
       - ''
-      - '<!italic><gray>Status: {online_servers}<gray>/<#00FC00>{max_servers}'
-      - '<!italic><gray>Spieler: {online_players}'
+      - '<!italic><gray>Der Hauptgrund warum dieses'
+      - '<!italic><gray>Netzwerk existiert. Für Force'
+      - '<!italic><gray>Item Battles, Challenges wie'
+      - '<!italic><gray>bei BastiGHG und Manhunts'
+      - ''
+      - '<!italic><dark_gray>» <gray>Status: <#00FC00>{online_servers}<dark_gray>/<white>{max_servers}'
+      - '<!italic><dark_gray>» <gray>Spieler: <#00A4FC>{online_players} 👤'
 
-inventories:
-  navigator:
-    title: 'Navigator'
+  archiv_server:
+    item: BOOK
+    name: '<!italic><aqua>Archiv'
+    lore:
+      - ''
+      - '<!italic><gray>Hier findest du alle alten'
+      - '<!italic><gray>Projekte wieder! Nimm dir'
+      - '<!italic><gray>Zeit um dir alles noch einmal'
+      - '<!italic><gray>anzuschauen'
+      - ''
+      - '<!italic><dark_gray>» <gray>Status: <#00FC00>{online_servers}<dark_gray>/<white>{max_servers}'
+      - '<!italic><dark_gray>» <gray>Spieler: <#00A4FC>{online_players} 👤'
+
+  among_server:
+    item: PLAYER_HEAD
+    base64: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTczNzY2ZjJhZjU1MmE4MWJlODU1ZGY0NjBlMjFjYjcwYzA3MmMzMTUzOTJmODkzNGMwOTEzNDU5YzQ0OTYyMCJ9fX0='
+    name: '<!italic><dark_red>Among Us'
+    lore:
+      - ''
+      - '<!italic><gray>Spiele coole kleine Among Us'
+      - '<!italic><gray>Runden in Minecraft auf der'
+      - '<!italic><gray>Map von thejocraft!'
+      - ''
+      - '<!italic><dark_gray>» <gray>Status: <#00FC00>{status}'
+      - '<!italic><dark_gray>» <gray>Spieler: <#00A4FC>{online_players} 👤'
+
+  duels_server:
+    item: DIAMOND_SWORD
+    name: '<!italic><gradient:#0356fc:#03fcfc><bold>Duels'
+    lore:
+      - ''
+      - '<!italic><gray>Spiele im Duell gegen Freunde'
+      - '<!italic><gray>oder mitspieler! Du kannst'
+      - '<!italic><gray>dein eigenes Kit erstellen'
+      - '<!italic><gray>oder eins der vorgefertigten'
+      - '<!italic><gray>verwenden.'
+      - ''
+      - '<!italic><dark_gray>» <gray>Status: <#00FC00>{status}'
+      - '<!italic><dark_gray>» <gray>Spieler: <#00A4FC>{online_players} 👤'
+
+  event_server:
+    item: NETHER_STAR
+    name: '<!italic><gradient:#03fc30:#03e3fc><bold>AwesomeSMP </bold><dark_gray>[Event-Server]'
+    server: ''
+    lore:
+      - ''
+      - '<!italic><gray>Hier finden die aktuellen'
+      - '<!italic><gray>Events wie SMPs oder andere'
+      - '<!italic><gray>spezielle Projekte statt!'
+      - ''
+      - '<!italic><dark_gray>» <gray>Status: <#00FC00>{status}'
+      - '<!italic><dark_gray>» <gray>Spieler: <#00A4FC>{online_players} 👤'

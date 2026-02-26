@@ -70,7 +70,6 @@ public final class JozelotLobby extends JavaPlugin {
             Bukkit.getConsoleSender().sendMessage("§a[§JoLobby§a] §7Sprach-Synchronisierung mit Proxy abgeschlossen!");
         }
 
-
         getServer().getConsoleSender().sendMessage("§a[§JoLobby§a]§a Minecraft läuft in der " + Bukkit.getBukkitVersion());
         getServer().getConsoleSender().sendMessage("§a[§JoLobby§a]§a ----------------------------------------------");
         getServer().getConsoleSender().sendMessage("§a[§JoLobby§a]§a    +==================+");

@@ -21,7 +21,7 @@ public class RedisListener {
                 plugin.getRedisSetup().getJedis().subscribe(new JedisPubSub() {
                     @Override
                     public void onMessage(String channel, String message) {
-                        if (channel.equals("move_player")) {
+                        if (channel.equals("network:move")) {
                             // String wieder zerlegen
                             String[] parts = message.split(";");
 
@@ -33,7 +33,7 @@ public class RedisListener {
                             }
                         }
                     }
-                }, "network:control");
+                }, "network:move");
             } catch (Exception e) {
             }
         }, "Redis-Listener-Thread").start();

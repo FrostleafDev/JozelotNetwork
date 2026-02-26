@@ -14,6 +14,7 @@ public class RedisListener {
     public RedisListener(JozelotLobby plugin) {
         this.plugin = plugin;
         startListening();
+        startStatusUpdater();
     }
 
     private void startListening() {
@@ -57,6 +58,6 @@ public class RedisListener {
             } catch (Exception e) {
                 plugin.getLogger().warning("Redis: Fehler beim Update der Server-Status-Daten: " + e.getMessage());
             }
-        }, 0L, 100L);
+        }, 0L, 60L);
     }
 }
