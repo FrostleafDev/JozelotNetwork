@@ -1,5 +1,6 @@
 package de.jozelot.jozelotLobby;
 
+import de.jozelot.jozelotLobby.api.placeholderapi.PlayerCount;
 import de.jozelot.jozelotLobby.database.*;
 import de.jozelot.jozelotLobby.ui.inventories.InventoryManager;
 import de.jozelot.jozelotLobby.ui.items.ClickHandler;
@@ -78,6 +79,11 @@ public final class JozelotLobby extends JavaPlugin {
         getServer().getConsoleSender().sendMessage("§a[§JoLobby§a]§a ----------------------------------------------");
         getServer().getConsoleSender().sendMessage("§a[§JoLobby§a]§6    Version: §e" + getVersion());
         getServer().getConsoleSender().sendMessage("§a[§JoLobby§a]§a ----------------------------------------------");
+
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            new PlayerCount(this).register();
+            getLogger().info("PlaceholderAPI Expansion registriert!");
+        }
     }
 
     @Override

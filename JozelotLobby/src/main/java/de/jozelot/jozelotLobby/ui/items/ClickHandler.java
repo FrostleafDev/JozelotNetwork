@@ -6,6 +6,9 @@ import de.jozelot.jozelotLobby.ui.inventories.InventoryType;
 import de.jozelot.jozelotLobby.ui.inventories.navigation.ArchivMenu;
 import de.jozelot.jozelotLobby.ui.inventories.navigation.ChallengeMenu;
 import de.jozelot.jozelotLobby.ui.inventories.navigation.NavigatorMenu;
+import de.jozelot.jozelotLobby.ui.inventories.profile.SecretMenu;
+import de.jozelot.jozelotLobby.ui.inventories.profile.SpielerinfoMenu;
+import de.jozelot.jozelotLobby.ui.inventories.profile.settings.SettingsMenu;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -55,7 +58,7 @@ public class ClickHandler implements Listener {
                 lobbyPlayer.openInventory(InventoryType.NAVIGATOR);
                 break;
             case "profile":
-
+                lobbyPlayer.openInventory(InventoryType.PROFILE);
                 break;
             case "player_hider":
                 lobbyPlayer.toggleHider();
@@ -105,6 +108,15 @@ public class ClickHandler implements Listener {
                 break;
             case "archiv_server":
                 openSubMenu(lobbyPlayer, InventoryType.ARCHIV, InventoryType.NAVIGATOR);
+                break;
+            case "secret_menu":
+                openSubMenu(lobbyPlayer, InventoryType.SECRETS, InventoryType.PROFILE);
+                break;
+            case "statistic_menu":
+                openSubMenu(lobbyPlayer, InventoryType.SPIELERINFO, InventoryType.PROFILE);
+                break;
+            case "settings_menu":
+                openSubMenu(lobbyPlayer, InventoryType.SETTINGS, InventoryType.PROFILE);
                 break;
             case "back_button":
                 backButton(player, event.getInventory().getHolder());
@@ -158,6 +170,12 @@ public class ClickHandler implements Listener {
             parent = menu.getParentType();
         } else if (holder instanceof ArchivMenu menu) {
             parent = menu.getParentType();
+        } else if (holder instanceof SecretMenu menu) {
+            parent = menu.getParentType();
+        } else if (holder instanceof SpielerinfoMenu menu) {
+            parent = menu.getParentType();
+        } else if (holder instanceof SettingsMenu menu) {
+            parent = menu.getParentType();
         }
 
         if (parent == null) {
@@ -185,6 +203,10 @@ public class ClickHandler implements Listener {
         }
 
         if (inventory.getHolder() instanceof NavigatorMenu menu) {
+            menu.stopUpdateTask();
+        } else if (inventory.getHolder() instanceof ChallengeMenu menu) {
+            menu.stopUpdateTask();
+        } else if (inventory.getHolder() instanceof ArchivMenu menu) {
             menu.stopUpdateTask();
         }
     }

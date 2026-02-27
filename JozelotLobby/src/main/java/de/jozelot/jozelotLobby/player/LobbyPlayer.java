@@ -7,6 +7,10 @@ import de.jozelot.jozelotLobby.ui.inventories.InventoryType;
 import de.jozelot.jozelotLobby.ui.inventories.navigation.ArchivMenu;
 import de.jozelot.jozelotLobby.ui.inventories.navigation.ChallengeMenu;
 import de.jozelot.jozelotLobby.ui.inventories.navigation.NavigatorMenu;
+import de.jozelot.jozelotLobby.ui.inventories.profile.ProfileMenu;
+import de.jozelot.jozelotLobby.ui.inventories.profile.SecretMenu;
+import de.jozelot.jozelotLobby.ui.inventories.profile.SpielerinfoMenu;
+import de.jozelot.jozelotLobby.ui.inventories.profile.settings.SettingsMenu;
 import de.jozelot.jozelotLobby.ui.items.HiderState;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
@@ -149,13 +153,13 @@ public class LobbyPlayer {
         Player player = getPlayer();
         InventoryHolder holder = type.create(plugin, player);
 
-        if (holder instanceof ChallengeMenu menu) {
-            menu.setParentType(parent);
-        } else if (holder instanceof NavigatorMenu menu) {
-            menu.setParentType(parent);
-        } else if (holder instanceof ArchivMenu menu) {
-            menu.setParentType(parent);
-        }
+        if (holder instanceof NavigatorMenu menu) menu.setParentType(parent);
+        else if (holder instanceof ChallengeMenu menu) menu.setParentType(parent);
+        else if (holder instanceof ArchivMenu menu) menu.setParentType(parent);
+        else if (holder instanceof ProfileMenu menu) menu.setParentType(parent);
+        else if (holder instanceof SecretMenu menu) menu.setParentType(parent);
+        else if (holder instanceof SpielerinfoMenu menu) menu.setParentType(parent);
+        else if (holder instanceof SettingsMenu menu) menu.setParentType(parent);
 
         player.openInventory(holder.getInventory());
     }

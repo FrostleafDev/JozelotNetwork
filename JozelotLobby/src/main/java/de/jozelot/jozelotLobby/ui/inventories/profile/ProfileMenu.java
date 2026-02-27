@@ -1,4 +1,4 @@
-package de.jozelot.jozelotLobby.ui.inventories.navigation;
+package de.jozelot.jozelotLobby.ui.inventories.profile;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
@@ -11,7 +11,10 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.*;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitTask;
@@ -21,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class NavigatorMenu implements InventoryHolder {
+public class ProfileMenu implements InventoryHolder {
 
     private final Inventory inventory;
     private final JozelotLobby plugin;
@@ -29,16 +32,15 @@ public class NavigatorMenu implements InventoryHolder {
     private BukkitTask bukkitTask;
     private final MiniMessage mm = MiniMessage.miniMessage();
 
-    public NavigatorMenu(JozelotLobby plugin, Player player) {
+    public ProfileMenu(JozelotLobby plugin, Player player) {
         this.plugin = plugin;
         this.lobbyPlayer = plugin.getLobbyPlayerManager().getPlayer(player);
 
-        String title = plugin.getConfig().getString("inventories.navigator.title", "Navigator");
-        this.inventory = Bukkit.createInventory(this, 9 * 4, mm.deserialize(title));
+        String title = plugin.getConfig().getString("inventories.profile.title", "Profil");
+        this.inventory = Bukkit.createInventory(this, 9 * 3, mm.deserialize(title));
 
         fillBackGround();
         update();
-        startUpdateTask();
     }
 
     private InventoryType parentType = null;
@@ -58,7 +60,7 @@ public class NavigatorMenu implements InventoryHolder {
             meta.getPersistentDataContainer().set(HotbarItems.IS_PROTECTED, PersistentDataType.BOOLEAN, true);
         });
 
-        for (int i : new int[]{0,1,2,3,4,5,6,7,8,28,29,30,32,33,34,35}) {
+        for (int i : new int[]{0,1,2,3,4,5,6,7,8,19,20,21,22,23,24,25,26}) {
             inventory.setItem(i, filler);
         }
 
@@ -72,87 +74,42 @@ public class NavigatorMenu implements InventoryHolder {
             meta.getPersistentDataContainer().set(HotbarItems.ITEM_ID, PersistentDataType.STRING, "back_button");
             meta.getPersistentDataContainer().set(HotbarItems.IS_PROTECTED, PersistentDataType.BOOLEAN, true);
         });
-        inventory.setItem(27, backArrow);
-
-        // Spawn Button
-        Material spawnMat = Material.matchMaterial(plugin.getConfig().getString("items.spawn_button.item", "MAGMA_CREAM"));
-        ItemStack spawnButton = new ItemStack(spawnMat != null ? spawnMat : Material.MAGMA_CREAM);
-        spawnButton.editMeta(meta -> {
-            meta.displayName(mm.deserialize(plugin.getConfig().getString("items.spawn_button.name", "<gold>Spawn")));
-            meta.getPersistentDataContainer().set(HotbarItems.ITEM_ID, PersistentDataType.STRING, "spawn_button");
-            meta.getPersistentDataContainer().set(HotbarItems.IS_PROTECTED, PersistentDataType.BOOLEAN, true);
-        });
-        inventory.setItem(31, spawnButton);
+        inventory.setItem(18, backArrow);
     }
 
     public void update() {
-        // Challenges
-        setupServerItem(13, "challenge_server", new String[]{"challenge-1", "challenge-2", "challenge-3"}, true);
+        // SECRETS
+        setupServerItem(11, "secret_menu");
 
-        // Archiv
-        setupServerItem(21, "archiv_server", new String[]{"archiv-1", "archiv-2"}, true);
+        // STATISTICS
+        setupServerItem(13, "statistic_menu");
 
-        // Among Us
-        setupServerItem(10, "among_server", new String[]{"among-us"}, false);
-
-        // Duels
-        setupServerItem(23, "duels_server", new String[]{"duels"}, false);
-
-        // Event
-        String eventSrv = plugin.getConfig().getString("items.event_server.server", "");
-        setupServerItem(16, "event_server", eventSrv.isEmpty() ? new String[0] : new String[]{eventSrv}, false);
+        // SETTINGS
+        setupServerItem(15, "settings_menu");
     }
 
-    private void setupServerItem(int slot, String configKey, String[] serverIds, boolean isMulti) {
+    private void setupServerItem(int slot, String configKey) {
         String path = "items." + configKey;
 
-        // Material holen
         String matName = plugin.getConfig().getString(path + ".item", "BARRIER");
         Material mat = Material.matchMaterial(matName != null ? matName : "BARRIER");
         ItemStack item = new ItemStack(mat != null ? mat : Material.BARRIER);
 
-        // Netzwerk Daten
-        int totalPlayers = 0;
-        int onlineCount = 0;
-        for (String id : serverIds) {
-            var state = plugin.getNetworkStateManager().getServer(id);
-            if (state != null) {
-                totalPlayers += state.players();
-                if (state.online()) onlineCount++;
-            }
-        }
-
-        // Platzhalter vorbereiten
-        final String finalPlayers = (totalPlayers > 0 ? "<#00FC00>" : "<#f90036>") + totalPlayers;
-        final String finalStatus;
-        if (serverIds.length == 0) {
-            finalStatus = "<#f90036>Kein Event";
-        } else if (isMulti) {
-            finalStatus = (onlineCount < serverIds.length ? "<#f90036>" : "<#00FC00>") + onlineCount;
-        } else {
-            finalStatus = onlineCount > 0 ? "<#00FC00>Online" : "<#f90036>Offline";
-        }
-
-        // Meta anwenden
         item.editMeta(meta -> {
-            // Name
+
             String name = plugin.getConfig().getString(path + ".name");
             meta.displayName(mm.deserialize(name != null ? name : "<red>FEHLER: Name fehlt"));
 
-            // Lore
             List<String> configLore = plugin.getConfig().getStringList(path + ".lore");
             List<Component> loreComponents = new ArrayList<>();
             for (String line : configLore) {
                 if (line == null) continue;
-                String replaced = line.replace("{online_players}", finalPlayers)
-                        .replace("{online_servers}", finalStatus)
-                        .replace("{status}", finalStatus)
-                        .replace("{max_servers}", String.valueOf(serverIds.length));
+                String replaced = line.replace("{secrets_current}", "0")
+                        .replace("{secrets_max}", "0");
                 loreComponents.add(mm.deserialize(replaced));
             }
             meta.lore(loreComponents);
 
-            // Kopf Textur
             if (meta instanceof SkullMeta skullMeta) {
                 String b64 = plugin.getConfig().getString(path + ".base64");
                 if (b64 != null && !b64.isEmpty()) {
@@ -168,14 +125,6 @@ public class NavigatorMenu implements InventoryHolder {
         });
 
         inventory.setItem(slot, item);
-    }
-
-    public void startUpdateTask() {
-        this.bukkitTask = Bukkit.getScheduler().runTaskTimer(plugin, this::update, 0L, 60L);
-    }
-
-    public void stopUpdateTask() {
-        if (this.bukkitTask != null) this.bukkitTask.cancel();
     }
 
     @Override

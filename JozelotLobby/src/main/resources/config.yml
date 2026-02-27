@@ -63,10 +63,9 @@ items:
     name: '<!italic><gradient:#fca801:#fc3701><bold>Challenges'
     lore:
       - ''
-      - '<!italic><gray>Der Hauptgrund warum dieses'
-      - '<!italic><gray>Netzwerk existiert. Für Force'
-      - '<!italic><gray>Item Battles, Challenges wie'
-      - '<!italic><gray>bei BastiGHG und Manhunts'
+      - '<!italic><gray>Der Hauptgrund warum dieses Netzwerk'
+      - '<!italic><gray>existiert. Für Force Item Battles'
+      - '<!italic><gray>Challenges wie bei BastiGHG und Manhunts.'
       - ''
       - '<!italic><dark_gray>» <gray>Status: <#00FC00>{online_servers}<dark_gray>/<white>{max_servers}'
       - '<!italic><dark_gray>» <gray>Spieler: <#00A4FC>{online_players} 👤'
@@ -76,10 +75,9 @@ items:
     name: '<!italic><aqua>Archiv'
     lore:
       - ''
-      - '<!italic><gray>Hier findest du alle alten'
-      - '<!italic><gray>Projekte wieder! Nimm dir'
-      - '<!italic><gray>Zeit um dir alles noch einmal'
-      - '<!italic><gray>anzuschauen'
+      - '<!italic><gray>Hier findest du alle alten Projekte'
+      - '<!italic><gray>wieder! Nimm dir Zeit um dir alles'
+      - '<!italic><gray>noch einmal anzuschauen.'
       - ''
       - '<!italic><dark_gray>» <gray>Status: <#00FC00>{online_servers}<dark_gray>/<white>{max_servers}'
       - '<!italic><dark_gray>» <gray>Spieler: <#00A4FC>{online_players} 👤'
@@ -90,9 +88,8 @@ items:
     name: '<!italic><dark_red>Among Us'
     lore:
       - ''
-      - '<!italic><gray>Spiele coole kleine Among Us'
-      - '<!italic><gray>Runden in Minecraft auf der'
-      - '<!italic><gray>Map von thejocraft!'
+      - '<!italic><gray>Spiele coole kleine Among Us Runden'
+      - '<!italic><gray>in Minecraft auf der Map von thejocraft.'
       - ''
       - '<!italic><dark_gray>» <gray>Status: <#00FC00>{status}'
       - '<!italic><dark_gray>» <gray>Spieler: <#00A4FC>{online_players} 👤'
@@ -102,24 +99,23 @@ items:
     name: '<!italic><gradient:#0356fc:#03fcfc><bold>Duels'
     lore:
       - ''
-      - '<!italic><gray>Spiele im Duell gegen Freunde'
-      - '<!italic><gray>oder mitspieler! Du kannst'
-      - '<!italic><gray>dein eigenes Kit erstellen'
-      - '<!italic><gray>oder eins der vorgefertigten'
-      - '<!italic><gray>verwenden.'
+      - '<!italic><gray>Spiele im Duell gegen Freunde oder'
+      - '<!italic><gray>mitspieler! Du kannst dein eigenes'
+      - '<!italic><gray>Kit erstellen oder eins der'
+      - '<!italic><gray>vorgefertigten verwenden.'
       - ''
       - '<!italic><dark_gray>» <gray>Status: <#00FC00>{status}'
       - '<!italic><dark_gray>» <gray>Spieler: <#00A4FC>{online_players} 👤'
 
   event_server:
     item: NETHER_STAR
-    name: '<!italic><gradient:#03fc30:#03e3fc><bold>AwesomeSMP </bold><dark_gray>[Event-Server]'
+    name: '<!italic><gradient:#03fc30:#03e3fc><bold>AwesomeSMP</gradient> <dark_gray>[Event-Server]'
     server: ''
     lore:
       - ''
-      - '<!italic><gray>Hier finden die aktuellen'
-      - '<!italic><gray>Events wie SMPs oder andere'
-      - '<!italic><gray>spezielle Projekte statt!'
+      - '<!italic><gray>Hier finden die aktuellen Events'
+      - '<!italic><gray>wie SMPs oder andere spezielle'
+      - '<!italic><gray>Projekte statt!'
       - ''
       - '<!italic><dark_gray>» <gray>Status: <#00FC00>{status}'
       - '<!italic><dark_gray>» <gray>Spieler: <#00A4FC>{online_players} 👤'
@@ -153,7 +149,7 @@ items:
 
   archiv-1_server:
     item: BOOK
-    name: '<!italic><gradient:#f5961b:#f5291b><bold>Event Attack 1 </bold><dark_gray>[Winter 2024]'
+    name: '<!italic><gradient:#f5961b:#f5291b><bold>Event Attack</gradient> <dark_gray>[Winter 2024]'
     lore:
       - ''
       - '<!italic><gray>Ein Projekt von TFJ von 2024.'
@@ -164,10 +160,10 @@ items:
       - ''
       - '<!italic><dark_gray>» <gray>Status: <#00FC00>{status}'
       - '<!italic><dark_gray>» <gray>Spieler: <#00A4FC>{online_players} 👤'
-      -
+
   archiv-2_server:
     item: BOOK
-    name: '<!italic><gradient:#03fc30:#03e3fc><bold>AwesomeSMP 1 </bold><dark_gray>[Herbst 2025]'
+    name: '<!italic><gradient:#03fc30:#03e3fc><bold>AwesomeSMP</gradient> <dark_gray>[Herbst 2025]'
     lore:
       - ''
       - '<!italic><gray>Ein Herzensprojekt, zum '
@@ -180,6 +176,34 @@ items:
       - '<!italic><dark_gray>» <gray>Status: <#00FC00>{status}'
       - '<!italic><dark_gray>» <gray>Spieler: <#00A4FC>{online_players} 👤'
 
+  secret_menu:
+    item: SPYGLASS
+    name: '<!italic><green>Secret Übersicht'
+    lore:
+      - ''
+      - '<!italic><gray>Hier hast du einen Überblick'
+      - '<!italic><gray>über alle verstecke in der Lobby'
+      - ''
+      - '<!italic><dark_gray>» <gray>Status: <#00FC00>{secrets_current}<dark_gray>/<white>{secrets_current}'
+
+  statistic_menu:
+    item: CHEST
+    name: '<!italic><dark_aqua>Spielerinfo'
+    lore:
+      - ''
+      - '<!italic><gray>Hier findest du alle Informationen'
+      - '<!italic><gray>über dich heraus! Statistiken,'
+      - '<!italic><gray>Erfolge und allgemeine Informationen'
+
+  settings_menu:
+    item: COMPARATOR
+    name: '<!italic><dark_red>Einstellungen'
+    lore:
+      - ''
+      - '<!italic><gray>Stelle alles mögliche für unser'
+      - '<!italic><gray>Netzwerk für dich ein, so wie es'
+      - '<!italic><gray>für dich passt!'
+
 inventories:
   navigator:
     title: "Navigator"
@@ -187,3 +211,11 @@ inventories:
     title: "Challenge Server"
   archiv_server:
     title: "Archiv"
+  profile:
+    title: "Profil"
+  secrets:
+    title: "Secret Übersicht"
+  playerinfo:
+    title: "Spielerinfo"
+  settings:
+    title: "Einstellungen"
