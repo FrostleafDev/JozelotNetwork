@@ -185,3 +185,5 @@ inventories:
     title: "Navigator"
   challenge_server:
     title: "Challenge Server"
+  archiv_server:
+    title: "Archiv"

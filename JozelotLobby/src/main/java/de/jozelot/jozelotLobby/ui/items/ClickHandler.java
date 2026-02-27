@@ -3,6 +3,7 @@ package de.jozelot.jozelotLobby.ui.items;
 import de.jozelot.jozelotLobby.JozelotLobby;
 import de.jozelot.jozelotLobby.player.LobbyPlayer;
 import de.jozelot.jozelotLobby.ui.inventories.InventoryType;
+import de.jozelot.jozelotLobby.ui.inventories.navigation.ArchivMenu;
 import de.jozelot.jozelotLobby.ui.inventories.navigation.ChallengeMenu;
 import de.jozelot.jozelotLobby.ui.inventories.navigation.NavigatorMenu;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -154,6 +155,8 @@ public class ClickHandler implements Listener {
         if (holder instanceof ChallengeMenu menu) {
             parent = menu.getParentType();
         } else if (holder instanceof NavigatorMenu menu) {
+            parent = menu.getParentType();
+        } else if (holder instanceof ArchivMenu menu) {
             parent = menu.getParentType();
         }
 
