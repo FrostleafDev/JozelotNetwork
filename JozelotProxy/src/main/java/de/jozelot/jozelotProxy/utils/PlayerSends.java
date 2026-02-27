@@ -44,6 +44,7 @@ public class PlayerSends {
     public void connectPlayerSimple(Player player, String serverName) {
         Optional<RegisteredServer> targetServer = server.getServer(serverName);
         Optional<ServerConnection> currentConnection = player.getCurrentServer();
+        //System.out.println("Spieler wird gesendet..... ");
 
         String finalName = getDisplayName(serverName);
 
@@ -68,6 +69,7 @@ public class PlayerSends {
     public void connectPlayerSimple(UUID uuid, String serverName) {
         Optional<Player> player = server.getPlayer(uuid);
         player.ifPresent(value -> connectPlayerSimple(value, serverName));
+        //System.out.println("Spieler mit UUID " + uuid.toString() + " gesendet zu " + serverName);
     }
 
     /**

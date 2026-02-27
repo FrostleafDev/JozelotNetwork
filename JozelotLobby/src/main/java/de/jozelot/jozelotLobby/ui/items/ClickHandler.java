@@ -3,6 +3,7 @@ package de.jozelot.jozelotLobby.ui.items;
 import de.jozelot.jozelotLobby.JozelotLobby;
 import de.jozelot.jozelotLobby.player.LobbyPlayer;
 import de.jozelot.jozelotLobby.ui.inventories.InventoryType;
+import de.jozelot.jozelotLobby.ui.inventories.navigation.ChallengeMenu;
 import de.jozelot.jozelotLobby.ui.inventories.navigation.NavigatorMenu;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
@@ -22,6 +23,7 @@ import java.util.Map;
 public class ClickHandler implements Listener {
 
     private final JozelotLobby plugin;
+    private MiniMessage mm = MiniMessage.miniMessage();
 
     public ClickHandler(JozelotLobby plugin) {
         this.plugin = plugin;
@@ -79,17 +81,30 @@ public class ClickHandler implements Listener {
             event.setCancelled(true);
         }
 
+
         String itemId = itemMeta.getPersistentDataContainer().get(HotbarItems.ITEM_ID, PersistentDataType.STRING);
         if (itemId == null) return;
 
         LobbyPlayer lobbyPlayer = plugin.getLobbyPlayerManager().getPlayer(player);
         if (lobbyPlayer == null) return;
 
+        Boolean isOffline = itemMeta.getPersistentDataContainer().get(HotbarItems.IS_OFFLINE, PersistentDataType.BOOLEAN);
+        if (Boolean.TRUE.equals(isOffline)) {
+            lobbyPlayer.playSound("error");
+            player.sendMessage(mm.deserialize(plugin.getLang().format("connect-to-server-offline", null)));
+            return;
+        }
+
         switch (itemId) {
             case "spawn_button":
                 spawnButton(player);
                 break;
-
+            case "challenge_server":
+                openSubMenu(lobbyPlayer, InventoryType.CHALLENGE, InventoryType.NAVIGATOR);
+                break;
+            case "archiv_server":
+                openSubMenu(lobbyPlayer, InventoryType.ARCHIV, InventoryType.NAVIGATOR);
+                break;
             case "back_button":
                 backButton(player, event.getInventory().getHolder());
                 break;
@@ -99,11 +114,25 @@ public class ClickHandler implements Listener {
             case "duels_server":
                 connectButton(lobbyPlayer,"duels");
                 break;
+            case "challenge-1_server":
+                connectButton(lobbyPlayer,"challenge-1");
+                break;
+            case "challenge-2_server":
+                connectButton(lobbyPlayer,"challenge-2");
+                break;
+            case "challenge-3_server":
+                connectButton(lobbyPlayer,"challenge-3");
+            case "archiv-1_server":
+                connectButton(lobbyPlayer,"archiv-1");
+                break;
+            case "archiv-2_server":
+                connectButton(lobbyPlayer,"archiv-2");
+                break;
             case "event_server":
                 //connectButton(player,"event_server");
                 player.sendMessage(MiniMessage.miniMessage().deserialize(plugin.getLang().format("event-server-no-event", null)));
                 lobbyPlayer.playSound("error");
-                break;
+                return;
             default:
                 return;
         }
@@ -117,14 +146,33 @@ public class ClickHandler implements Listener {
     }
 
     private void backButton(Player player, InventoryHolder holder) {
-        if (holder instanceof NavigatorMenu) {
+        LobbyPlayer lobbyPlayer = plugin.getLobbyPlayerManager().getPlayer(player);
+        if (lobbyPlayer == null) return;
+
+        InventoryType parent = null;
+
+        if (holder instanceof ChallengeMenu menu) {
+            parent = menu.getParentType();
+        } else if (holder instanceof NavigatorMenu menu) {
+            parent = menu.getParentType();
+        }
+
+        if (parent == null) {
             player.closeInventory();
+        } else {
+            lobbyPlayer.openInventory(parent);
         }
     }
 
     private void connectButton(LobbyPlayer player, String serverName) {
         player.playSound("pling");
         player.sendToServer(serverName);
+        //plugin.getLogger().info("Sende " + player + " zu " + serverName);
+    }
+
+    public void openSubMenu(LobbyPlayer player, InventoryType inventoryType, InventoryType parentType) {
+        player.openInventory(inventoryType, parentType);
+        player.playSound("pling");
     }
 
     @EventHandler

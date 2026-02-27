@@ -4,12 +4,15 @@ import de.jozelot.jozelotLobby.JozelotLobby;
 import de.jozelot.jozelotLobby.player.settings.ColorPreference;
 import de.jozelot.jozelotLobby.player.settings.Setting;
 import de.jozelot.jozelotLobby.ui.inventories.InventoryType;
+import de.jozelot.jozelotLobby.ui.inventories.navigation.ArchivMenu;
+import de.jozelot.jozelotLobby.ui.inventories.navigation.ChallengeMenu;
 import de.jozelot.jozelotLobby.ui.inventories.navigation.NavigatorMenu;
 import de.jozelot.jozelotLobby.ui.items.HiderState;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.InventoryHolder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -138,15 +141,23 @@ public class LobbyPlayer {
         return settings;
     }
 
-    public void openInventory(InventoryType inventory) {
+    public void openInventory(InventoryType type) {
+        openInventory(type, null);
+    }
+
+    public void openInventory(InventoryType type, InventoryType parent) {
         Player player = getPlayer();
-        switch (inventory) {
-            case PROFILE:
-                break;
-            case NAVIGATOR:
-                player.openInventory(new NavigatorMenu(plugin, player).getInventory());
-                break;
+        InventoryHolder holder = type.create(plugin, player);
+
+        if (holder instanceof ChallengeMenu menu) {
+            menu.setParentType(parent);
+        } else if (holder instanceof NavigatorMenu menu) {
+            menu.setParentType(parent);
+        } else if (holder instanceof ArchivMenu menu) {
+            menu.setParentType(parent);
         }
+
+        player.openInventory(holder.getInventory());
     }
 
     public void sendToServer(String serverName) {

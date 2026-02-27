@@ -23,6 +23,7 @@ public class HotbarItems {
 
     public static final NamespacedKey ITEM_ID = new NamespacedKey("jozelotlobby", "item_id");
     public static final NamespacedKey IS_PROTECTED = new NamespacedKey("jozelotlobby", "protected");
+    public static final NamespacedKey IS_OFFLINE = new NamespacedKey("jozelotlobby", "offline");
 
     public HotbarItems(JozelotLobby plugin) {
         this.plugin = plugin;

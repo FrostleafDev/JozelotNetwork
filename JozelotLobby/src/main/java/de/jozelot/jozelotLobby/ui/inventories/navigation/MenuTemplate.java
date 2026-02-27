@@ -4,14 +4,16 @@ import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
 import de.jozelot.jozelotLobby.JozelotLobby;
 import de.jozelot.jozelotLobby.player.LobbyPlayer;
-import de.jozelot.jozelotLobby.ui.inventories.InventoryType;
 import de.jozelot.jozelotLobby.ui.items.HotbarItems;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.*;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitTask;
@@ -21,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class NavigatorMenu implements InventoryHolder {
+public class MenuTemplate implements InventoryHolder {
 
     private final Inventory inventory;
     private final JozelotLobby plugin;
@@ -29,7 +31,7 @@ public class NavigatorMenu implements InventoryHolder {
     private BukkitTask bukkitTask;
     private final MiniMessage mm = MiniMessage.miniMessage();
 
-    public NavigatorMenu(JozelotLobby plugin, Player player) {
+    public MenuTemplate(JozelotLobby plugin, Player player) {
         this.plugin = plugin;
         this.lobbyPlayer = plugin.getLobbyPlayerManager().getPlayer(player);
 
@@ -41,16 +43,6 @@ public class NavigatorMenu implements InventoryHolder {
         startUpdateTask();
     }
 
-    private InventoryType parentType = null;
-
-    public void setParentType(InventoryType parentType) {
-        this.parentType = parentType;
-    }
-
-    public InventoryType getParentType() {
-        return parentType;
-    }
-
     public void fillBackGround() {
         ItemStack filler = new ItemStack(lobbyPlayer.getColor().getFillerMaterial());
         filler.editMeta(meta -> {
@@ -58,7 +50,7 @@ public class NavigatorMenu implements InventoryHolder {
             meta.getPersistentDataContainer().set(HotbarItems.IS_PROTECTED, PersistentDataType.BOOLEAN, true);
         });
 
-        for (int i : new int[]{0,1,2,3,4,5,6,7,8,37,38,39,41,42,43,44}) {
+        for (int i : new int[]{0,1,2,3,4,5,6,7,8,37,38,39,40,41,42,43,44}) {
             inventory.setItem(i, filler);
         }
 
@@ -70,37 +62,13 @@ public class NavigatorMenu implements InventoryHolder {
             meta.setPlayerProfile(profile);
             meta.displayName(mm.deserialize(plugin.getConfig().getString("items.back_arrow.name", "<red>Zurück")));
             meta.getPersistentDataContainer().set(HotbarItems.ITEM_ID, PersistentDataType.STRING, "back_button");
-            meta.getPersistentDataContainer().set(HotbarItems.IS_PROTECTED, PersistentDataType.BOOLEAN, true);
         });
         inventory.setItem(36, backArrow);
-
-        // Spawn Button
-        Material spawnMat = Material.matchMaterial(plugin.getConfig().getString("items.spawn_button.item", "MAGMA_CREAM"));
-        ItemStack spawnButton = new ItemStack(spawnMat != null ? spawnMat : Material.MAGMA_CREAM);
-        spawnButton.editMeta(meta -> {
-            meta.displayName(mm.deserialize(plugin.getConfig().getString("items.spawn_button.name", "<gold>Spawn")));
-            meta.getPersistentDataContainer().set(HotbarItems.ITEM_ID, PersistentDataType.STRING, "spawn_button");
-            meta.getPersistentDataContainer().set(HotbarItems.IS_PROTECTED, PersistentDataType.BOOLEAN, true);
-        });
-        inventory.setItem(40, spawnButton);
     }
 
     public void update() {
-        // Challenges
+        // SERVER 1
         setupServerItem(13, "challenge_server", new String[]{"challenge-1", "challenge-2", "challenge-3"}, true);
-
-        // Archiv
-        setupServerItem(21, "archiv_server", new String[]{"archiv-1", "archiv-2"}, true);
-
-        // Among Us
-        setupServerItem(19, "among_server", new String[]{"among-us"}, false);
-
-        // Duels
-        setupServerItem(23, "duels_server", new String[]{"duels"}, false);
-
-        // Event
-        String eventSrv = plugin.getConfig().getString("items.event_server.server", "");
-        setupServerItem(25, "event_server", eventSrv.isEmpty() ? new String[0] : new String[]{eventSrv}, false);
     }
 
     private void setupServerItem(int slot, String configKey, String[] serverIds, boolean isMulti) {

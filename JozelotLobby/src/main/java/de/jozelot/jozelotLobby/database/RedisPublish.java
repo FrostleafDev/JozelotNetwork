@@ -22,6 +22,7 @@ public class RedisPublish {
             String message = uuid + ";" + serverName;
 
             jedis.publish("network:move", message);
+            //plugin.getLogger().info("Move nachricht gesendet");
         }
     }
 }

@@ -19,10 +19,7 @@ import de.jozelot.jozelotProxy.commands.messaging.GMsgCommand;
 import de.jozelot.jozelotProxy.commands.messaging.GlobalCommand;
 import de.jozelot.jozelotProxy.commands.messaging.MsgCommand;
 import de.jozelot.jozelotProxy.commands.messaging.ReplyCommand;
-import de.jozelot.jozelotProxy.database.MySQLManager;
-import de.jozelot.jozelotProxy.database.MySQLSetup;
-import de.jozelot.jozelotProxy.database.RedisManager;
-import de.jozelot.jozelotProxy.database.RedisSetup;
+import de.jozelot.jozelotProxy.database.*;
 import de.jozelot.jozelotProxy.listener.*;
 import de.jozelot.jozelotProxy.storage.ConfigManager;
 import de.jozelot.jozelotProxy.storage.LangManager;
@@ -70,6 +67,7 @@ public class JozelotProxy {
     private RedisManager redisManager;
     private MySQLSetup mySQLSetup;
     private MySQLManager mySQLManager;
+    private RedisListener redisListener;
 
     private MiniMessage mm = MiniMessage.miniMessage();
 
@@ -132,6 +130,7 @@ public class JozelotProxy {
         this.groupManager = new GroupManager(this);
         groupManager.load();
         this.pluginReload = new PluginReload(this);
+        this.redisListener = new RedisListener(this);
 
         if (server.getPluginManager().getPlugin("luckperms").isPresent()) {
             this.luckPerms = LuckPermsProvider.get();
@@ -358,5 +357,8 @@ public class JozelotProxy {
 
     public ServerSwitchListener getServerSwitchListener() {
         return serverSwitchListener;
+    }
+    public RedisListener getRedisListener() {
+        return redisListener;
     }
 }

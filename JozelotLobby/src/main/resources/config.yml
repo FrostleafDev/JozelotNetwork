@@ -123,3 +123,65 @@ items:
       - ''
       - '<!italic><dark_gray>» <gray>Status: <#00FC00>{status}'
       - '<!italic><dark_gray>» <gray>Spieler: <#00A4FC>{online_players} 👤'
+      -
+  challenge-1_server:
+    item: GOLDEN_AXE
+    name: '<!italic><gradient:#fca801:#fc3701>Challenge 1'
+    server: ''
+    lore:
+      - ''
+      - '<!italic><dark_gray>» <gray>Status: <#00FC00>{status}'
+      - '<!italic><dark_gray>» <gray>Spieler: <#00A4FC>{online_players} 👤'
+
+  challenge-2_server:
+    item: GOLDEN_AXE
+    name: '<!italic><gradient:#fca801:#fc3701>Challenge 2'
+    server: ''
+    lore:
+      - ''
+      - '<!italic><dark_gray>» <gray>Status: <#00FC00>{status}'
+      - '<!italic><dark_gray>» <gray>Spieler: <#00A4FC>{online_players} 👤'
+
+  challenge-3_server:
+    item: GOLDEN_AXE
+    name: '<!italic><gradient:#fca801:#fc3701>Challenge 3'
+    server: ''
+    lore:
+      - ''
+      - '<!italic><dark_gray>» <gray>Status: <#00FC00>{status}'
+      - '<!italic><dark_gray>» <gray>Spieler: <#00A4FC>{online_players} 👤'
+
+  archiv-1_server:
+    item: BOOK
+    name: '<!italic><gradient:#f5961b:#f5291b><bold>Event Attack 1 </bold><dark_gray>[Winter 2024]'
+    lore:
+      - ''
+      - '<!italic><gray>Ein Projekt von TFJ von 2024.'
+      - '<!italic><gray>Es war ein großer SMP mit ca. 40'
+      - '<!italic><gray>Spielern. Es gab viel Krieg,'
+      - '<!italic><gray>Zerstörung, aber es war einer'
+      - '<!italic><gray>der besten!'
+      - ''
+      - '<!italic><dark_gray>» <gray>Status: <#00FC00>{status}'
+      - '<!italic><dark_gray>» <gray>Spieler: <#00A4FC>{online_players} 👤'
+      -
+  archiv-2_server:
+    item: BOOK
+    name: '<!italic><gradient:#03fc30:#03e3fc><bold>AwesomeSMP 1 </bold><dark_gray>[Herbst 2025]'
+    lore:
+      - ''
+      - '<!italic><gray>Ein Herzensprojekt, zum '
+      - '<!italic><gray>Ausprobieren. Ich habe den'
+      - '<!italic><gray>ersten SMP mit ca. 25'
+      - '<!italic><gray>Spieler gehostet und es'
+      - '<!italic><gray>wurden Freundschaften'
+      - '<!italic><gray>geschlossen!'
+      - ''
+      - '<!italic><dark_gray>» <gray>Status: <#00FC00>{status}'
+      - '<!italic><dark_gray>» <gray>Spieler: <#00A4FC>{online_players} 👤'
+
+inventories:
+  navigator:
+    title: "Navigator"
+  challenge_server:
+    title: "Challenge Server"

@@ -30,6 +30,7 @@ public class RedisListener {
                                 String targetServer = parts[1];
 
                                 plugin.getPlayerSends().connectPlayerSimple(uuid, targetServer);
+                                //System.out.println("Spieler move empfangen");
                             }
                         }
                     }
