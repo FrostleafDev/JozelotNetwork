@@ -175,7 +175,6 @@ public class ClickHandler implements Listener {
 
     public void openSubMenu(LobbyPlayer player, InventoryType inventoryType, InventoryType parentType) {
         player.openInventory(inventoryType, parentType);
-        player.playSound("pling");
     }
 
     @EventHandler
