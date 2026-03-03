@@ -2,12 +2,16 @@ package de.jozelot.jozelotLobby.ui.items;
 
 import de.jozelot.jozelotLobby.JozelotLobby;
 import de.jozelot.jozelotLobby.player.LobbyPlayer;
+import de.jozelot.jozelotLobby.player.settings.ColorPreference;
+import de.jozelot.jozelotLobby.player.settings.Setting;
 import de.jozelot.jozelotLobby.ui.inventories.InventoryType;
+import de.jozelot.jozelotLobby.ui.inventories.LobbyInventory;
 import de.jozelot.jozelotLobby.ui.inventories.navigation.ArchivMenu;
 import de.jozelot.jozelotLobby.ui.inventories.navigation.ChallengeMenu;
 import de.jozelot.jozelotLobby.ui.inventories.navigation.NavigatorMenu;
 import de.jozelot.jozelotLobby.ui.inventories.profile.SecretMenu;
 import de.jozelot.jozelotLobby.ui.inventories.profile.SpielerinfoMenu;
+import de.jozelot.jozelotLobby.ui.inventories.profile.settings.ColorPreferenceMenu;
 import de.jozelot.jozelotLobby.ui.inventories.profile.settings.SettingsMenu;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
@@ -99,6 +103,22 @@ public class ClickHandler implements Listener {
             return;
         }
 
+        if (itemId.startsWith("settings.color.")) {
+            String colorId = itemId.replace("settings.color.", "");
+
+            if (lobbyPlayer.getColor() == ColorPreference.getByName(colorId)) {
+                lobbyPlayer.playSound("error");
+                return;
+            }
+
+            lobbyPlayer.setSetting(Setting.COLOR_PREFERENCE, colorId);
+            lobbyPlayer.playSound("pling");
+            if (event.getInventory().getHolder() instanceof ColorPreferenceMenu menu) {
+                menu.update();
+            }
+            return;
+        }
+
         switch (itemId) {
             case "spawn_button":
                 spawnButton(player);
@@ -117,6 +137,9 @@ public class ClickHandler implements Listener {
                 break;
             case "settings_menu":
                 openSubMenu(lobbyPlayer, InventoryType.SETTINGS, InventoryType.PROFILE);
+                break;
+            case "settings.color_preference":
+                openSubMenu(lobbyPlayer, InventoryType.COLOR_PREFERENCE, InventoryType.SETTINGS);
                 break;
             case "back_button":
                 backButton(player, event.getInventory().getHolder());
@@ -162,26 +185,22 @@ public class ClickHandler implements Listener {
         LobbyPlayer lobbyPlayer = plugin.getLobbyPlayerManager().getPlayer(player);
         if (lobbyPlayer == null) return;
 
-        InventoryType parent = null;
+        if (holder instanceof LobbyInventory menu) {
+            InventoryType parent = menu.getParentType();
 
-        if (holder instanceof ChallengeMenu menu) {
-            parent = menu.getParentType();
-        } else if (holder instanceof NavigatorMenu menu) {
-            parent = menu.getParentType();
-        } else if (holder instanceof ArchivMenu menu) {
-            parent = menu.getParentType();
-        } else if (holder instanceof SecretMenu menu) {
-            parent = menu.getParentType();
-        } else if (holder instanceof SpielerinfoMenu menu) {
-            parent = menu.getParentType();
-        } else if (holder instanceof SettingsMenu menu) {
-            parent = menu.getParentType();
-        }
+            if (parent == null) {
+                player.closeInventory();
+                return;
+            }
 
-        if (parent == null) {
-            player.closeInventory();
+            InventoryType grandParent = null;
+
+            if (parent == InventoryType.SETTINGS || parent == InventoryType.SECRETS || parent == InventoryType.SPIELERINFO) {
+                grandParent = InventoryType.PROFILE;
+            }
+            lobbyPlayer.openInventory(parent, grandParent);
         } else {
-            lobbyPlayer.openInventory(parent);
+            player.closeInventory();
         }
     }
 

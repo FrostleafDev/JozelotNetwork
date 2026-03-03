@@ -1,6 +1,7 @@
 package de.jozelot.jozelotLobby.database;
 
 import de.jozelot.jozelotLobby.JozelotLobby;
+import de.jozelot.jozelotLobby.player.LobbyPlayer;
 import redis.clients.jedis.JedisPubSub;
 import org.bukkit.Bukkit;
 
@@ -23,12 +24,22 @@ public class RedisListener {
                 plugin.getRedisSetup().getJedis().subscribe(new JedisPubSub() {
                     @Override
                     public void onMessage(String channel, String message) {
-                        // Globaler Reload
                         if (channel.equals("network:control") && message.equals("reload")) {
                             handleReload();
                         }
+                        if (channel.equals("network:playtime") && message.startsWith("sync:")) {
+                            String[] parts = message.split(":");
+                            UUID uuid = UUID.fromString(parts[1]);
+                            long base = Long.parseLong(parts[2]);
+                            long login = Long.parseLong(parts[3]);
+
+                            LobbyPlayer lp = plugin.getLobbyPlayerManager().getPlayer(uuid);
+                            if (lp != null) {
+                                lp.setPlaytimeData(base, login);
+                            }
+                        }
                     }
-                }, "network:control");
+                }, "network:control", "network:playtime");
             } catch (Exception e) {
                 plugin.getLogger().severe("Redis: Fehler im Pub/Sub Listener: " + e.getMessage());
             }

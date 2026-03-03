@@ -7,6 +7,7 @@ import de.jozelot.jozelotLobby.ui.inventories.navigation.NavigatorMenu;
 import de.jozelot.jozelotLobby.ui.inventories.profile.ProfileMenu;
 import de.jozelot.jozelotLobby.ui.inventories.profile.SecretMenu;
 import de.jozelot.jozelotLobby.ui.inventories.profile.SpielerinfoMenu;
+import de.jozelot.jozelotLobby.ui.inventories.profile.settings.ColorPreferenceMenu;
 import de.jozelot.jozelotLobby.ui.inventories.profile.settings.SettingsMenu;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
@@ -20,7 +21,8 @@ public enum InventoryType {
     ARCHIV(ArchivMenu::new),
     SECRETS(SecretMenu::new),
     SPIELERINFO(SpielerinfoMenu::new),
-    SETTINGS(SettingsMenu::new);
+    SETTINGS(SettingsMenu::new),
+    COLOR_PREFERENCE(ColorPreferenceMenu::new);
 
     private final BiFunction<JozelotLobby, Player, InventoryHolder> factory;
 

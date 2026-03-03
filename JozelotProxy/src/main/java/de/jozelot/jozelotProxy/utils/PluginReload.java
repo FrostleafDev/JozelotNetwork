@@ -11,6 +11,7 @@ import de.jozelot.jozelotProxy.storage.ConfigManager;
 import de.jozelot.jozelotProxy.storage.LangManager;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class PluginReload {
 
@@ -55,5 +56,13 @@ public class PluginReload {
             plugin.getBrandNameChanger().sendBrandName(player, config.getBrandName());
         }
 
+        plugin.getServer().getScheduler().buildTask(plugin, () -> {
+            for (Player player : plugin.getServer().getAllPlayers()) {
+                long loginTime = plugin.getLoginTimes().getOrDefault(player.getUniqueId(), System.currentTimeMillis());
+                long baseTime = plugin.getMySQLManager().getTotalNetworkPlaytime(player.getUniqueId());
+
+                plugin.getRedisManager().publish("network:playtime", "sync:" + player.getUniqueId() + ":" + baseTime + ":" + loginTime);
+            }
+        }).delay(1, TimeUnit.SECONDS).schedule();
     }
 }

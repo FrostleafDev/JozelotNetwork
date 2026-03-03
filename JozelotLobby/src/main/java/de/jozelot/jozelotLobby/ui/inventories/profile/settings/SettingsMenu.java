@@ -5,6 +5,7 @@ import com.destroystokyo.paper.profile.ProfileProperty;
 import de.jozelot.jozelotLobby.JozelotLobby;
 import de.jozelot.jozelotLobby.player.LobbyPlayer;
 import de.jozelot.jozelotLobby.ui.inventories.InventoryType;
+import de.jozelot.jozelotLobby.ui.inventories.LobbyInventory;
 import de.jozelot.jozelotLobby.ui.items.HotbarItems;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -24,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class SettingsMenu implements InventoryHolder {
+public class SettingsMenu extends LobbyInventory {
 
     private final Inventory inventory;
     private final JozelotLobby plugin;
@@ -43,16 +44,6 @@ public class SettingsMenu implements InventoryHolder {
         update();
     }
 
-    private InventoryType parentType = null;
-
-    public void setParentType(InventoryType parentType) {
-        this.parentType = parentType;
-    }
-
-    public InventoryType getParentType() {
-        return parentType;
-    }
-
     public void fillBackGround() {
         ItemStack filler = new ItemStack(lobbyPlayer.getColor().getFillerMaterial());
         filler.editMeta(meta -> {
@@ -60,11 +51,16 @@ public class SettingsMenu implements InventoryHolder {
             meta.getPersistentDataContainer().set(HotbarItems.IS_PROTECTED, PersistentDataType.BOOLEAN, true);
         });
 
-        for (int i : new int[]{0,1,2,3,4,5,6,7,8,19,20,21,22,23,24,25,26}) {
+        int size = inventory.getSize();
+
+        for (int i = 0; i < 9; i++) {
             inventory.setItem(i, filler);
         }
 
-        // Back Arrow
+        for (int i = size - 9; i < size; i++) {
+            inventory.setItem(i, filler);
+        }
+
         ItemStack backArrow = new ItemStack(Material.PLAYER_HEAD);
         backArrow.editMeta(SkullMeta.class, meta -> {
             PlayerProfile profile = Bukkit.createProfile(UUID.randomUUID());
@@ -74,10 +70,51 @@ public class SettingsMenu implements InventoryHolder {
             meta.getPersistentDataContainer().set(HotbarItems.ITEM_ID, PersistentDataType.STRING, "back_button");
             meta.getPersistentDataContainer().set(HotbarItems.IS_PROTECTED, PersistentDataType.BOOLEAN, true);
         });
-        inventory.setItem(18, backArrow);
+        inventory.setItem(size - 9, backArrow);
     }
 
+    @Override
     public void update() {
+        setupServerItem(13, "settings.color_preference");
+    }
+
+    private void setupServerItem(int slot, String configKey) {
+        String path = "items." + configKey;
+
+        String matName = plugin.getConfig().getString(path + ".item", "BARRIER");
+        Material mat = Material.matchMaterial(matName != null ? matName : "BARRIER");
+        ItemStack item = new ItemStack(mat != null ? mat : Material.BARRIER);
+
+        item.editMeta(meta -> {
+
+            String name = plugin.getConfig().getString(path + ".name");
+            meta.displayName(mm.deserialize(name != null ? name : "<red>FEHLER: Name fehlt"));
+
+            List<String> configLore = plugin.getConfig().getStringList(path + ".lore");
+            List<Component> loreComponents = new ArrayList<>();
+            for (String line : configLore) {
+                if (line == null) continue;
+                String replaced = line.replace("{secrets_current}", "0")
+                        .replace("{secrets_max}", "0");
+                loreComponents.add(mm.deserialize(replaced));
+            }
+            meta.lore(loreComponents);
+
+            if (meta instanceof SkullMeta skullMeta) {
+                String b64 = plugin.getConfig().getString(path + ".base64");
+                if (b64 != null && !b64.isEmpty()) {
+                    PlayerProfile profile = Bukkit.createProfile(UUID.randomUUID());
+                    profile.setProperty(new ProfileProperty("textures", b64));
+                    skullMeta.setPlayerProfile(profile);
+                }
+            }
+
+            meta.getPersistentDataContainer().set(HotbarItems.IS_PROTECTED, PersistentDataType.BOOLEAN, true);
+            meta.getPersistentDataContainer().set(HotbarItems.ITEM_ID, PersistentDataType.STRING, configKey);
+            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+        });
+
+        inventory.setItem(slot, item);
     }
 
     @Override

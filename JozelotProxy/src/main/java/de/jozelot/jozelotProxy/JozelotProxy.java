@@ -227,9 +227,11 @@ public class JozelotProxy {
                             return null;
                         });
                     }
-                })
-                .repeat(3, TimeUnit.SECONDS)
-                .schedule();
+                }).repeat(3, TimeUnit.SECONDS).schedule();
+
+        server.getScheduler().buildTask(this, () -> {
+            redisManager.updateStatus("proxy", server.getPlayerCount() - vanishManager.getVanishedPlayers().size(), true);
+        }).repeat(3, TimeUnit.SECONDS).schedule();
     }
 
     private void pluginStartMessage() {

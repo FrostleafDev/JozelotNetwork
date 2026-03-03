@@ -288,6 +288,12 @@ public class ServerSwitchListener {
             updateTabHeaderForPlayer(player, groupId);
         }
 
+        plugin.getServer().getScheduler().buildTask(plugin, () -> {
+            long loginTime = plugin.getLoginTimes().getOrDefault(player.getUniqueId(), System.currentTimeMillis());
+            long baseTime = plugin.getMySQLManager().getTotalNetworkPlaytime(player.getUniqueId());
+            plugin.getRedisManager().publish("network:playtime", "sync:" + player.getUniqueId() + ":" + baseTime + ":" + loginTime);
+        }).delay(1, TimeUnit.SECONDS).schedule();
+
         server.getScheduler().buildTask(plugin, () -> {
             plugin.getBrandNameChanger().sendBrandName(player, config.getBrandName());
         }).delay(250, TimeUnit.MILLISECONDS).schedule();

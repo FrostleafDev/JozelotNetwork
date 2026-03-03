@@ -1,4 +1,4 @@
-package de.jozelot.jozelotLobby;
+package de.jozelot.jozelotLobby.utils;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

@@ -5,6 +5,7 @@ import com.destroystokyo.paper.profile.ProfileProperty;
 import de.jozelot.jozelotLobby.JozelotLobby;
 import de.jozelot.jozelotLobby.player.LobbyPlayer;
 import de.jozelot.jozelotLobby.ui.inventories.InventoryType;
+import de.jozelot.jozelotLobby.ui.inventories.LobbyInventory;
 import de.jozelot.jozelotLobby.ui.items.HotbarItems;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -24,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class SecretMenu implements InventoryHolder{
+public class SecretMenu extends LobbyInventory {
 
     private final Inventory inventory;
     private final JozelotLobby plugin;
@@ -43,15 +44,6 @@ public class SecretMenu implements InventoryHolder{
         update();
     }
 
-    private InventoryType parentType = null;
-
-    public void setParentType(InventoryType parentType) {
-        this.parentType = parentType;
-    }
-
-    public InventoryType getParentType() {
-        return parentType;
-    }
 
     public void fillBackGround() {
         ItemStack filler = new ItemStack(lobbyPlayer.getColor().getFillerMaterial());
@@ -60,11 +52,16 @@ public class SecretMenu implements InventoryHolder{
             meta.getPersistentDataContainer().set(HotbarItems.IS_PROTECTED, PersistentDataType.BOOLEAN, true);
         });
 
-        for (int i : new int[]{0,1,2,3,4,5,6,7,8,27,28,29,30,31,32,33,34,35}) {
+        int size = inventory.getSize();
+
+        for (int i = 0; i < 9; i++) {
             inventory.setItem(i, filler);
         }
 
-        // Back Arrow
+        for (int i = size - 9; i < size; i++) {
+            inventory.setItem(i, filler);
+        }
+
         ItemStack backArrow = new ItemStack(Material.PLAYER_HEAD);
         backArrow.editMeta(SkullMeta.class, meta -> {
             PlayerProfile profile = Bukkit.createProfile(UUID.randomUUID());
@@ -74,9 +71,10 @@ public class SecretMenu implements InventoryHolder{
             meta.getPersistentDataContainer().set(HotbarItems.ITEM_ID, PersistentDataType.STRING, "back_button");
             meta.getPersistentDataContainer().set(HotbarItems.IS_PROTECTED, PersistentDataType.BOOLEAN, true);
         });
-        inventory.setItem(27, backArrow);
+        inventory.setItem(size - 9, backArrow);
     }
 
+    @Override
     public void update() {
     }
 

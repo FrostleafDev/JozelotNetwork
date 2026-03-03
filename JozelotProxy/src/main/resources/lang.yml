@@ -1,494 +1,512 @@
-#
-# {prefix} {primary} {secondary} {tertiary} {danger} {grey}
-# Minimessage Format Support
-
-# Basic
-prefix: '{grey}[<gradient:#f90036:#f90011><b>System</b>{grey}]'
-only-player: '{danger}Nur Spieler können diesen Command ausführen'
-no-permission: '{danger}Du hast keine Rechte dazu'
-first-join:
-  - ""
-  - "  <gradient:#00A4FC:#00FC00><b>WILLKOMMEN AUF JOZELOT.DE</b></gradient>"
-  - "  {grey}Hey <white>{player-name}</white>, schön dass du da bist!"
-  - ""
-  - "  {grey}Du startest heute dein Abenteuer auf unserem Netzwerk."
-  - "  {grey}Erkunde die Lobby, triff Freunde und hab Spaß!"
-  - ""
-  - "  <dark_gray>» {secondary}Discord: <click:open_url:'https://jozelot.de/discord'><hover:show_text:'{primary}Klicke hier, um unserem Discord beizutreten!'><u><white>jozelot.de/discord</white></u></hover></click>"
-  - ""
-
-sounds:
-  error: "entity.villager.no"
-  success: "entity.player.levelup"
-  pling: "block.note_block.pling"
-  notify: "block.note_block.chime"
-  experience: "entity.experience_orb.pickup"
-  warning: 'block.note_block.bit'
-
-server-maintenance-kick: '{danger}Du wurdest wegen Wartungsarbeiten von {server-name} gekickt'
-server-maintenance-no-access: '{danger}Du kannst {server-name} nicht, wegen aktuellen Wartungsarbeiten, beitreten, '
-proxy-maintenance-kick:
-  - "<gradient:#f90036:#f90011><b>WARTUNGSARBEITEN</b></gradient>"
-  - ""
-  - "{grey}Unser Netzwerk wird aktuell {danger}überarbeitet{grey},"
-  - "{grey}um dein Spielerlebnis noch besser zu machen."
-  - ""
-  - "{grey}Wir sind in Kürze wieder für dich da!"
-  - ""
-  - "<dark_gray>Aktuelle Infos & Updates findest du hier:"
-  - "{secondary}jozelot.de/discord <dark_gray>| <white>jozelot.de</white>"
-maintenance-version: '§4Wartungsarbeiten'
-no-forcedhost-permission: '{danger}Du kannst {server-name} nicht über einen Horced Host joinen'
-
-generic-error: '{danger}An error encoured'
-# Server Sends
-send-to-lobby: '{grey}Du wirst zur {primary}Lobby{grey} gesendet...'
-already-on-lobby: '{grey}Du befindest dich bereits in der {danger}Lobby'
-server-not-found: '{grey}Der Server {danger}{server-name}{grey} wurde nicht gefunden'
-player-not-found: '{grey}Der Spieler {danger}{player-name}{grey} wurde nicht gefunden'
-already-on-server: '{grey}Du befindest dich schon auf {danger}{server-name}'
-connection-failed: '{grey}Verbindung zu {danger}{server-name} {grey}fehlgeschlagen'
-player-not-on-server: '{danger}{server-name}{grey} befindet sich auf keinem Server'
-
-blocked-command: '<red>Unknown or incomplete command, see below for error<newline><red><u>{command}</u><italic><--[HERE]</italic>'
-# Commands
-network-help:
-  - ''
-  - ''
-  - '{grey}<bold>Alle Netzwerk Commands:</bold>'
-  - '{grey}- {primary}/net help {grey}Zeigt diese Nachricht'
-  - '{grey}- {primary}/net reload {grey}Lädt das gesamte Netzwerk neu'
-  - '{grey}- {primary}/net manage {grey}Stelle die einzelnen Backend Server ein'
-  - '{grey}- {primary}/net start/stop/restart/status {grey}Du hast die volle Kontrolle über jeden Server'
-  - '{grey}- {primary}/find {grey}Sieh auf welchem Server sind ein Spieler befindet'
-  - '{grey}- {primary}/clearchat {grey}Lehre den Chat'
-  - '{grey}- {primary}/ban {grey}Banne Spieler vom Netzwerk'
-  - '{grey}- {primary}/banlist {grey}Zeigt dir alle gebannten Spieler an'
-  - '{grey}- {primary}/unban {grey}Entbannt einen Spieler'
-  - '{grey}- {primary}/kick {grey}Kickt einen Spieler vom Netzwerk'
-  - '{grey}- {primary}/server {grey}Gelange zu einem beliebigen Unterserver'
-  - '{grey}- {primary}/send {grey}Sende eine Gruppe von Spielern auf einen bestimmen Server'
-  - '{grey}- {primary}/tpo {grey}Gelange auf den Server eines anderen Spielers'
-  - '{grey}- {primary}/tpohere {grey}Hole einen Spieler auf deinen Server'
-  - '{grey}- {primary}/lobby {grey}Geh zur Lobby'
-  - '{grey}- {primary}/msg {grey}Schreibe einem Spieler in der Gruppe eine Nachricht'
-  - '{grey}- {primary}/gmsg {grey}Schreibe einem Spieler eine Nachricht'
-  - '{grey}- {primary}/reply {grey}Antworte einem Spieler'
-  - '{grey}- {primary}/g {grey}Schreibe in den globalen Chat'
-  - '{grey}- {primary}/whitelist {grey}Verwalte die Netzwerk weite Whitelist'
-  - '{grey}- {primary}/playtime {grey}Schau dir die Spielzeiten anderer Spieler an'
-  - '{grey}- {primary}/broadcast {grey}Sende Nachrichten an alle Spieler auf dem Netzwerk'
-network-reload-success: '{primary}Das Netzwerk wurde erfolgreich neu geladen'
-network-reload-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat das Netzwerk neu geladen'
-chat-cleared:
-  - '{grey}Der Chat wurde von {primary}{player-name}{grey} gelehrt'
-chat-cleared-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat den Chat gelehrt'
-chat-cleared-success: '{primary}Der Chat wurde gelehrt'
-
-command-find-not-found: '{danger}{player-name} {grey}konnte nicht gefunden werden'
-command-find-success: '{primary}{player-name} {grey}befindet sich auf {primary}{server-name}'
-command-find-offline: '{primary}{player-name} {grey}war zuletzt auf {primary}{server-name}'
-command-find-missing-argument: '{tertiary}/find <Spieler>'
-command-find-connecting: '{danger}{player-name} {grey}verbindet sich gerade zu einem Server'
-
-command-manage-display-name-success: '{primary}{server-name} {grey}wurde {primary}erfolgreich{grey} in {primary}{display-name}{grey} umbenannt'
-command-manage-display-name-get: '{grey}Der Anzeige Name von {primary}{server-name} {grey}ist {primary}{display-name}{grey}'
-command-manage-display-name-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat {primary}{server-name} {grey}in {primary}{display-name} {grey}umbenannt'
-
-command-manage-max-players-get: '{grey}Auf {primary}{server-name} {grey}können maximal {primary}{max-players}{grey} joinen'
-command-manage-max-players-success: '{grey}Die maximale Spieler Anzahl von {primary}{server-name}{grey} auf {primary}{max-players}'
-command-manage-max-players-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat die maximale Spieler Anzahl von{primary}{server-name} {grey}auf {primary}{max-players} {grey}geändert'
-command-manage-max-players-not-a-number: '{danger}{input}{grey} ist keine Zahl'
-
-command-manage-motd-get: '{grey}Die aktuelle MOTD von {primary}{server-name} {grey}ist: <reset>{motd}'
-command-manage-motd-success: '{grey}Die MOTD von {primary}{server-name}{grey} wurde erfolgreich geändert'
-command-manage-motd-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat die MOTD von {primary}{server-name} {grey}geändert'
-
-command-manage-maintenance-get: '{primary}{server-name} {grey}hat den Maintenance Modus:   {primary}{status}'
-command-manage-maintenance-success: '{grey}Maintenance Modus von {primary}{server-name}{grey} {primary}{status}'
-command-manage-maintenance-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat den Maintenance Modus von {primary}{server-name} {primary}{status}'
-
-command-ban-usage: '{tertiary}/ban <Spieler> <Zeit> <Grund>'
-command-ban-player-not-found: '{grey}Der Spieler {danger}{player-name}{grey} war noch nie auf dem Netzwerk'
-command-ban-invalid-time: '{grey}Das Format für die Banlänge ist falsch: {danger}{input}'
-command-ban-already-banned: '{danger}{player-name} {grey}ist bereits gebannt'
-command-ban-hierarchy-error: '{grey}Du kannst {danger}{player-name}{grey} nicht bannen!'
-command-ban-success: '{grey}Du hast {primary}{player-name}{grey} erfolgreich gebannt. Grund: {primary}{reason} {grey}| Dauer: {primary}{duration}'
-command-ban-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat {primary}{target-name} {grey}gebannt. Grund: {primary}{reason} {grey}| Dauer: {primary}{duration}'
-
-ban-kick-screen:
-  - "<gradient:#f90036:#f90011><b>AUSSCHLUSS VOM NETZWERK</b></gradient>"
-  - ""
-  - "{grey}Deine Verbindung wurde dauerhaft getrennt."
-  - ""
-  - "{grey}Grund: <white>{reason}"
-  - "{grey}Dauer: <white>{duration}"
-  - ""
-  - "{grey}Erstelle einen Entbannungsantrag unter:"
-  - "{secondary}jozelot.de/discord"
-
-ban-join-screen:
-  - "<gradient:#f90036:#f90011><b>DU BIST GEBANNT</b></gradient>"
-  - ""
-  - "{grey}Du bist aktuell vom Netzwerk ausgeschlossen."
-  - ""
-  - "{grey}Grund: <white>{reason}"
-  - "{grey}Datum des Unbans: <white>{duration}"
-  - ""
-  - "{grey}Sollte dies ein Fehler sein, wende dich an das Team."
-
-ban-bypass-info:
-  - ""
-  - "  <gradient:#00A4FC:#00FC00><b>ADMIN-BYPASS AKTIV</b></gradient>"
-  - "  {grey}Du bist eigentlich auf dem Netzwerk {danger}gebannt{grey}."
-  - "  {grey}Aufgrund deiner Rechte wurdest du dennoch verbunden."
-  - ""
-  - "  <dark_gray>»</dark_gray> {grey}Grund: <white>{reason}"
-  - "  <dark_gray>»</dark_gray> {grey}Bis: <white>{duration}"
-  - "  <dark_gray>»</dark_gray> {grey}Von: <white>{admin-name}"
-  - ""
-  - "  {grey}Nutze <click:suggest_command:'/unban {player-name}'><hover:show_text:'{primary}Klicke hier, um dich zu entbannen!'>{primary}<u>/unban {player-name}</u></hover></click>{grey}, um den Bann aufzuheben."
-  - ""
-
-command-unban-usage: '{tertiary}/unban <Spieler>'
-command-unban-success: '{primary}{player-name} {grey}wurde entbannt'
-command-unban-not-banned: '{danger}{player-name} {grey}ist nicht gebannt'
-command-unban-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat {primary}{ban-name} {grey}entbannt.'
-
-command-banlist-empty: '{grey}Es sind aktuell keine Spieler gebannt.'
-command-banlist-header: '{grey}--- {danger}Aktive Banns {grey}({primary}{count}{grey}) ---'
-command-banlist-entry: '{grey}• {primary}{target} {grey}| Grund: {primary}{reason} {grey}| Von: {danger}{operator} {grey}({primary}{duration}{grey})'
-command-banlist-footer: '{grey}---------------------'
-
-command-kick-usage: '{tertiary}/kick <Spieler> <Grund>'
-command-kick-player-not-online: '{danger}{player-name}{grey} ist nicht online'
-command-kick-hierarchy-error: '{grey}Du kannst {danger}{player-name} {grey}nicht kicken'
-command-kick-success: '{grey}Du hast {primary}{player-name}{grey} erfolgreich gekickt. Grund: {primary}{reason}'
-command-kick-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat {primary}{target-name} {grey}gekickt. Grund: {primary}{reason}'
-
-kick-screen:
-  - "<gradient:#f90036:#f90011><b>VERBINDUNG GETRENNT</b></gradient>"
-  - ""
-  - "{grey}Du wurdest vom <white>jozelot.de</white> Netzwerk gekickt."
-  - ""
-  - "{grey}Grund für den Ausschluss:"
-  - "<white>» {danger}{reason}"
-  - ""
-  - "{grey}Solltest du diesen Kick für unberechtigt halten,"
-  - "{grey}melde dich bitte auf unserem {secondary}Discord{grey}."
-
-command-tpo-player-not-found: '{danger}{player-name}{grey} konnte nicht gefunden werden'
-send-to-server-success: '{grey}Du wurdest erfolgreich zu {primary}{player-name} {grey}auf {primary}{server-name}{grey} gesendet'
-command-tpo-usage: '{tertiary}/tpo <Spieler>'
-
-command-tpohere-already-on-server: '{danger}{player-name}{grey} ist bereits auf diesem Server'
-command-tpohere-success: '{primary}{player-name} {grey}wurde erfolgreich zu dir teleportiert'
-command-tpohere-target-info: '{grey}Du wurdest zu {primary}{player-name} {grey}teleportiert'
-command-tpohere-usage: '{tertiary}/tpohere <Spieler> [--silent]'
-command-tpohere-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat {primary}{target-name} {grey}zu sich verschoben'
-
-command-server-usage: '{tertiary}/server <Server>'
-command-server-try: '{grey}Du wirst zu {primary}{server-name} {grey}gesendet'
-
-command-send-usage: '{tertiary}/send <Spieler> <Server>'
-command-send-success-multiple: '{primary}{count}{grey} Spieler wurden zu {primary}{server-name}{grey} gesendet'
-command-send-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat {primary}{range} {grey}auf {primary}{server-name} {grey}verschoben'
-
-pterodactyl-control-no-id: '{grey}Es ist keine Pterodactyl-ID für {danger}{server-name}{grey} hinterlegt'
-pterodactyl-control-success: '{grey}Befehl für {primary}{action}{grey} wurde an {primary}{server-name}{grey} gesendet'
-pterodactyl-control-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat den Befehl für {primary}{action}{grey} an {primary}{server-name}{grey} gesendet'
-pterodactyl-control-api-error: '{grey}Die API hat mit dem Fehler Code {danger}{code}{grey} geantwortet'
-pterodactyl-restart-kick:
-  - "<gradient:#f90036:#f90011><b>NETZWERK NEUSTART</b></gradient>"
-  - ""
-  - "{grey}Das System wird aktuell {danger}neu gestartet{grey},"
-  - "{grey}um Updates oder Änderungen zu übernehmen."
-  - ""
-  - "{grey}Bitte gedulde dich einen kleinen Moment."
-  - "{grey}Du kannst in Kürze wieder {secondary}beitreten{grey}."
-  - ""
-  - "<dark_gray>Versuche es in ca. <white>10 Sekunden</white> erneut."
-
-pterodactlyl-status-error: '{grey}Fehler beim abrufer der {danger}API Daten'
-pterodactyl-status-message:
-  - ''
-  - '<gray>» <gradient:#ffcc00:#ff8800><bold>SERVER STATUS</bold></gradient> <gray>«'
-  - '<dark_gray>Ziel: <white>{server-name} <dark_gray>(<gray>{id}...<dark_gray>)'
-  - '<gray>Status: {status}'
-  - '<gray>CPU: <white>{cpu}%'
-  - '<gray>RAM: <white>{memory} MB'
-  - '<gray>Network: <white>↓{network-in}KB <gray>| <white>↑{network-out}KB'
-  - ''
-  - '<gray>» <dark_gray>Abgefragt via Pterodactyl API'
-
-tab-header:
-  - ''
-  - '<gradient:#00A4FC:#00f4fc><bold>jozelot.de</bold></gradient>'
-  - ''
-  - '<dark_grey>- <#FCD46F>{server-name} <dark_grey>-'
-  - ''
-  - '{grey}<strikethrough>                                                 </strikethrough>'
-  - ''
-
-tab-footer:
-  - ''
-  - '{grey}<strikethrough>                                                 </strikethrough>'
-  - ''
-  - '<gray>Online: {secondary}{online-players} <gray>| <gray>Ping: {secondary}{ping}ms'
-  - ''
-  - '<#FCD46F>{group-info}'
-  - ''
-
-tab-player-format: '{rank-prefix}{player-name}'
-chat-format: '<hover:show_text:"{primary}Klicke, um {player-name} privat zu schreiben"><click:suggest_command:"/msg {player-name} ">{rank-prefix}{player-name}</click></hover> {grey}» <white>{message}'
-global-chat-format: '{tertiary}[Global] <reset><hover:show_text:"{primary}Klicke, um {player-name} eine Nachricht zu schreiben"><click:suggest_command:"/gmsg {player-name} ">{rank-prefix}{player-name}</click></hover> {grey}» <white>{message}'
-
-command-gmsg-usage: '{tertiary}/gmsg <Spieler> <Nachricht>'
-command-gmsg-target-not-found: '{danger}{player-name} {grey}konnte nicht gefunden werden'
-command-gmsg-self-msg: '{danger}Du kannst dir selbst keine Nachrichten schreiben'
-
-gmsg-format-send: '{tertiary}[Global] <reset>{grey}[{primary}Ich {grey}-> {primary}{target-name}{grey}] {grey}{message}'
-gmsg-format-receive: '{tertiary}[Global] <reset>{grey}[{primary}{player-name} {grey}-> {primary}Ich{grey}] {grey}{message}'
-
-command-msg-not-in-group: '{danger}{player-name} {grey}konnte nicht gefunden werden'
-command-msg-usage: '{tertiary}/msg <Spieler> <Nachricht>'
-
-msg-format-send: '{grey}[{primary}Ich {grey}-> {primary}{target-name}{grey}] {grey}{message}'
-msg-format-receive: '{grey}[{primary}{player-name} {grey}-> {primary}Ich{grey}] {grey}{message}'
-
-command-reply-usage: '{tertiary}/reply <Nachricht>'
-command-reply-no-target: '{danger}Du hast niemanden, dem du antworten kannst'
-command-reply-target-offline: '{danger}Der Spieler, dem du antworten möchtest, ist nicht mehr online'
-
-command-global-usage: '{tertiary}/g <Nachricht>'
-
-command-whitelist-usage: '{tertiary}/whitelist <add|remove|on|off|list> <Gruppe> [Spieler]'
-command-whitelist-not-found: '{grey}Die Gruppe {danger}{group} existiert nicht'
-command-whitelist-player-not-found: '{danger}{player-name} {grey}wurde nicht gefunden'
-command-whitelist-added: '{primary}{player} {grey}wurde zur Whitelist von {primary}{group}{grey} hinzugefügt'
-command-whitelist-removed: '{primary}{player} {grey}wurde von der Whitelist von {primary}{group}{grey} entfernt'
-command-whitelist-state: '{primary}Whitelist{grey} für {primary}{group}{grey} ist nun {secondary}{state}'
-command-whitelist-list-header: '{primary}Whitelist für {group}:'
-command-whitelist-kick: '{danger}Du bist nicht auf der Whitelist für diesen Server-Bereich!'
-command-whitelist-state-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat die Whitelist für {primary}{group} {primary}{state}'
-command-whitelist-added-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat {primary}{target} {grey}zur Whitelist von {primary}{group} {grey}hinzugefügt'
-command-whitelist-removed-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat {primary}{target} {grey}von der Whitelist von {primary}{group} {grey}entfernt'
-
-command-playtime-usage: '{tertiary}/playtime <Spieler>'
-command-playtime-no-playtime: '{grey}Der Spieler {danger}{player-name}{grey} war noch nie auf dieser Region'
-command-playtime-total: '{grey}Spielzeit von {primary}{player-name} {grey}auf {primary}{type}{grey}: {secondary}{days}d {hours}h {minutes}m {seconds}s'
-command-playtime-syntax-error: '{grey}Bitte nutze: {danger}server: / group:'
-
-command-broadcast-usage: '{tertiary}/broadcast <Ziel> <Typ> <Nachricht>'
-command-broadcast-invalid: '{danger}Keine Spierler gefunden oder der Bereich ist ungültig'
-command-broadcast-send: '{grey}Broadcast wurde an {primary}{size} Spieler gesendet'
-command-broadcast-send-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat einen Broadcast an {primary}{size} Spieler gesendet'
-broadcast-announcement:
-  - ""
-  - "<dark_gray> -------- « <gold><b>ANKÜNDIGUNG</b> <dark_gray>» ---------"
-  - ""
-  - "<gray>{message}"
-  - ""
-  - "<reset><dark_gray> ----------------------------------"
-  - ""
-broadcast-message:
-  - ""
-  - "<dark_gray> --------- « <blue><b>NACHRICHT</b> <dark_gray>» ---------"
-  - ""
-  - "<gray>{message}"
-  - ""
-  - "<reset><dark_gray> ---------------------------------"
-  - ""
-broadcast-information:
-  - ""
-  - "<dark_gray> ------------ « <aqua><b>INFO</b> <dark_gray>» ------------"
-  - ""
-  - "<gray>{message}"
-  - ""
-  - "<reset><dark_gray> ---------------------------------"
-  - ""
-broadcast-warning:
-  - ""
-  - "<dark_gray> ---------- « <red><b>WARNUNG</b> <dark_gray>» ----------"
-  - ""
-  - "<gray>{message}"
-  - ""
-  - "<reset><dark_gray> ---------------------------------"
-  - ""
-  -
-server-full-message: "{danger}Du kannst nicht auf {server-name} verbinden, da dieser voll ist."
-
-proxy-full-kick:
-  - "<gradient:#f90036:#f90011><b>NETZWERK AUSGELASTET</b></gradient>"
-  - ""
-  - "{grey}Aktuell sind alle <white>{max} Slots</white> belegt."
-  - ""
-  - "{grey}Mit dem <gradient:#00A4FC:#00FC00><b>VIP Rang</b></gradient> kannst du"
-  - "{grey}auch bei vollem Netzwerk jederzeit beitreten!"
-
-protocol-to-old:
-  - "<red><b>ZUTRITT VERWEIGERT</b>"
-  - ""
-  - "{grey}Deine Minecraft-Version ist zu {danger}alt{grey}."
-  - "{grey}Aktuelle Version: {danger}{current-version}"
-  - ""
-  - "{grey}Bitte nutze mindestens die Version: {primary}{min-version}"
-
-protocol-to-new:
-  - "<red><b>ZUTRITT VERWEIGERT</b>"
-  - ""
-  - "{grey}Deine Minecraft-Version ist zu <danger>neu{grey}."
-  - "{grey}Aktuelle Version: {danger}{current-version}"
-  - ""
-  - "{grey}Bitte nutze maximal die Version: {primary}{max-version}"
-  - "{grey}Empfohlene Version: {primary}{reco-version}"
-  - ""
-  - "{grey}Du kannst mit der {primary}{max-version}{grey} problemlos joinen."
-
-protocol-recomment:
-  - ''
-  - '  <gradient:#f90036:#f90011><b>HINWEIS ZUR SPIELVERSION</b></gradient>'
-  - '  {grey}Du spielst aktuell auf der Version {danger}{current-version}{grey}.'
-  - '  {grey}Für das {secondary}beste Spielerlebnis{grey} empfehlen wir:'
-  - '  <white>» <gradient:#00A4FC:#00FC00><b>{reco-version}</b></gradient> <dark_gray>bis</dark_gray> <gradient:#00A4FC:#00FC00><b>{max-version}</b></gradient>'
-  - ''
-  - '  <dark_gray><i>Einige Serverfunktionen sind mit deiner Version eingeschränkt.</i>'
-  - ''
-
-# Backend Lang
-command-fly-success: '{grey}Flugmodus wurde {primary}{state}'
-command-fly-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat den Flugmodus für {grey}sich {primary}{state}'
-command-fly-others-success: '{grey}Flugmodus für {primary}{player} {primary}{state}'
-command-fly-others-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat den Flugmodus für {primary}{target-name} {state}'
-command-fly-all-success: '{grey}Flugmodus für {primary}alle Spieler {grey}umgeschaltet'
-command-fly-all-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat den Flugmodus für {primary}alle Spieler {grey}umgeschaltet'
-
-command-flyspeed-usage: '{tertiary}/flyspeed <1-10>'
-command-flyspeed-success: '{grey}Deine Fluggeschwindigkeit wurde auf {primary}{speed}{grey} gesetzt'
-invalid-number: '{danger}{input}{grey} ist keine Zahl'
-
-join-message: '<dark_grey>[<green>+<dark_grey>] {grey}{player-name}'
-leave-message: '<dark_grey>[<red>-<dark_grey>] {grey}{player-name}'
-
-command-spec-success: '{grey}Dein Spielmodus wurde auf {primary}Spectator {grey}gesetzt'
-command-spec-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}ist nun im {primary}Spectator'
-command-spec-others-success: '{grey}Spieler {primary}{target} {grey}ist nun im {primary}Spectator'
-command-spec-others-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat {primary}{target-name} {grey}in den {primary}Spectator {grey}gesetzt'
-command-spec-usage: '{tertiary}/spec <player>'
-command-spec-back: '{grey}Dein Spielmodus wurde auf {primary}{gm} {grey}zurückgesetzt'
-
-command-spawn-success: '{grey}Du wurdest erfolgreich zum Spawn teleportiert'
-
-command-setspawn-error: '{danger}Bitte gebe richtige Koordinaten an'
-command-setspawn-usage: '{tertiary}/setspawn <x> <y> <z> [yaw] [pitch]'
-command-setspawn-success: '{grey}Der Welt Spawn wurde auf {primary}{x}{grey}, {primary}{y}{grey}, {primary}{z}{grey} gesetzt'
-
-command-playerinfo-sucess:
-  - ""
-  - "  <gradient:#00A4FC:#00f4fc><b>SPIELER INFORMATIONEN</b></gradient>"
-  - "  {grey}Details zu: <white>{player}</white>"
-  - ""
-  - "  <dark_gray>» {secondary}Allgemein:"
-  - "    {grey}UUID: <white><click:copy_to_clipboard:'{uuid}'><hover:show_text:'{primary}Klicken zum Kopieren'>{uuid}</hover></click></white>"
-  - "    {grey}Version: <white>{version}</white>"
-  - "    {grey}Client: <white>{client}</white>"
-  - "    {grey}Online seit: <white>{online_time}</white>"
-  - ""
-  - "  <dark_gray>» {secondary}Verbindung:"
-  - "    {grey}Server: <white>{server}</white> {grey}({primary}{group}{grey})"
-  - "    {grey}Ping: <white>{ping}ms</white>"
-  - "    {grey}IP-Adresse: <white><click:copy_to_clipboard:'{ip}'><hover:show_text:'{primary}Klicken zum Kopieren'>{ip}</hover></click></white>"
-  - ""
-  - "  <dark_gray>» {secondary}Sicherheit:"
-  - "    {grey}Zweitaccounts: <white>{alts}</white>"
-  - ""
-
-command-playerinfo-click-for-more: '{primary}Klicke für Info zu {name}'
-command-playerinfo-no-more-accounts: '{grey}Keine weiteren Accounts gefunden'
-command-playerinfo-usage: '{tertiary}/playerinfo <Spieler>'
-
-server-restart-move: '{grey}Der Server {danger}{server-name}{grey} startet neu. Du wurdest in die {primary}Lobby {grey}verschoben!'
-lobby-restart-kick:
-  - "<gradient:#f90036:#f90011><b>LOBBY NEUSTART</b></gradient>"
-  - ""
-  - "{grey}Die Lobby wird {danger}neu gestartet{grey}."
-  - "{grey}Da dies der Haupt Server ist, wurde deine Verbindung getrennt."
-  - ""
-  - "{grey}Bitte gedulde dich einen kleinen Moment."
-  - "{grey}Du kannst in Kürze wieder {secondary}beitreten{grey}."
-  - ""
-  - "<dark_gray>Versuche es in ca. <white>60 Sekunden</white> erneut."
-
-command-spy-enabled: '{grey}Spy Modus {primary}aktiviert{grey}. Du siehst nun alle privaten Nachrichten.'
-command-spy-disabled: '{grey}Spy Modus {danger}deaktiviert{grey}.'
-command-spy-usage: '{tertiary}/spy'
-
-spy-chat: '{grey}[{danger}Spy{grey}] {tertiary}[{group}] {primary}{player-name} {grey}» <white>{message}'
-spy-msg: '{grey}[{danger}Spy{grey}] {grey}[{primary}{sender} {grey}-> {primary}{receiver}{grey}] {grey}{message}'
-spy-gmsg: '{grey}[{danger}Spy{grey}] {tertiary}[Global] {grey}[{primary}{sender} {grey}-> {primary}{receiver}{grey}] {grey}{message}'
-
-command-client-usage: '{tertiary}/client <Spieler>'
-command-client-success: '{grey}Client von {primary}{player-name}{grey}: {secondary}{brand} {grey}(Version: {primary}{version}{grey}, Protocol: {primary}{protocol}{grey})'
-
-command-version-usage: '{tertiary}/version <Spieler>'
-command-version-success: '{grey}Spielversion von {primary}{player-name}{grey}: {secondary}{version} {grey}(Protocol {primary}{protocol}{grey})'
-
-command-mods-usage: '{tertiary}/mods <Spieler>'
-command-mods-none: '{danger}{player-name} {grey}nutzt keine Mods (Vanilla/Labymod Inject)'
-command-mods-list: '{grey}Mods von {primary}{player-name} {grey}({count}): {secondary}{mods}'
-
-command-heal-success: '{grey}Du wurdest erfolgreich {primary}geheilt{grey}'
-command-heal-others-success: '{grey}Du hast {primary}{target-name} {grey}erfolgreich geheilt'
-
-server-kick-redirect:
-  - ""
-  - "  <gradient:#f90036:#f90011><b>VERBINDUNGS-INFO</b></gradient>"
-  - "  {grey}Du wurdest von {danger}{server} {grey}gekickt!"
-  - ""
-  - "  <dark_gray>» {grey}Grund: <white>{reason}"
-  - ""
-  - "  {grey}Du wurdest zur {primary}Lobby {grey}verschoben."
-  - ""
-
-command-mute-usage: '{tertiary}/mute <Spieler> <Zeit> <Grund>'
-command-mute-player-not-found: '{grey}Der Spieler {danger}{player-name}{grey} war noch nie auf dem Netzwerk'
-command-mute-invalid-time: '{grey}Das Format für die Mutelänge ist falsch: {danger}{input}'
-command-mute-already-muted: '{danger}{player-name} {grey}ist bereits gemutet'
-command-mute-hierarchy-error: '{grey}Du kannst {danger}{player-name}{grey} nicht muten!'
-command-mute-success: '{grey}Du hast {primary}{player-name}{grey} erfolgreich gemutet ({type}). Grund: {primary}{reason} {grey}| Dauer: {primary}{duration}'
-command-mute-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat {primary}{mute-name} {grey}gemutet. Grund: {primary}{reason} {grey}| Dauer: {primary}{duration}'
-
-mute-notification:
-  - ""
-  - "<gradient:#f90036:#f90011><b>CHATAUSSCHLUSS</b></gradient>"
-  - "{grey}Du wurdest soeben vom Chat ausgeschlossen."
-  - ""
-  - "{grey}Grund: <white>{reason}"
-  - "{grey}Dauer: <white>{duration}"
-  - ""
-  - "{grey}Verhalte dich künftig regelkonform."
-  - ""
-
-mute-chat-info:
-  - "{danger}Du bist gemutet! {grey}Grund: <white>{reason} {grey}| Dauer: <white>{duration}"
-
-command-unmute-usage: '{tertiary}/unmute <Spieler>'
-command-unmute-success: '{primary}{player-name} {grey}wurde entmutet'
-command-unmute-not-muted: '{danger}{player-name} {grey}ist nicht gemutet'
-command-unmute-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat {primary}{mute-name} {grey}entmutet'
-
-command-mutelist-empty: '{grey}Es sind aktuell keine Spieler gemutet.'
-command-mutelist-header: '{grey}--- {danger}Aktive Mutes {grey}({primary}{count}{grey}) ---'
-command-mutelist-entry: '{grey}• {primary}{target} {grey}| Grund: {primary}{reason} {grey}| Von: {danger}{operator} {grey}({primary}{duration}{grey})'
-command-mutelist-footer: '{grey}---------------------'
-
-command-vanish-enabled: "{grey}Dein Vanish wurde {primary}aktiviert{grey}"
-command-vanish-disabled: "{grey}Dein Vanish wurde {danger}deaktiviert{grey}"
-
-command-vanish-target-enabled: "{grey}Dein Vanish wurde {primary}aktiviert{grey}"
-command-vanish-target-disabled: "{grey}Dein Vanish wurde {danger}deaktiviert{grey}"
-
-command-vanish-log: "{grey}[<gradient:#f90036:#f90011><b>LOG</b></gradient>{grey}] {primary}{player} {grey}hat Vanish {secondary}{state} {tertiary}{info}"
-
-event-server-no-event: "{grey}Aktuell findet kein Event statt!"
-connect-to-server-offline: "{grey}Du kannst dich nicht mit diesem Server verbinden, da er offline ist"
+  #
+  # {prefix} {primary} {secondary} {tertiary} {danger} {grey}
+  # Minimessage Format Support
+  
+  # Basic
+  prefix: '{grey}[<gradient:#f90036:#f90011><b>System</b>{grey}]'
+  only-player: '{danger}Nur Spieler können diesen Command ausführen'
+  no-permission: '{danger}Du hast keine Rechte dazu'
+  first-join:
+    - ""
+    - "  <gradient:#00A4FC:#00FC00><b>WILLKOMMEN AUF JOZELOT.DE</b></gradient>"
+    - "  {grey}Hey <white>{player-name}</white>, schön dass du da bist!"
+    - ""
+    - "  {grey}Du startest heute dein Abenteuer auf unserem Netzwerk."
+    - "  {grey}Erkunde die Lobby, triff Freunde und hab Spaß!"
+    - ""
+    - "  <dark_gray>» {secondary}Discord: <click:open_url:'https://jozelot.de/discord'><hover:show_text:'{primary}Klicke hier, um unserem Discord beizutreten!'><u><white>jozelot.de/discord</white></u></hover></click>"
+    - ""
+  
+  sounds:
+    error: "entity.villager.no"
+    success: "entity.player.levelup"
+    pling: "block.note_block.pling"
+    notify: "block.note_block.chime"
+    experience: "entity.experience_orb.pickup"
+    warning: 'block.note_block.bit'
+  
+  server-maintenance-kick: '{danger}Du wurdest wegen Wartungsarbeiten von {server-name} gekickt'
+  server-maintenance-no-access: '{danger}Du kannst {server-name} nicht, wegen aktuellen Wartungsarbeiten, beitreten, '
+  proxy-maintenance-kick:
+    - "<gradient:#f90036:#f90011><b>WARTUNGSARBEITEN</b></gradient>"
+    - ""
+    - "{grey}Unser Netzwerk wird aktuell {danger}überarbeitet{grey},"
+    - "{grey}um dein Spielerlebnis noch besser zu machen."
+    - ""
+    - "{grey}Wir sind in Kürze wieder für dich da!"
+    - ""
+    - "<dark_gray>Aktuelle Infos & Updates findest du hier:"
+    - "{secondary}jozelot.de/discord <dark_gray>| <white>jozelot.de</white>"
+  maintenance-version: '§4Wartungsarbeiten'
+  no-forcedhost-permission: '{danger}Du kannst {server-name} nicht über einen Horced Host joinen'
+  
+  generic-error: '{danger}An error encoured'
+  # Server Sends
+  send-to-lobby: '{grey}Du wirst zur {primary}Lobby{grey} gesendet...'
+  already-on-lobby: '{grey}Du befindest dich bereits in der {danger}Lobby'
+  server-not-found: '{grey}Der Server {danger}{server-name}{grey} wurde nicht gefunden'
+  player-not-found: '{grey}Der Spieler {danger}{player-name}{grey} wurde nicht gefunden'
+  already-on-server: '{grey}Du befindest dich schon auf {danger}{server-name}'
+  connection-failed: '{grey}Verbindung zu {danger}{server-name} {grey}fehlgeschlagen'
+  player-not-on-server: '{danger}{server-name}{grey} befindet sich auf keinem Server'
+  
+  blocked-command: '<red>Unknown or incomplete command, see below for error<newline><red><u>{command}</u><italic><--[HERE]</italic>'
+  # Commands
+  network-help:
+    - ''
+    - ''
+    - '{grey}<bold>Alle Netzwerk Commands:</bold>'
+    - '{grey}- {primary}/net help {grey}Zeigt diese Nachricht'
+    - '{grey}- {primary}/net reload {grey}Lädt das gesamte Netzwerk neu'
+    - '{grey}- {primary}/net manage {grey}Stelle die einzelnen Backend Server ein'
+    - '{grey}- {primary}/net start/stop/restart/status {grey}Du hast die volle Kontrolle über jeden Server'
+    - '{grey}- {primary}/find {grey}Sieh auf welchem Server sind ein Spieler befindet'
+    - '{grey}- {primary}/clearchat {grey}Lehre den Chat'
+    - '{grey}- {primary}/ban {grey}Banne Spieler vom Netzwerk'
+    - '{grey}- {primary}/banlist {grey}Zeigt dir alle gebannten Spieler an'
+    - '{grey}- {primary}/unban {grey}Entbannt einen Spieler'
+    - '{grey}- {primary}/kick {grey}Kickt einen Spieler vom Netzwerk'
+    - '{grey}- {primary}/server {grey}Gelange zu einem beliebigen Unterserver'
+    - '{grey}- {primary}/send {grey}Sende eine Gruppe von Spielern auf einen bestimmen Server'
+    - '{grey}- {primary}/tpo {grey}Gelange auf den Server eines anderen Spielers'
+    - '{grey}- {primary}/tpohere {grey}Hole einen Spieler auf deinen Server'
+    - '{grey}- {primary}/lobby {grey}Geh zur Lobby'
+    - '{grey}- {primary}/msg {grey}Schreibe einem Spieler in der Gruppe eine Nachricht'
+    - '{grey}- {primary}/gmsg {grey}Schreibe einem Spieler eine Nachricht'
+    - '{grey}- {primary}/reply {grey}Antworte einem Spieler'
+    - '{grey}- {primary}/g {grey}Schreibe in den globalen Chat'
+    - '{grey}- {primary}/whitelist {grey}Verwalte die Netzwerk weite Whitelist'
+    - '{grey}- {primary}/playtime {grey}Schau dir die Spielzeiten anderer Spieler an'
+    - '{grey}- {primary}/broadcast {grey}Sende Nachrichten an alle Spieler auf dem Netzwerk'
+  network-reload-success: '{primary}Das Netzwerk wurde erfolgreich neu geladen'
+  network-reload-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat das Netzwerk neu geladen'
+  chat-cleared:
+    - '{grey}Der Chat wurde von {primary}{player-name}{grey} gelehrt'
+  chat-cleared-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat den Chat gelehrt'
+  chat-cleared-success: '{primary}Der Chat wurde gelehrt'
+  
+  command-find-not-found: '{danger}{player-name} {grey}konnte nicht gefunden werden'
+  command-find-success: '{primary}{player-name} {grey}befindet sich auf {primary}{server-name}'
+  command-find-offline: '{primary}{player-name} {grey}war zuletzt auf {primary}{server-name}'
+  command-find-missing-argument: '{tertiary}/find <Spieler>'
+  command-find-connecting: '{danger}{player-name} {grey}verbindet sich gerade zu einem Server'
+  
+  command-manage-display-name-success: '{primary}{server-name} {grey}wurde {primary}erfolgreich{grey} in {primary}{display-name}{grey} umbenannt'
+  command-manage-display-name-get: '{grey}Der Anzeige Name von {primary}{server-name} {grey}ist {primary}{display-name}{grey}'
+  command-manage-display-name-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat {primary}{server-name} {grey}in {primary}{display-name} {grey}umbenannt'
+  
+  command-manage-max-players-get: '{grey}Auf {primary}{server-name} {grey}können maximal {primary}{max-players}{grey} joinen'
+  command-manage-max-players-success: '{grey}Die maximale Spieler Anzahl von {primary}{server-name}{grey} auf {primary}{max-players}'
+  command-manage-max-players-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat die maximale Spieler Anzahl von{primary}{server-name} {grey}auf {primary}{max-players} {grey}geändert'
+  command-manage-max-players-not-a-number: '{danger}{input}{grey} ist keine Zahl'
+  
+  command-manage-motd-get: '{grey}Die aktuelle MOTD von {primary}{server-name} {grey}ist: <reset>{motd}'
+  command-manage-motd-success: '{grey}Die MOTD von {primary}{server-name}{grey} wurde erfolgreich geändert'
+  command-manage-motd-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat die MOTD von {primary}{server-name} {grey}geändert'
+  
+  command-manage-maintenance-get: '{primary}{server-name} {grey}hat den Maintenance Modus:   {primary}{status}'
+  command-manage-maintenance-success: '{grey}Maintenance Modus von {primary}{server-name}{grey} {primary}{status}'
+  command-manage-maintenance-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat den Maintenance Modus von {primary}{server-name} {primary}{status}'
+  
+  command-ban-usage: '{tertiary}/ban <Spieler> <Zeit> <Grund>'
+  command-ban-player-not-found: '{grey}Der Spieler {danger}{player-name}{grey} war noch nie auf dem Netzwerk'
+  command-ban-invalid-time: '{grey}Das Format für die Banlänge ist falsch: {danger}{input}'
+  command-ban-already-banned: '{danger}{player-name} {grey}ist bereits gebannt'
+  command-ban-hierarchy-error: '{grey}Du kannst {danger}{player-name}{grey} nicht bannen!'
+  command-ban-success: '{grey}Du hast {primary}{player-name}{grey} erfolgreich gebannt. Grund: {primary}{reason} {grey}| Dauer: {primary}{duration}'
+  command-ban-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat {primary}{target-name} {grey}gebannt. Grund: {primary}{reason} {grey}| Dauer: {primary}{duration}'
+  
+  ban-kick-screen:
+    - "<gradient:#f90036:#f90011><b>AUSSCHLUSS VOM NETZWERK</b></gradient>"
+    - ""
+    - "{grey}Deine Verbindung wurde dauerhaft getrennt."
+    - ""
+    - "{grey}Grund: <white>{reason}"
+    - "{grey}Dauer: <white>{duration}"
+    - ""
+    - "{grey}Erstelle einen Entbannungsantrag unter:"
+    - "{secondary}jozelot.de/discord"
+  
+  ban-join-screen:
+    - "<gradient:#f90036:#f90011><b>DU BIST GEBANNT</b></gradient>"
+    - ""
+    - "{grey}Du bist aktuell vom Netzwerk ausgeschlossen."
+    - ""
+    - "{grey}Grund: <white>{reason}"
+    - "{grey}Datum des Unbans: <white>{duration}"
+    - ""
+    - "{grey}Sollte dies ein Fehler sein, wende dich an das Team."
+  
+  ban-bypass-info:
+    - ""
+    - "  <gradient:#00A4FC:#00FC00><b>ADMIN-BYPASS AKTIV</b></gradient>"
+    - "  {grey}Du bist eigentlich auf dem Netzwerk {danger}gebannt{grey}."
+    - "  {grey}Aufgrund deiner Rechte wurdest du dennoch verbunden."
+    - ""
+    - "  <dark_gray>»</dark_gray> {grey}Grund: <white>{reason}"
+    - "  <dark_gray>»</dark_gray> {grey}Bis: <white>{duration}"
+    - "  <dark_gray>»</dark_gray> {grey}Von: <white>{admin-name}"
+    - ""
+    - "  {grey}Nutze <click:suggest_command:'/unban {player-name}'><hover:show_text:'{primary}Klicke hier, um dich zu entbannen!'>{primary}<u>/unban {player-name}</u></hover></click>{grey}, um den Bann aufzuheben."
+    - ""
+  
+  command-unban-usage: '{tertiary}/unban <Spieler>'
+  command-unban-success: '{primary}{player-name} {grey}wurde entbannt'
+  command-unban-not-banned: '{danger}{player-name} {grey}ist nicht gebannt'
+  command-unban-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat {primary}{ban-name} {grey}entbannt.'
+  
+  command-banlist-empty: '{grey}Es sind aktuell keine Spieler gebannt.'
+  command-banlist-header: '{grey}--- {danger}Aktive Banns {grey}({primary}{count}{grey}) ---'
+  command-banlist-entry: '{grey}• {primary}{target} {grey}| Grund: {primary}{reason} {grey}| Von: {danger}{operator} {grey}({primary}{duration}{grey})'
+  command-banlist-footer: '{grey}---------------------'
+  
+  command-kick-usage: '{tertiary}/kick <Spieler> <Grund>'
+  command-kick-player-not-online: '{danger}{player-name}{grey} ist nicht online'
+  command-kick-hierarchy-error: '{grey}Du kannst {danger}{player-name} {grey}nicht kicken'
+  command-kick-success: '{grey}Du hast {primary}{player-name}{grey} erfolgreich gekickt. Grund: {primary}{reason}'
+  command-kick-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat {primary}{target-name} {grey}gekickt. Grund: {primary}{reason}'
+  
+  kick-screen:
+    - "<gradient:#f90036:#f90011><b>VERBINDUNG GETRENNT</b></gradient>"
+    - ""
+    - "{grey}Du wurdest vom <white>jozelot.de</white> Netzwerk gekickt."
+    - ""
+    - "{grey}Grund für den Ausschluss:"
+    - "<white>» {danger}{reason}"
+    - ""
+    - "{grey}Solltest du diesen Kick für unberechtigt halten,"
+    - "{grey}melde dich bitte auf unserem {secondary}Discord{grey}."
+  
+  command-tpo-player-not-found: '{danger}{player-name}{grey} konnte nicht gefunden werden'
+  send-to-server-success: '{grey}Du wurdest erfolgreich zu {primary}{player-name} {grey}auf {primary}{server-name}{grey} gesendet'
+  command-tpo-usage: '{tertiary}/tpo <Spieler>'
+  
+  command-tpohere-already-on-server: '{danger}{player-name}{grey} ist bereits auf diesem Server'
+  command-tpohere-success: '{primary}{player-name} {grey}wurde erfolgreich zu dir teleportiert'
+  command-tpohere-target-info: '{grey}Du wurdest zu {primary}{player-name} {grey}teleportiert'
+  command-tpohere-usage: '{tertiary}/tpohere <Spieler> [--silent]'
+  command-tpohere-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat {primary}{target-name} {grey}zu sich verschoben'
+  
+  command-server-usage: '{tertiary}/server <Server>'
+  command-server-try: '{grey}Du wirst zu {primary}{server-name} {grey}gesendet'
+  
+  command-send-usage: '{tertiary}/send <Spieler> <Server>'
+  command-send-success-multiple: '{primary}{count}{grey} Spieler wurden zu {primary}{server-name}{grey} gesendet'
+  command-send-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat {primary}{range} {grey}auf {primary}{server-name} {grey}verschoben'
+  
+  pterodactyl-control-no-id: '{grey}Es ist keine Pterodactyl-ID für {danger}{server-name}{grey} hinterlegt'
+  pterodactyl-control-success: '{grey}Befehl für {primary}{action}{grey} wurde an {primary}{server-name}{grey} gesendet'
+  pterodactyl-control-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat den Befehl für {primary}{action}{grey} an {primary}{server-name}{grey} gesendet'
+  pterodactyl-control-api-error: '{grey}Die API hat mit dem Fehler Code {danger}{code}{grey} geantwortet'
+  pterodactyl-restart-kick:
+    - "<gradient:#f90036:#f90011><b>NETZWERK NEUSTART</b></gradient>"
+    - ""
+    - "{grey}Das System wird aktuell {danger}neu gestartet{grey},"
+    - "{grey}um Updates oder Änderungen zu übernehmen."
+    - ""
+    - "{grey}Bitte gedulde dich einen kleinen Moment."
+    - "{grey}Du kannst in Kürze wieder {secondary}beitreten{grey}."
+    - ""
+    - "<dark_gray>Versuche es in ca. <white>10 Sekunden</white> erneut."
+  
+  pterodactlyl-status-error: '{grey}Fehler beim abrufer der {danger}API Daten'
+  pterodactyl-status-message:
+    - ''
+    - '<gray>» <gradient:#ffcc00:#ff8800><bold>SERVER STATUS</bold></gradient> <gray>«'
+    - '<dark_gray>Ziel: <white>{server-name} <dark_gray>(<gray>{id}...<dark_gray>)'
+    - '<gray>Status: {status}'
+    - '<gray>CPU: <white>{cpu}%'
+    - '<gray>RAM: <white>{memory} MB'
+    - '<gray>Network: <white>↓{network-in}KB <gray>| <white>↑{network-out}KB'
+    - ''
+    - '<gray>» <dark_gray>Abgefragt via Pterodactyl API'
+  
+  tab-header:
+    - ''
+    - '<gradient:#00A4FC:#00f4fc><bold>jozelot.de</bold></gradient>'
+    - ''
+    - '<dark_grey>- <#FCD46F>{server-name} <dark_grey>-'
+    - ''
+    - '{grey}<strikethrough>                                                 </strikethrough>'
+    - ''
+  
+  tab-footer:
+    - ''
+    - '{grey}<strikethrough>                                                 </strikethrough>'
+    - ''
+    - '<gray>Online: {secondary}{online-players} <gray>| <gray>Ping: {secondary}{ping}ms'
+    - ''
+    - '<#FCD46F>{group-info}'
+    - ''
+  
+  lobby-scoreboard-title: '     <gradient:#00A4FC:#00f4fc><bold>jozelot.de</bold></gradient>     '
+  lobby-scoreboard:
+    - ''
+    - 'Rang'
+    - '<white>» <gold>{rank} 👑'
+    - ''
+    - ''
+    - 'Secrets'
+    - '<white>» {secrets} ⭐'
+    - ''
+    - ''
+    - 'Onlinespieler'
+    - '<white>» {secondary}{players} 👤'
+    - ''
+    - ''
+    - 'Spielzeit'
+    - '<white>» {primary}{playtime} ⌚'
+  
+  tab-player-format: '{rank-prefix}{player-name}'
+  chat-format: '<hover:show_text:"{primary}Klicke, um {player-name} privat zu schreiben"><click:suggest_command:"/msg {player-name} ">{rank-prefix}{player-name}</click></hover> {grey}» <white>{message}'
+  global-chat-format: '{tertiary}[Global] <reset><hover:show_text:"{primary}Klicke, um {player-name} eine Nachricht zu schreiben"><click:suggest_command:"/gmsg {player-name} ">{rank-prefix}{player-name}</click></hover> {grey}» <white>{message}'
+  
+  command-gmsg-usage: '{tertiary}/gmsg <Spieler> <Nachricht>'
+  command-gmsg-target-not-found: '{danger}{player-name} {grey}konnte nicht gefunden werden'
+  command-gmsg-self-msg: '{danger}Du kannst dir selbst keine Nachrichten schreiben'
+  
+  gmsg-format-send: '{tertiary}[Global] <reset>{grey}[{primary}Ich {grey}-> {primary}{target-name}{grey}] {grey}{message}'
+  gmsg-format-receive: '{tertiary}[Global] <reset>{grey}[{primary}{player-name} {grey}-> {primary}Ich{grey}] {grey}{message}'
+  
+  command-msg-not-in-group: '{danger}{player-name} {grey}konnte nicht gefunden werden'
+  command-msg-usage: '{tertiary}/msg <Spieler> <Nachricht>'
+  
+  msg-format-send: '{grey}[{primary}Ich {grey}-> {primary}{target-name}{grey}] {grey}{message}'
+  msg-format-receive: '{grey}[{primary}{player-name} {grey}-> {primary}Ich{grey}] {grey}{message}'
+  
+  command-reply-usage: '{tertiary}/reply <Nachricht>'
+  command-reply-no-target: '{danger}Du hast niemanden, dem du antworten kannst'
+  command-reply-target-offline: '{danger}Der Spieler, dem du antworten möchtest, ist nicht mehr online'
+  
+  command-global-usage: '{tertiary}/g <Nachricht>'
+  
+  command-whitelist-usage: '{tertiary}/whitelist <add|remove|on|off|list> <Gruppe> [Spieler]'
+  command-whitelist-not-found: '{grey}Die Gruppe {danger}{group} existiert nicht'
+  command-whitelist-player-not-found: '{danger}{player-name} {grey}wurde nicht gefunden'
+  command-whitelist-added: '{primary}{player} {grey}wurde zur Whitelist von {primary}{group}{grey} hinzugefügt'
+  command-whitelist-removed: '{primary}{player} {grey}wurde von der Whitelist von {primary}{group}{grey} entfernt'
+  command-whitelist-state: '{primary}Whitelist{grey} für {primary}{group}{grey} ist nun {secondary}{state}'
+  command-whitelist-list-header: '{primary}Whitelist für {group}:'
+  command-whitelist-kick: '{danger}Du bist nicht auf der Whitelist für diesen Server-Bereich!'
+  command-whitelist-state-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat die Whitelist für {primary}{group} {primary}{state}'
+  command-whitelist-added-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat {primary}{target} {grey}zur Whitelist von {primary}{group} {grey}hinzugefügt'
+  command-whitelist-removed-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat {primary}{target} {grey}von der Whitelist von {primary}{group} {grey}entfernt'
+  
+  command-playtime-usage: '{tertiary}/playtime <Spieler>'
+  command-playtime-no-playtime: '{grey}Der Spieler {danger}{player-name}{grey} war noch nie auf dieser Region'
+  command-playtime-total: '{grey}Spielzeit von {primary}{player-name} {grey}auf {primary}{type}{grey}: {secondary}{days}d {hours}h {minutes}m {seconds}s'
+  command-playtime-syntax-error: '{grey}Bitte nutze: {danger}server: / group:'
+  
+  command-broadcast-usage: '{tertiary}/broadcast <Ziel> <Typ> <Nachricht>'
+  command-broadcast-invalid: '{danger}Keine Spierler gefunden oder der Bereich ist ungültig'
+  command-broadcast-send: '{grey}Broadcast wurde an {primary}{size} Spieler gesendet'
+  command-broadcast-send-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat einen Broadcast an {primary}{size} Spieler gesendet'
+  broadcast-announcement:
+    - ""
+    - "<dark_gray> -------- « <gold><b>ANKÜNDIGUNG</b> <dark_gray>» ---------"
+    - ""
+    - "<gray>{message}"
+    - ""
+    - "<reset><dark_gray> ----------------------------------"
+    - ""
+  broadcast-message:
+    - ""
+    - "<dark_gray> --------- « <blue><b>NACHRICHT</b> <dark_gray>» ---------"
+    - ""
+    - "<gray>{message}"
+    - ""
+    - "<reset><dark_gray> ---------------------------------"
+    - ""
+  broadcast-information:
+    - ""
+    - "<dark_gray> ------------ « <aqua><b>INFO</b> <dark_gray>» ------------"
+    - ""
+    - "<gray>{message}"
+    - ""
+    - "<reset><dark_gray> ---------------------------------"
+    - ""
+  broadcast-warning:
+    - ""
+    - "<dark_gray> ---------- « <red><b>WARNUNG</b> <dark_gray>» ----------"
+    - ""
+    - "<gray>{message}"
+    - ""
+    - "<reset><dark_gray> ---------------------------------"
+    - ""
+    -
+  server-full-message: "{danger}Du kannst nicht auf {server-name} verbinden, da dieser voll ist."
+  
+  proxy-full-kick:
+    - "<gradient:#f90036:#f90011><b>NETZWERK AUSGELASTET</b></gradient>"
+    - ""
+    - "{grey}Aktuell sind alle <white>{max} Slots</white> belegt."
+    - ""
+    - "{grey}Mit dem <gradient:#00A4FC:#00FC00><b>VIP Rang</b></gradient> kannst du"
+    - "{grey}auch bei vollem Netzwerk jederzeit beitreten!"
+  
+  protocol-to-old:
+    - "<red><b>ZUTRITT VERWEIGERT</b>"
+    - ""
+    - "{grey}Deine Minecraft-Version ist zu {danger}alt{grey}."
+    - "{grey}Aktuelle Version: {danger}{current-version}"
+    - ""
+    - "{grey}Bitte nutze mindestens die Version: {primary}{min-version}"
+  
+  protocol-to-new:
+    - "<red><b>ZUTRITT VERWEIGERT</b>"
+    - ""
+    - "{grey}Deine Minecraft-Version ist zu <danger>neu{grey}."
+    - "{grey}Aktuelle Version: {danger}{current-version}"
+    - ""
+    - "{grey}Bitte nutze maximal die Version: {primary}{max-version}"
+    - "{grey}Empfohlene Version: {primary}{reco-version}"
+    - ""
+    - "{grey}Du kannst mit der {primary}{max-version}{grey} problemlos joinen."
+  
+  protocol-recomment:
+    - ''
+    - '  <gradient:#f90036:#f90011><b>HINWEIS ZUR SPIELVERSION</b></gradient>'
+    - '  {grey}Du spielst aktuell auf der Version {danger}{current-version}{grey}.'
+    - '  {grey}Für das {secondary}beste Spielerlebnis{grey} empfehlen wir:'
+    - '  <white>» <gradient:#00A4FC:#00FC00><b>{reco-version}</b></gradient> <dark_gray>bis</dark_gray> <gradient:#00A4FC:#00FC00><b>{max-version}</b></gradient>'
+    - ''
+    - '  <dark_gray><i>Einige Serverfunktionen sind mit deiner Version eingeschränkt.</i>'
+    - ''
+  
+  # Backend Lang
+  command-fly-success: '{grey}Flugmodus wurde {primary}{state}'
+  command-fly-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat den Flugmodus für {grey}sich {primary}{state}'
+  command-fly-others-success: '{grey}Flugmodus für {primary}{player} {primary}{state}'
+  command-fly-others-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat den Flugmodus für {primary}{target-name} {state}'
+  command-fly-all-success: '{grey}Flugmodus für {primary}alle Spieler {grey}umgeschaltet'
+  command-fly-all-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat den Flugmodus für {primary}alle Spieler {grey}umgeschaltet'
+  
+  command-flyspeed-usage: '{tertiary}/flyspeed <1-10>'
+  command-flyspeed-success: '{grey}Deine Fluggeschwindigkeit wurde auf {primary}{speed}{grey} gesetzt'
+  invalid-number: '{danger}{input}{grey} ist keine Zahl'
+  
+  join-message: '<dark_grey>[<green>+<dark_grey>] {grey}{player-name}'
+  leave-message: '<dark_grey>[<red>-<dark_grey>] {grey}{player-name}'
+  
+  command-spec-success: '{grey}Dein Spielmodus wurde auf {primary}Spectator {grey}gesetzt'
+  command-spec-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}ist nun im {primary}Spectator'
+  command-spec-others-success: '{grey}Spieler {primary}{target} {grey}ist nun im {primary}Spectator'
+  command-spec-others-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat {primary}{target-name} {grey}in den {primary}Spectator {grey}gesetzt'
+  command-spec-usage: '{tertiary}/spec <player>'
+  command-spec-back: '{grey}Dein Spielmodus wurde auf {primary}{gm} {grey}zurückgesetzt'
+  
+  command-spawn-success: '{grey}Du wurdest erfolgreich zum Spawn teleportiert'
+  
+  command-setspawn-error: '{danger}Bitte gebe richtige Koordinaten an'
+  command-setspawn-usage: '{tertiary}/setspawn <x> <y> <z> [yaw] [pitch]'
+  command-setspawn-success: '{grey}Der Welt Spawn wurde auf {primary}{x}{grey}, {primary}{y}{grey}, {primary}{z}{grey} gesetzt'
+  
+  command-playerinfo-sucess:
+    - ""
+    - "  <gradient:#00A4FC:#00f4fc><b>SPIELER INFORMATIONEN</b></gradient>"
+    - "  {grey}Details zu: <white>{player}</white>"
+    - ""
+    - "  <dark_gray>» {secondary}Allgemein:"
+    - "    {grey}UUID: <white><click:copy_to_clipboard:'{uuid}'><hover:show_text:'{primary}Klicken zum Kopieren'>{uuid}</hover></click></white>"
+    - "    {grey}Version: <white>{version}</white>"
+    - "    {grey}Client: <white>{client}</white>"
+    - "    {grey}Online seit: <white>{online_time}</white>"
+    - ""
+    - "  <dark_gray>» {secondary}Verbindung:"
+    - "    {grey}Server: <white>{server}</white> {grey}({primary}{group}{grey})"
+    - "    {grey}Ping: <white>{ping}ms</white>"
+    - "    {grey}IP-Adresse: <white><click:copy_to_clipboard:'{ip}'><hover:show_text:'{primary}Klicken zum Kopieren'>{ip}</hover></click></white>"
+    - ""
+    - "  <dark_gray>» {secondary}Sicherheit:"
+    - "    {grey}Zweitaccounts: <white>{alts}</white>"
+    - ""
+  
+  command-playerinfo-click-for-more: '{primary}Klicke für Info zu {name}'
+  command-playerinfo-no-more-accounts: '{grey}Keine weiteren Accounts gefunden'
+  command-playerinfo-usage: '{tertiary}/playerinfo <Spieler>'
+  
+  server-restart-move: '{grey}Der Server {danger}{server-name}{grey} startet neu. Du wurdest in die {primary}Lobby {grey}verschoben!'
+  lobby-restart-kick:
+    - "<gradient:#f90036:#f90011><b>LOBBY NEUSTART</b></gradient>"
+    - ""
+    - "{grey}Die Lobby wird {danger}neu gestartet{grey}."
+    - "{grey}Da dies der Haupt Server ist, wurde deine Verbindung getrennt."
+    - ""
+    - "{grey}Bitte gedulde dich einen kleinen Moment."
+    - "{grey}Du kannst in Kürze wieder {secondary}beitreten{grey}."
+    - ""
+    - "<dark_gray>Versuche es in ca. <white>60 Sekunden</white> erneut."
+  
+  command-spy-enabled: '{grey}Spy Modus {primary}aktiviert{grey}. Du siehst nun alle privaten Nachrichten.'
+  command-spy-disabled: '{grey}Spy Modus {danger}deaktiviert{grey}.'
+  command-spy-usage: '{tertiary}/spy'
+  
+  spy-chat: '{grey}[{danger}Spy{grey}] {tertiary}[{group}] {primary}{player-name} {grey}» <white>{message}'
+  spy-msg: '{grey}[{danger}Spy{grey}] {grey}[{primary}{sender} {grey}-> {primary}{receiver}{grey}] {grey}{message}'
+  spy-gmsg: '{grey}[{danger}Spy{grey}] {tertiary}[Global] {grey}[{primary}{sender} {grey}-> {primary}{receiver}{grey}] {grey}{message}'
+  
+  command-client-usage: '{tertiary}/client <Spieler>'
+  command-client-success: '{grey}Client von {primary}{player-name}{grey}: {secondary}{brand} {grey}(Version: {primary}{version}{grey}, Protocol: {primary}{protocol}{grey})'
+  
+  command-version-usage: '{tertiary}/version <Spieler>'
+  command-version-success: '{grey}Spielversion von {primary}{player-name}{grey}: {secondary}{version} {grey}(Protocol {primary}{protocol}{grey})'
+  
+  command-mods-usage: '{tertiary}/mods <Spieler>'
+  command-mods-none: '{danger}{player-name} {grey}nutzt keine Mods (Vanilla/Labymod Inject)'
+  command-mods-list: '{grey}Mods von {primary}{player-name} {grey}({count}): {secondary}{mods}'
+  
+  command-heal-success: '{grey}Du wurdest erfolgreich {primary}geheilt{grey}'
+  command-heal-others-success: '{grey}Du hast {primary}{target-name} {grey}erfolgreich geheilt'
+  
+  server-kick-redirect:
+    - ""
+    - "  <gradient:#f90036:#f90011><b>VERBINDUNGS-INFO</b></gradient>"
+    - "  {grey}Du wurdest von {danger}{server} {grey}gekickt!"
+    - ""
+    - "  <dark_gray>» {grey}Grund: <white>{reason}"
+    - ""
+    - "  {grey}Du wurdest zur {primary}Lobby {grey}verschoben."
+    - ""
+  
+  command-mute-usage: '{tertiary}/mute <Spieler> <Zeit> <Grund>'
+  command-mute-player-not-found: '{grey}Der Spieler {danger}{player-name}{grey} war noch nie auf dem Netzwerk'
+  command-mute-invalid-time: '{grey}Das Format für die Mutelänge ist falsch: {danger}{input}'
+  command-mute-already-muted: '{danger}{player-name} {grey}ist bereits gemutet'
+  command-mute-hierarchy-error: '{grey}Du kannst {danger}{player-name}{grey} nicht muten!'
+  command-mute-success: '{grey}Du hast {primary}{player-name}{grey} erfolgreich gemutet ({type}). Grund: {primary}{reason} {grey}| Dauer: {primary}{duration}'
+  command-mute-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat {primary}{mute-name} {grey}gemutet. Grund: {primary}{reason} {grey}| Dauer: {primary}{duration}'
+  
+  mute-notification:
+    - ""
+    - "<gradient:#f90036:#f90011><b>CHATAUSSCHLUSS</b></gradient>"
+    - "{grey}Du wurdest soeben vom Chat ausgeschlossen."
+    - ""
+    - "{grey}Grund: <white>{reason}"
+    - "{grey}Dauer: <white>{duration}"
+    - ""
+    - "{grey}Verhalte dich künftig regelkonform."
+    - ""
+  
+  mute-chat-info:
+    - "{danger}Du bist gemutet! {grey}Grund: <white>{reason} {grey}| Dauer: <white>{duration}"
+  
+  command-unmute-usage: '{tertiary}/unmute <Spieler>'
+  command-unmute-success: '{primary}{player-name} {grey}wurde entmutet'
+  command-unmute-not-muted: '{danger}{player-name} {grey}ist nicht gemutet'
+  command-unmute-success-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat {primary}{mute-name} {grey}entmutet'
+  
+  command-mutelist-empty: '{grey}Es sind aktuell keine Spieler gemutet.'
+  command-mutelist-header: '{grey}--- {danger}Aktive Mutes {grey}({primary}{count}{grey}) ---'
+  command-mutelist-entry: '{grey}• {primary}{target} {grey}| Grund: {primary}{reason} {grey}| Von: {danger}{operator} {grey}({primary}{duration}{grey})'
+  command-mutelist-footer: '{grey}---------------------'
+  
+  command-vanish-enabled: "{grey}Dein Vanish wurde {primary}aktiviert{grey}"
+  command-vanish-disabled: "{grey}Dein Vanish wurde {danger}deaktiviert{grey}"
+  
+  command-vanish-target-enabled: "{grey}Dein Vanish wurde {primary}aktiviert{grey}"
+  command-vanish-target-disabled: "{grey}Dein Vanish wurde {danger}deaktiviert{grey}"
+  
+  command-vanish-log: "{grey}[<gradient:#f90036:#f90011><b>LOG</b></gradient>{grey}] {primary}{player} {grey}hat Vanish {secondary}{state} {tertiary}{info}"
+  
+  event-server-no-event: "{grey}Aktuell findet kein Event statt!"
+  connect-to-server-offline: "{grey}Du kannst dich nicht mit diesem Server verbinden, da er offline ist"

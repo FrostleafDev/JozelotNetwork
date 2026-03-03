@@ -4,14 +4,17 @@ import de.jozelot.jozelotLobby.JozelotLobby;
 import de.jozelot.jozelotLobby.player.settings.ColorPreference;
 import de.jozelot.jozelotLobby.player.settings.Setting;
 import de.jozelot.jozelotLobby.ui.inventories.InventoryType;
+import de.jozelot.jozelotLobby.ui.inventories.LobbyInventory;
 import de.jozelot.jozelotLobby.ui.inventories.navigation.ArchivMenu;
 import de.jozelot.jozelotLobby.ui.inventories.navigation.ChallengeMenu;
 import de.jozelot.jozelotLobby.ui.inventories.navigation.NavigatorMenu;
 import de.jozelot.jozelotLobby.ui.inventories.profile.ProfileMenu;
 import de.jozelot.jozelotLobby.ui.inventories.profile.SecretMenu;
 import de.jozelot.jozelotLobby.ui.inventories.profile.SpielerinfoMenu;
+import de.jozelot.jozelotLobby.ui.inventories.profile.settings.ColorPreferenceMenu;
 import de.jozelot.jozelotLobby.ui.inventories.profile.settings.SettingsMenu;
 import de.jozelot.jozelotLobby.ui.items.HiderState;
+import de.jozelot.jozelotLobby.utils.LuckpermsManager;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.Bukkit;
@@ -28,12 +31,16 @@ public class LobbyPlayer {
     private final JozelotLobby plugin;
     private HiderState hiderState;
     private Map<Setting, String> settings = new HashMap<>();
+    private long baseNetworkPlaytime;
+    private long loginTime;
 
 
     public LobbyPlayer(UUID uuid, HiderState hiderState, JozelotLobby plugin) {
         this.hiderState = hiderState;
         this.uuid = uuid;
         this.plugin = plugin;
+        loginTime = System.currentTimeMillis();
+        plugin.getScoreboardManager().createScoreboard(getPlayer());
     }
 
     public void setHiderState(HiderState hiderState) {
@@ -79,6 +86,10 @@ public class LobbyPlayer {
                         }
                     }
                 });
+    }
+
+    public String getRank() {
+        return LuckpermsManager.getPlayerRankAsString(getPlayer());
     }
 
     /**
@@ -132,9 +143,6 @@ public class LobbyPlayer {
 
     public void setSetting(Setting setting, String value) {
         this.settings.put(setting, value);
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            plugin.getLobbyPlayerDatabase().setSetting(this, setting, value);
-        });
     }
 
     public void setSettings(Map<Setting, String> settingStringMap) {
@@ -153,18 +161,43 @@ public class LobbyPlayer {
         Player player = getPlayer();
         InventoryHolder holder = type.create(plugin, player);
 
-        if (holder instanceof NavigatorMenu menu) menu.setParentType(parent);
-        else if (holder instanceof ChallengeMenu menu) menu.setParentType(parent);
-        else if (holder instanceof ArchivMenu menu) menu.setParentType(parent);
-        else if (holder instanceof ProfileMenu menu) menu.setParentType(parent);
-        else if (holder instanceof SecretMenu menu) menu.setParentType(parent);
-        else if (holder instanceof SpielerinfoMenu menu) menu.setParentType(parent);
-        else if (holder instanceof SettingsMenu menu) menu.setParentType(parent);
+        if (holder instanceof LobbyInventory menu) menu.setParentType(parent);
 
         player.openInventory(holder.getInventory());
     }
 
     public void sendToServer(String serverName) {
         plugin.getRedisPublish().sendPlayerToServer(getUuid(), serverName);
+    }
+
+    public void setPlaytimeData(long baseNetworkPlaytime, long loginTime) {
+        this.baseNetworkPlaytime = baseNetworkPlaytime;
+        this.loginTime = loginTime;
+    }
+
+    public long getTotalPlaytimeMillis() {
+        return baseNetworkPlaytime + (System.currentTimeMillis() - loginTime);
+    }
+
+    public String getFormattedPlaytime() {
+        long millis = getTotalPlaytimeMillis();
+        long seconds = millis / 1000;
+        long minutes = seconds / 60;
+        long hours = minutes / 60;
+
+        if (hours > 0) return hours + "h";
+        if (minutes > 0) return minutes + "m";
+        return seconds + "s";
+    }
+
+    public String getFormattedPlaytime2() {
+        long millis = getTotalPlaytimeMillis();
+        long seconds = millis / 1000;
+        long minutes = seconds / 60;
+        long hours = minutes / 60;
+
+        if (hours > 0) return hours + "h " + (minutes % 60) + "m";
+        if (minutes > 0) return minutes + "m " + (seconds % 60) + "s";
+        return seconds + "s";
     }
 }

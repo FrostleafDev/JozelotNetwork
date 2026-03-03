@@ -5,6 +5,7 @@ import com.destroystokyo.paper.profile.ProfileProperty;
 import de.jozelot.jozelotLobby.JozelotLobby;
 import de.jozelot.jozelotLobby.player.LobbyPlayer;
 import de.jozelot.jozelotLobby.ui.inventories.InventoryType;
+import de.jozelot.jozelotLobby.ui.inventories.LobbyInventory;
 import de.jozelot.jozelotLobby.ui.items.HotbarItems;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -21,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class NavigatorMenu implements InventoryHolder {
+public class NavigatorMenu extends LobbyInventory {
 
     private final Inventory inventory;
     private final JozelotLobby plugin;
@@ -39,16 +40,6 @@ public class NavigatorMenu implements InventoryHolder {
         fillBackGround();
         update();
         startUpdateTask();
-    }
-
-    private InventoryType parentType = null;
-
-    public void setParentType(InventoryType parentType) {
-        this.parentType = parentType;
-    }
-
-    public InventoryType getParentType() {
-        return parentType;
     }
 
     public void fillBackGround() {
@@ -85,6 +76,7 @@ public class NavigatorMenu implements InventoryHolder {
         inventory.setItem(31, spawnButton);
     }
 
+    @Override
     public void update() {
         // Challenges
         setupServerItem(13, "challenge_server", new String[]{"challenge-1", "challenge-2", "challenge-3"}, true);

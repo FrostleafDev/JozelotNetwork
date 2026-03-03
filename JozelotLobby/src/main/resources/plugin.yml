@@ -6,3 +6,7 @@ authors: [ jozelot_ ]
 description: Lobby Plugin für jozelot.de - Bereitgestellt von jozelot_
 website: https://jozelot.de
 softdepend: [PlaceholderAPI]
+
+commands:
+  openmenu:
+

@@ -1,8 +1,10 @@
 package de.jozelot.jozelotLobby;
 
 import de.jozelot.jozelotLobby.api.placeholderapi.PlayerCount;
+import de.jozelot.jozelotLobby.commands.BlockHiddenCommands;
+import de.jozelot.jozelotLobby.commands.OpenMenu;
 import de.jozelot.jozelotLobby.database.*;
-import de.jozelot.jozelotLobby.ui.inventories.InventoryManager;
+import de.jozelot.jozelotLobby.utils.ScoreboardManager;
 import de.jozelot.jozelotLobby.ui.items.ClickHandler;
 import de.jozelot.jozelotLobby.ui.items.HotbarItems;
 import de.jozelot.jozelotLobby.ui.items.HotbarManager;
@@ -11,10 +13,10 @@ import de.jozelot.jozelotLobby.player.LobbyPlayerManager;
 import de.jozelot.jozelotLobby.player.PlayerConnectionListener;
 import de.jozelot.jozelotLobby.storage.ConfigManager;
 import de.jozelot.jozelotLobby.storage.LangManager;
+import de.jozelot.jozelotLobby.utils.NetworkStateManager;
 import de.jozelot.jozelotLobby.utils.ReloadPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.checkerframework.checker.units.qual.N;
 
 import java.util.Map;
 
@@ -32,11 +34,9 @@ public final class JozelotLobby extends JavaPlugin {
 
     private LobbyPlayerManager lobbyPlayerManager;
     private LobbyPlayerDatabase lobbyPlayerDatabase;
-
     private MySQLSetup mySQLSetup;
-    private InventoryManager inventoryManager;
-
     private NetworkStateManager networkStateManager;
+    private ScoreboardManager scoreboardManager;
 
     @Override
     public void onEnable() {
@@ -59,11 +59,15 @@ public final class JozelotLobby extends JavaPlugin {
         this.hotbarItems = new HotbarItems(this);
         this.hotbarManager = new HotbarManager(this);
 
-        this.inventoryManager = new InventoryManager(this);
         this.networkStateManager = new NetworkStateManager();
+        this.scoreboardManager = new ScoreboardManager(this);
+        this.scoreboardManager.startScheduler();
+
+        getCommand("openmenu").setExecutor(new OpenMenu(this));
 
         getServer().getPluginManager().registerEvents(new PlayerConnectionListener(this), this);
         getServer().getPluginManager().registerEvents(new ClickHandler(this), this);
+        getServer().getPluginManager().registerEvents(new BlockHiddenCommands(), this);
 
         Map<String, String> redisData = redisManager.fetchLanguageData();
         if (redisData != null) {
@@ -139,11 +143,10 @@ public final class JozelotLobby extends JavaPlugin {
         return lobbyPlayerDatabase;
     }
 
-    public InventoryManager getInventoryManager() {
-        return inventoryManager;
-    }
-
     public NetworkStateManager getNetworkStateManager() {
         return networkStateManager;
+    }
+    public ScoreboardManager getScoreboardManager() {
+        return scoreboardManager;
     }
 }

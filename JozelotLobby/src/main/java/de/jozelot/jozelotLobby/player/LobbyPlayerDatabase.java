@@ -273,4 +273,28 @@ public class LobbyPlayerDatabase {
             e.printStackTrace();
         }
     }
+
+    public Map<String, Long> getAllServerPlaytimes(UUID uuid) {
+        Map<String, Long> times = new HashMap<>();
+        String query = "SELECT s.display_name, ps.total_playtime " +
+                "FROM playtime_server ps " +
+                "JOIN server s ON ps.server_id = s.id " +
+                "WHERE ps.player_uuid = ?;";
+
+        try (Connection conn = plugin.getMySQLSetup().getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setString(1, uuid.toString());
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String name = rs.getString("display_name");
+                    long time = rs.getLong("total_playtime");
+                    times.put(name, time);
+                }
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().severe("Fehler beim Laden der Server-Spielzeiten: " + e.getMessage());
+        }
+        return times;
+    }
 }

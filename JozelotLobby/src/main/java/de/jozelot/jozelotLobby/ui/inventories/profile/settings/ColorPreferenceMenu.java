@@ -1,9 +1,10 @@
-package de.jozelot.jozelotLobby.ui.inventories.profile;
+package de.jozelot.jozelotLobby.ui.inventories.profile.settings;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
 import de.jozelot.jozelotLobby.JozelotLobby;
 import de.jozelot.jozelotLobby.player.LobbyPlayer;
+import de.jozelot.jozelotLobby.player.settings.ColorPreference;
 import de.jozelot.jozelotLobby.ui.inventories.InventoryType;
 import de.jozelot.jozelotLobby.ui.inventories.LobbyInventory;
 import de.jozelot.jozelotLobby.ui.items.HotbarItems;
@@ -25,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class ProfileMenu extends LobbyInventory {
+public class ColorPreferenceMenu extends LobbyInventory {
 
     private final Inventory inventory;
     private final JozelotLobby plugin;
@@ -33,15 +34,28 @@ public class ProfileMenu extends LobbyInventory {
     private BukkitTask bukkitTask;
     private final MiniMessage mm = MiniMessage.miniMessage();
 
-    public ProfileMenu(JozelotLobby plugin, Player player) {
+    public ColorPreferenceMenu(JozelotLobby plugin, Player player) {
         this.plugin = plugin;
         this.lobbyPlayer = plugin.getLobbyPlayerManager().getPlayer(player);
 
-        String title = plugin.getConfig().getString("inventories.profile.title", "Profil");
-        this.inventory = Bukkit.createInventory(this, 9 * 3, mm.deserialize(title));
+        String title = plugin.getConfig().getString("inventories.color_preference.title", "Menufarben");
+        int colors = ColorPreference.values().length;
 
-        fillBackGround();
+        int rows = (int) Math.ceil(colors / 9.0) + 2;
+        rows = Math.min(rows, 6);
+        this.inventory = Bukkit.createInventory(this, 9 * rows, mm.deserialize(title));
+
         update();
+    }
+
+    private InventoryType parentType = null;
+
+    public void setParentType(InventoryType parentType) {
+        this.parentType = parentType;
+    }
+
+    public InventoryType getParentType() {
+        return parentType;
     }
 
     public void fillBackGround() {
@@ -75,53 +89,28 @@ public class ProfileMenu extends LobbyInventory {
 
     @Override
     public void update() {
-        // SECRETS
-        setupServerItem(11, "secret_menu");
-
-        // STATISTICS
-        setupServerItem(13, "statistic_menu");
-
-        // SETTINGS
-        setupServerItem(15, "settings_menu");
+        fillBackGround();
+        for (int i = 0; i < ColorPreference.values().length; i++) {
+            setColor(i);
+        }
     }
 
-    private void setupServerItem(int slot, String configKey) {
-        String path = "items." + configKey;
+    private void setColor(int i) {
+        ColorPreference[] colors = ColorPreference.values();
+        ColorPreference color = colors[i];
 
-        String matName = plugin.getConfig().getString(path + ".item", "BARRIER");
-        Material mat = Material.matchMaterial(matName != null ? matName : "BARRIER");
-        ItemStack item = new ItemStack(mat != null ? mat : Material.BARRIER);
+        Material material = color.getIcon();
+
+        ItemStack item = new ItemStack(material);
 
         item.editMeta(meta -> {
-
-            String name = plugin.getConfig().getString(path + ".name");
-            meta.displayName(mm.deserialize(name != null ? name : "<red>FEHLER: Name fehlt"));
-
-            List<String> configLore = plugin.getConfig().getStringList(path + ".lore");
-            List<Component> loreComponents = new ArrayList<>();
-            for (String line : configLore) {
-                if (line == null) continue;
-                String replaced = line.replace("{secrets_current}", "0")
-                        .replace("{secrets_max}", "0");
-                loreComponents.add(mm.deserialize(replaced));
-            }
-            meta.lore(loreComponents);
-
-            if (meta instanceof SkullMeta skullMeta) {
-                String b64 = plugin.getConfig().getString(path + ".base64");
-                if (b64 != null && !b64.isEmpty()) {
-                    PlayerProfile profile = Bukkit.createProfile(UUID.randomUUID());
-                    profile.setProperty(new ProfileProperty("textures", b64));
-                    skullMeta.setPlayerProfile(profile);
-                }
-            }
-
+            meta.getPersistentDataContainer().set(HotbarItems.ITEM_ID, PersistentDataType.STRING, "settings.color." + color.name());
             meta.getPersistentDataContainer().set(HotbarItems.IS_PROTECTED, PersistentDataType.BOOLEAN, true);
-            meta.getPersistentDataContainer().set(HotbarItems.ITEM_ID, PersistentDataType.STRING, configKey);
-            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+            String info = color == lobbyPlayer.getColor() ? "<dark_gray> [Aktuell]" : "";
+            meta.displayName(mm.deserialize("<!italic><white>" + color.getName() + info));
         });
 
-        inventory.setItem(slot, item);
+        inventory.setItem(i + 9, item);
     }
 
     @Override
