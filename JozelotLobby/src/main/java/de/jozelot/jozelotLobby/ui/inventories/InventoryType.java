@@ -4,6 +4,7 @@ import de.jozelot.jozelotLobby.JozelotLobby;
 import de.jozelot.jozelotLobby.ui.inventories.navigation.ArchivMenu;
 import de.jozelot.jozelotLobby.ui.inventories.navigation.ChallengeMenu;
 import de.jozelot.jozelotLobby.ui.inventories.navigation.NavigatorMenu;
+import de.jozelot.jozelotLobby.ui.inventories.profile.PlaytimeMenu;
 import de.jozelot.jozelotLobby.ui.inventories.profile.ProfileMenu;
 import de.jozelot.jozelotLobby.ui.inventories.profile.SecretMenu;
 import de.jozelot.jozelotLobby.ui.inventories.profile.SpielerinfoMenu;
@@ -22,7 +23,8 @@ public enum InventoryType {
     SECRETS(SecretMenu::new),
     SPIELERINFO(SpielerinfoMenu::new),
     SETTINGS(SettingsMenu::new),
-    COLOR_PREFERENCE(ColorPreferenceMenu::new);
+    COLOR_PREFERENCE(ColorPreferenceMenu::new),
+    PLAYTIME(PlaytimeMenu::new);
 
     private final BiFunction<JozelotLobby, Player, InventoryHolder> factory;
 

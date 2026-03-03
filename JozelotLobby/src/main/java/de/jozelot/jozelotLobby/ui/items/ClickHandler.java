@@ -141,6 +141,9 @@ public class ClickHandler implements Listener {
             case "settings.color_preference":
                 openSubMenu(lobbyPlayer, InventoryType.COLOR_PREFERENCE, InventoryType.SETTINGS);
                 break;
+            /*case "settings.global_playtime":
+                openSubMenu(lobbyPlayer, InventoryType.PLAYTIME, InventoryType.SPIELERINFO);
+                break;*/
             case "back_button":
                 backButton(player, event.getInventory().getHolder());
                 break;

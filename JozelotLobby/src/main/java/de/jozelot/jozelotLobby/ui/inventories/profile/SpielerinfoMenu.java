@@ -79,6 +79,34 @@ public class SpielerinfoMenu extends LobbyInventory {
     @Override
     public void update() {
         inventory.setItem(11, getGlobalTimeItem());
+        inventory.setItem(15, getRankItem());
+    }
+
+
+
+    private ItemStack getRankItem() {
+        ItemStack item = new ItemStack(Material.getMaterial(plugin.getConfig().getString("items.settings.rank.item")));
+        Player player = lobbyPlayer.getPlayer();
+
+        item.editMeta(meta -> {
+            meta.displayName(mm.deserialize(plugin.getConfig().getString("items.settings.rank.name")));
+
+            List<String> configLore = plugin.getConfig().getStringList("items.settings.rank.lore");
+            List<Component> loreComponents = new ArrayList<>();
+            for (String line : configLore) {
+                if (line == null) continue;
+                String replaced = line
+                        .replace("{rank}", lobbyPlayer.getRank());
+                loreComponents.add(mm.deserialize(replaced));
+            }
+            meta.lore(loreComponents);
+
+            meta.getPersistentDataContainer().set(HotbarItems.IS_PROTECTED, PersistentDataType.BOOLEAN, true);
+            meta.getPersistentDataContainer().set(HotbarItems.ITEM_ID, PersistentDataType.STRING, "settings.rank");
+            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+        });
+
+        return item;
     }
 
     private ItemStack getPlayerInfoItem() {

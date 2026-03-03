@@ -217,6 +217,11 @@ items:
       name: '<!italic><blue>Spielzeit '
       lore:
         - '<!italic><dark_gray>» <gray>{playtime}'
+    rank:
+      item: RABBIT_FOOT
+      name: '<!italic><gold>Rang'
+      lore:
+        - '<!italic><dark_gray>» <gray>{rank}'
 
 inventories:
   navigator:
@@ -231,6 +236,8 @@ inventories:
     title: "Secret Übersicht"
   playerinfo:
     title: "Spielerinfo - "
+  playtime:
+    title: "Spielzeiten - "
   settings:
     title: "Einstellungen"
   color_preference:

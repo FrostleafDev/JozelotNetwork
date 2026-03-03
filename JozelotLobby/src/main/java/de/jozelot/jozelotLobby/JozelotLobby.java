@@ -28,13 +28,14 @@ public final class JozelotLobby extends JavaPlugin {
     private RedisPublish redisPublish;
     private LangManager lang;
     private ReloadPlugin reloadPlugin;
+    private MySQLSetup mySQLSetup;
+    private MySQLManager mySQLManager;
 
     private HotbarItems hotbarItems;
     private HotbarManager hotbarManager;
 
     private LobbyPlayerManager lobbyPlayerManager;
     private LobbyPlayerDatabase lobbyPlayerDatabase;
-    private MySQLSetup mySQLSetup;
     private NetworkStateManager networkStateManager;
     private ScoreboardManager scoreboardManager;
 
@@ -50,6 +51,7 @@ public final class JozelotLobby extends JavaPlugin {
         this.redisManager = new RedisManager(this);
         this.mySQLSetup = new MySQLSetup(this);
         mySQLSetup.setup();
+        this.mySQLManager = new MySQLManager(this);
         this.reloadPlugin = new ReloadPlugin(this);
         this.redisPublish = new RedisPublish(this);
 
@@ -137,6 +139,10 @@ public final class JozelotLobby extends JavaPlugin {
 
     public MySQLSetup getMySQLSetup() {
         return mySQLSetup;
+    }
+
+    public MySQLManager getMySQLManager() {
+        return mySQLManager;
     }
 
     public LobbyPlayerDatabase getLobbyPlayerDatabase() {
