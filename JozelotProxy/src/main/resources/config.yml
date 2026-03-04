@@ -155,3 +155,4 @@ color-settings:
 # network.utils.command.spawn | .setspawn
 
 # network.lobby.player_hider.team
+# network.lobby.command.secret

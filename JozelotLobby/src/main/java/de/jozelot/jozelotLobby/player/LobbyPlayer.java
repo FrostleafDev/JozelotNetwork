@@ -3,6 +3,7 @@ package de.jozelot.jozelotLobby.player;
 import de.jozelot.jozelotLobby.JozelotLobby;
 import de.jozelot.jozelotLobby.player.settings.ColorPreference;
 import de.jozelot.jozelotLobby.player.settings.Setting;
+import de.jozelot.jozelotLobby.secrets.objects.Secret;
 import de.jozelot.jozelotLobby.ui.inventories.InventoryType;
 import de.jozelot.jozelotLobby.ui.inventories.LobbyInventory;
 import de.jozelot.jozelotLobby.ui.inventories.navigation.ArchivMenu;
@@ -21,16 +22,15 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class LobbyPlayer {
 
     private final UUID uuid;
     private final JozelotLobby plugin;
     private HiderState hiderState;
-    private Map<Setting, String> settings = new HashMap<>();
+    private final Map<Setting, String> settings = new HashMap<>();
+    private final Set<Integer> foundSecretIds = new HashSet<>();
     private long baseNetworkPlaytime;
     private long loginTime;
 
@@ -41,6 +41,14 @@ public class LobbyPlayer {
         this.plugin = plugin;
         loginTime = System.currentTimeMillis();
         plugin.getScoreboardManager().createScoreboard(getPlayer());
+
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            Set<Integer> foundIds = plugin.getSecretDb().getFoundSecretIds(uuid);
+
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                setFoundSecretIds(foundIds);
+            });
+        });
     }
 
     public void setHiderState(HiderState hiderState) {
@@ -199,5 +207,22 @@ public class LobbyPlayer {
         if (hours > 0) return hours + "h " + (minutes % 60) + "m";
         if (minutes > 0) return minutes + "m " + (seconds % 60) + "s";
         return seconds + "s";
+    }
+
+    public void setFoundSecretIds(Collection<Integer> ids) {
+        this.foundSecretIds.clear();
+        this.foundSecretIds.addAll(ids);
+    }
+
+    public boolean hasFoundSecret(int id) {
+        return foundSecretIds.contains(id);
+    }
+
+    public void addFoundSecret(int id) {
+        this.foundSecretIds.add(id);
+    }
+
+    public Set<Integer> getFoundSecretIds() {
+        return foundSecretIds;
     }
 }

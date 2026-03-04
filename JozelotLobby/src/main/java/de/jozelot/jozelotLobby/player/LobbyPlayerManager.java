@@ -53,8 +53,12 @@ public class LobbyPlayerManager {
 
     public void removePlayer(Player player) {
         LobbyPlayer lobbyPlayer = players.get(player.getUniqueId());
-        plugin.getLobbyPlayerDatabase().setHiderState(lobbyPlayer, lobbyPlayer.getHiderState());
-        plugin.getLobbyPlayerDatabase().setSettings(lobbyPlayer, lobbyPlayer.getSettings());
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            plugin.getLobbyPlayerDatabase().setHiderState(lobbyPlayer, lobbyPlayer.getHiderState());
+            plugin.getLobbyPlayerDatabase().setSettings(lobbyPlayer, lobbyPlayer.getSettings());
+
+            plugin.getSecretDb().saveAllFoundSecrets(lobbyPlayer.getUuid(), lobbyPlayer.getFoundSecretIds());
+        });
         players.remove(player.getUniqueId());
     }
 
@@ -63,6 +67,9 @@ public class LobbyPlayerManager {
     }
 
     public void removeAllPlayers() {
+        for (LobbyPlayer lp : players.values()) {
+            plugin.getSecretDb().saveAllFoundSecrets(lp.getUuid(), lp.getFoundSecretIds());
+        }
         lpd.saveAllPlayerSettings(players.values());
         players.clear();
     }

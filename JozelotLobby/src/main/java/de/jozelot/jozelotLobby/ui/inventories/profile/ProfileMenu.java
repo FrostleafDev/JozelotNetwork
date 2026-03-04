@@ -99,10 +99,16 @@ public class ProfileMenu extends LobbyInventory {
 
             List<String> configLore = plugin.getConfig().getStringList(path + ".lore");
             List<Component> loreComponents = new ArrayList<>();
+
+            int foundSecrets = lobbyPlayer.getFoundSecretIds().size();
+            int maxSecrets = plugin.getSecretMgr().getSecrets().size();
+
+            String secretColor = foundSecrets == maxSecrets ? "<#00FC00>" : "<#f90036>";
+
             for (String line : configLore) {
                 if (line == null) continue;
-                String replaced = line.replace("{secrets_current}", "0")
-                        .replace("{secrets_max}", "0");
+                String replaced = line.replace("{secrets_current}", secretColor + String.valueOf(foundSecrets))
+                        .replace("{secrets_max}", String.valueOf(maxSecrets));
                 loreComponents.add(mm.deserialize(replaced));
             }
             meta.lore(loreComponents);

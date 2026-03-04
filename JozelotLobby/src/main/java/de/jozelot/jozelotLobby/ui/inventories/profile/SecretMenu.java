@@ -4,6 +4,8 @@ import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
 import de.jozelot.jozelotLobby.JozelotLobby;
 import de.jozelot.jozelotLobby.player.LobbyPlayer;
+import de.jozelot.jozelotLobby.player.settings.ColorPreference;
+import de.jozelot.jozelotLobby.secrets.objects.Secret;
 import de.jozelot.jozelotLobby.ui.inventories.InventoryType;
 import de.jozelot.jozelotLobby.ui.inventories.LobbyInventory;
 import de.jozelot.jozelotLobby.ui.items.HotbarItems;
@@ -38,7 +40,12 @@ public class SecretMenu extends LobbyInventory {
         this.lobbyPlayer = plugin.getLobbyPlayerManager().getPlayer(player);
 
         String title = plugin.getConfig().getString("inventories.secrets.title", "Secret Übersicht");
-        this.inventory = Bukkit.createInventory(this, 9 * 4, mm.deserialize(title));
+
+        int size = plugin.getSecretMgr().getSecrets().size();
+        int rows = (int) Math.ceil(size / 9.0) + 2;
+        rows = Math.min(rows, 6);
+        if (rows == 2) rows = 3;
+        this.inventory = Bukkit.createInventory(this, 9 * rows, mm.deserialize(title));
 
         fillBackGround();
         update();
@@ -76,6 +83,66 @@ public class SecretMenu extends LobbyInventory {
 
     @Override
     public void update() {
+
+        int slot = 9;
+        for (Secret secret : plugin.getSecretMgr().getSecrets()) {
+            setSecretItem(secret, slot);
+            slot++;
+        }
+    }
+
+    private void setSecretItem(Secret secret, int slot) {
+        boolean found = lobbyPlayer.hasFoundSecret(secret.getId());
+        String name = found ? "<#f7bc74>" + secret.getName() : "<gray>???";
+
+        Material material = secret.getIcon();
+
+        ItemStack item = new ItemStack(material);
+
+        item.editMeta(meta -> {
+            meta.getPersistentDataContainer().set(HotbarItems.IS_PROTECTED, PersistentDataType.BOOLEAN, true);
+            meta.displayName(mm.deserialize("<!italic>" + name));
+
+            List<Component> lore = new ArrayList<>();
+
+            if (found) {
+                lore.addAll(wrapText(secret.getDescription(), 32));
+            }
+
+            lore.add(Component.empty());
+            String status = found ? "<#00FC00>Gefunden" : "<#f90036>Nicht gefunden";
+            lore.add(mm.deserialize("<!italic><dark_gray>» <gray>Status: " + status));
+
+            meta.lore(lore);
+
+            meta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ATTRIBUTES);
+        });
+
+        inventory.setItem(slot, item);
+    }
+
+    private List<net.kyori.adventure.text.Component> wrapText(String text, int maxLength) {
+        List<net.kyori.adventure.text.Component> lines = new ArrayList<>();
+
+        lines.add(net.kyori.adventure.text.Component.empty());
+
+        StringBuilder currentLine = new StringBuilder();
+        String baseTag = "<gray>";
+
+        String[] words = text.split(" ");
+        for (String word : words) {
+            if (currentLine.length() + word.length() + 1 > maxLength) {
+                lines.add(mm.deserialize("<!italic>" + baseTag + currentLine.toString().trim()));
+                currentLine.setLength(0);
+            }
+            currentLine.append(word).append(" ");
+        }
+
+        if (currentLine.length() > 0) {
+            lines.add(mm.deserialize("<!italic>" + baseTag + currentLine.toString().trim()));
+        }
+
+        return lines;
     }
 
 

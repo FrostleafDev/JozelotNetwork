@@ -84,6 +84,10 @@
       <id>placeholderapi</id>
       <url>https://repo.helpch.at/releases</url>
     </repository>
+    <repository>
+      <id>enginehub-repo</id>
+      <url>https://maven.enginehub.org/repo/</url>
+    </repository>
   </repositories>
   <dependencies>
     <dependency>
@@ -102,6 +106,12 @@
       <groupId>net.luckperms</groupId>
       <artifactId>api</artifactId>
       <version>5.4</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.sk89q.worldedit</groupId>
+      <artifactId>worldedit-bukkit</artifactId>
+      <version>7.2.9</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>

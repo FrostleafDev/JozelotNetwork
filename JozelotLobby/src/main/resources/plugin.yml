@@ -5,8 +5,13 @@ api-version: '1.21'
 authors: [ jozelot_ ]
 description: Lobby Plugin für jozelot.de - Bereitgestellt von jozelot_
 website: https://jozelot.de
-softdepend: [PlaceholderAPI]
+softdepend: [PlaceholderAPI, WorldEdit]
 
 commands:
   openmenu:
+  secrets:
+    permission: network.lobby.command.secret
 
+permissions:
+  network.lobby.command.secret:
+    default: op

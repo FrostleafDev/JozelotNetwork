@@ -3,7 +3,6 @@ package de.jozelot.jozelotLobby.secrets.objects;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
-
 public class SecretRegion {
 
     private final Vector min;
@@ -19,5 +18,17 @@ public class SecretRegion {
     public boolean contains(Location loc) {
         if (!loc.getWorld().getName().equals(worldName)) return false;
         return loc.toVector().isInAABB(min, max);
+    }
+
+    public Vector getMin() {
+        return min;
+    }
+
+    public Vector getMax() {
+        return max;
+    }
+
+    public String getWorldName() {
+        return worldName;
     }
 }

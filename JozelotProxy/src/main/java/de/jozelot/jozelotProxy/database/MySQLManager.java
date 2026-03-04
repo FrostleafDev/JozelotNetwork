@@ -119,7 +119,8 @@ public class MySQLManager {
                         "min_z INT," +
                         "max_x INT," +
                         "max_y INT," +
-                        "max_z INT," + // Komma hinzugefügt
+                        "max_z INT," +
+                        "world VARCHAR(64)," +
                         "FOREIGN KEY (secret_id) REFERENCES secret(id) ON DELETE CASCADE" +
                         ");",
 

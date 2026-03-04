@@ -61,13 +61,18 @@ public class ScoreboardManager {
         List<String> rawLines = plugin.getLang().formatList("lobby-scoreboard", null);
         List<String> formattedLines = new ArrayList<>();
 
+        int foundSecrets = lobbyPlayer.getFoundSecretIds().size();
+        int maxSecrets = plugin.getSecretMgr().getSecrets().size();
+
+        String secretColor = foundSecrets == maxSecrets ? "<#00FC00>" : "<#f90036>";
+
         for (String line : rawLines) {
             String processed = line
                     .replace("{player}", player.getName())
                     .replace("{rank}", lobbyPlayer.getRank())
                     .replace("{color}", lobbyPlayer.getColor().toString())
                     .replace("{playtime}", lobbyPlayer.getFormattedPlaytime())
-                    .replace("{secrets}", "<#f90036>0<gray>/11<#f90036>")
+                    .replace("{secrets}", secretColor +  foundSecrets + "<gray>/" + maxSecrets + secretColor)
                     .replace("{players}", String.valueOf(plugin.getNetworkStateManager().getServer("proxy").players()));
             formattedLines.add(processed);
         }

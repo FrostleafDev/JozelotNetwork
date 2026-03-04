@@ -3,7 +3,11 @@ package de.jozelot.jozelotLobby;
 import de.jozelot.jozelotLobby.api.placeholderapi.PlayerCount;
 import de.jozelot.jozelotLobby.commands.BlockHiddenCommands;
 import de.jozelot.jozelotLobby.commands.OpenMenu;
+import de.jozelot.jozelotLobby.commands.SecretCommand;
 import de.jozelot.jozelotLobby.database.*;
+import de.jozelot.jozelotLobby.secrets.engine.SecretDatabase;
+import de.jozelot.jozelotLobby.secrets.engine.SecretListener;
+import de.jozelot.jozelotLobby.secrets.engine.SecretManager;
 import de.jozelot.jozelotLobby.utils.ScoreboardManager;
 import de.jozelot.jozelotLobby.ui.items.ClickHandler;
 import de.jozelot.jozelotLobby.ui.items.HotbarItems;
@@ -39,6 +43,9 @@ public final class JozelotLobby extends JavaPlugin {
     private NetworkStateManager networkStateManager;
     private ScoreboardManager scoreboardManager;
 
+    private SecretDatabase secretDb;
+    private SecretManager secretMgr;
+
     @Override
     public void onEnable() {
         this.config = new ConfigManager(this);
@@ -52,8 +59,11 @@ public final class JozelotLobby extends JavaPlugin {
         this.mySQLSetup = new MySQLSetup(this);
         mySQLSetup.setup();
         this.mySQLManager = new MySQLManager(this);
-        this.reloadPlugin = new ReloadPlugin(this);
+        this.secretDb = new SecretDatabase(this);
+        this.secretMgr = new SecretManager(this);
         this.redisPublish = new RedisPublish(this);
+
+        this.reloadPlugin = new ReloadPlugin(this);
 
         new RedisListener(this);
         this.lobbyPlayerDatabase = new LobbyPlayerDatabase(this);
@@ -66,10 +76,14 @@ public final class JozelotLobby extends JavaPlugin {
         this.scoreboardManager.startScheduler();
 
         getCommand("openmenu").setExecutor(new OpenMenu(this));
+        SecretCommand secretCommand = new SecretCommand(this);
+        getCommand("secrets").setExecutor(secretCommand);
+        getCommand("secrets").setTabCompleter(secretCommand);
 
         getServer().getPluginManager().registerEvents(new PlayerConnectionListener(this), this);
         getServer().getPluginManager().registerEvents(new ClickHandler(this), this);
         getServer().getPluginManager().registerEvents(new BlockHiddenCommands(), this);
+        getServer().getPluginManager().registerEvents(new SecretListener(this), this);
 
         Map<String, String> redisData = redisManager.fetchLanguageData();
         if (redisData != null) {
@@ -152,6 +166,15 @@ public final class JozelotLobby extends JavaPlugin {
     public NetworkStateManager getNetworkStateManager() {
         return networkStateManager;
     }
+
+    public SecretDatabase getSecretDb() {
+        return secretDb;
+    }
+
+    public SecretManager getSecretMgr() {
+        return secretMgr;
+    }
+
     public ScoreboardManager getScoreboardManager() {
         return scoreboardManager;
     }

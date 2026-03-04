@@ -184,7 +184,7 @@ items:
       - '<!italic><gray>Hier hast du einen Überblick'
       - '<!italic><gray>über alle Verstecke in der Lobby'
       - ''
-      - '<!italic><dark_gray>» <gray>Status: <#00FC00>{secrets_current}<gray>/{secrets_current}'
+      - '<!italic><dark_gray>» <gray>Status: <#00FC00>{secrets_current}<gray>/{secrets_max}'
 
   statistic_menu:
     item: CHEST
