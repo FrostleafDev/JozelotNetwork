@@ -512,7 +512,7 @@ event-server-no-event: "{grey}Aktuell findet kein Event statt!"
 connect-to-server-offline: "{grey}Du kannst dich nicht mit diesem Server verbinden, da er offline ist"
 
 secret-found-actionbar: '<#f58856>Secret gefunden! (<#FCD46F>{secret-name}<#f58856>)'
-secret-found-message-other: '{gray}[<gold>Secrets{gray}] {primary}{player-name}{gray} hat ein Secret gefunden! {primary}({current-secrets}/{max-secrets}'
+secret-found-message-other: '{grey}[<gold>Secrets{grey}] {primary}{player-name}{grey} hat ein Secret gefunden! {primary}({current-secrets}/{max-secrets})'
 secret-found-message:
   - ''
   - '<dark_gray><bold>------------------------------<reset>'
