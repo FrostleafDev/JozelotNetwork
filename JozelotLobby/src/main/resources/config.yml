@@ -176,6 +176,17 @@ items:
       - '<!italic><dark_gray>» <gray>Status: <#00FC00>{status}'
       - '<!italic><dark_gray>» <gray>Spieler: <#00A4FC>{online_players} 👤'
 
+  secret_info:
+    name: '<!italic><white>Information'
+    lore:
+      - ''
+      - '<!italic><gray>Die Secrets sind findbare Orte'
+      - '<!italic><gray>auf der Spawn Insel. Du kannst'
+      - '<!italic><gray>alle finden ohne mit Blöcken'
+      - '<!italic><gray>zu interagieren. Zum finden'
+      - '<!italic><gray>mancher Secrets musst du <gold>/crawl<gray>'
+      - '<!italic><gray>nutzen! Viel Glück!'
+
   secret_menu:
     item: SPYGLASS
     name: '<!italic><green>Secret Übersicht'

@@ -40,6 +40,8 @@ public class ServerSwitchListener {
     private final ConfigManager config;
     private final MiniMessage mm = MiniMessage.miniMessage();
 
+    private final Map<UUID, String> playerSecretStats = new HashMap<>();
+
     public ServerSwitchListener(JozelotProxy plugin) {
         this.plugin = plugin;
         this.server = plugin.getServer();
@@ -179,6 +181,10 @@ public class ServerSwitchListener {
 
         server.getScheduler().buildTask(plugin, () -> {
             boolean isNew = plugin.getMySQLManager().addToPlayerList(uuid, username, player.getRemoteAddress().getAddress().getHostAddress());
+
+            int found = plugin.getMySQLManager().getFoundSecretsCount(uuid);
+            int max = plugin.getMySQLManager().getTotalSecretsCount();
+            updatePlayerSecrets(uuid, found, max);
 
             // 1. Vanish Status laden & setzen
             boolean wasVanished = plugin.getMySQLManager().getVanishStatus(uuid);
@@ -353,13 +359,14 @@ public class ServerSwitchListener {
         int groupId = plugin.getGroupManager().getGroupId(connectedServer.getServerInfo().getName());
         if (groupId == -1 || !plugin.getGroupManager().isTabEnabled(groupId)) return;
 
+        String groupIdentifier = plugin.getGroupManager().getGroupIdentifier(groupId);
+
         List<Player> playersInGroup = server.getAllPlayers().stream()
                 .filter(p -> p.getCurrentServer().isPresent())
                 .filter(p -> plugin.getGroupManager().getGroupId(p.getCurrentServer().get().getServerInfo().getName()) == groupId)
                 .collect(Collectors.toList());
 
         for (Player target : playersInGroup) {
-            // Vanish Check
             if (!plugin.getVanishManager().canSee(viewer, target)) {
                 viewer.getTabList().removeEntry(target.getUniqueId());
                 continue;
@@ -369,17 +376,26 @@ public class ServerSwitchListener {
             int weight = plugin.getLuckpermsUtils().getWeight(target);
             String name = target.getUsername();
 
-            // Vanish Suffix: [V] in Lime hinter dem Namen
-            String vanishSuffix = plugin.getVanishManager().isVanished(target.getUniqueId()) ? " <#00FC00>[V]" : "";
-
-            String displayNameRaw = "<reset><italic:false>" + lang.format("tab-player-format", Map.of(
+            String leftSide = lang.format("tab-player-format", Map.of(
                     "rank-prefix", prefix != null ? prefix : "",
                     "player-name", name
-            )) + vanishSuffix;
+            ));
+
+            StringBuilder rightSide = new StringBuilder();
+            if (groupIdentifier.equalsIgnoreCase("hub")) {
+                // Geändert auf Gold
+                rightSide.append(playerSecretStats.getOrDefault(target.getUniqueId(), "<gold>(0/0)"));
+            }
+            if (plugin.getVanishManager().isVanished(target.getUniqueId())) {
+                if (rightSide.length() > 0) rightSide.append(" ");
+                rightSide.append("<#00FC00>[V]");
+            }
+
+            // Wir nutzen ein spezielles Leerzeichen für breiteren Abstand ohne hässliche Symbole
+            String fullDisplayName = "<reset><italic:false>" + leftSide + (rightSide.length() > 0 ? "  " + rightSide : "");
 
             viewer.getTabList().getEntry(target.getUniqueId()).ifPresentOrElse(entry -> {
-                entry.setDisplayName(mm.deserialize(displayNameRaw));
-                // WICHTIG: Hier den aktuellen Ping setzen
+                entry.setDisplayName(mm.deserialize(fullDisplayName));
                 entry.setLatency((int) target.getPing());
                 entry.setListOrder(weight);
             }, () -> {
@@ -387,17 +403,14 @@ public class ServerSwitchListener {
                         .profile(target.getGameProfile())
                         .tabList(viewer.getTabList())
                         .latency((int) target.getPing())
-                        .displayName(mm.deserialize(displayNameRaw))
+                        .displayName(mm.deserialize(fullDisplayName))
                         .listOrder(weight)
                         .build());
             });
         }
 
-        // Cleanup: Spieler entfernen, die nicht mehr in der Gruppe sind
-        Set<UUID> groupPlayerUuids = playersInGroup.stream()
-                .map(Player::getUniqueId)
-                .collect(Collectors.toSet());
-
+        // Cleanup...
+        Set<UUID> groupPlayerUuids = playersInGroup.stream().map(Player::getUniqueId).collect(Collectors.toSet());
         viewer.getTabList().getEntries().forEach(entry -> {
             if (!groupPlayerUuids.contains(entry.getProfile().getId())) {
                 viewer.getTabList().removeEntry(entry.getProfile().getId());
@@ -490,5 +503,17 @@ public class ServerSwitchListener {
         }
     }
 
+    public void updatePlayerSecrets(UUID uuid, int found, int max) {
+        // Wenn gefunden >= max, wird es Gold, sonst bleibt es Grau (oder wie du magst)
+        String color = (found >= max && max > 0) ? "<gold>" : "<gray>";
+        playerSecretStats.put(uuid, color + "(" + found + "/" + max + ")</reset>");
+    }
 
+    public void updateAllPlayerStatsDynamically(int newMax) {
+        for (Player p : server.getAllPlayers()) {
+            int found = plugin.getMySQLManager().getFoundSecretsCount(p.getUniqueId());
+            updatePlayerSecrets(p.getUniqueId(), found, newMax);
+        }
+        updateAllTabs();
+    }
 }

@@ -78,7 +78,27 @@ public class SecretMenu extends LobbyInventory {
             meta.getPersistentDataContainer().set(HotbarItems.ITEM_ID, PersistentDataType.STRING, "back_button");
             meta.getPersistentDataContainer().set(HotbarItems.IS_PROTECTED, PersistentDataType.BOOLEAN, true);
         });
+
+        ItemStack info = new ItemStack(Material.PLAYER_HEAD);
+        info.editMeta(SkullMeta.class, meta -> {
+            PlayerProfile profile = Bukkit.createProfile(UUID.randomUUID());
+            profile.setProperty(new ProfileProperty("textures", lobbyPlayer.getColor().getInfoIcon()));
+            meta.setPlayerProfile(profile);
+            meta.displayName(mm.deserialize(plugin.getConfig().getString("items.secret_info.name", "<white>Information")));
+
+            List<String> lore = plugin.getConfig().getStringList("items.secret_info.lore");
+            List<Component> fullLore = new ArrayList<>();
+            for (String lorePart : lore) {
+                fullLore.add(mm.deserialize(lorePart));
+            }
+
+            meta.lore(fullLore);
+            meta.getPersistentDataContainer().set(HotbarItems.ITEM_ID, PersistentDataType.STRING, "info_button");
+            meta.getPersistentDataContainer().set(HotbarItems.IS_PROTECTED, PersistentDataType.BOOLEAN, true);
+        });
+
         inventory.setItem(size - 9, backArrow);
+        inventory.setItem(size - 1, info);
     }
 
     @Override

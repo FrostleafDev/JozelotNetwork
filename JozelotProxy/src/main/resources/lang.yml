@@ -511,6 +511,18 @@ command-vanish-log: "{grey}[<gradient:#f90036:#f90011><b>LOG</b></gradient>{grey
 event-server-no-event: "{grey}Aktuell findet kein Event statt!"
 connect-to-server-offline: "{grey}Du kannst dich nicht mit diesem Server verbinden, da er offline ist"
 
+secret-found-actionbar: '<#f58856>Secret gefunden! (<#FCD46F>{secret-name}<#f58856>)'
+secret-found-message-other: '{gray}[<gold>Secrets{gray}] {primary}{player-name}{gray} hat ein Secret gefunden! {primary}({current-secrets}/{max-secrets}'
+secret-found-message:
+  - ''
+  - '<dark_gray><bold>------------------------------<reset>'
+  - ''
+  - '<#f58856>Glückwunsch! Du hast das Secret <#FCD46F>{secret-name}<#f58856> gefunden!'
+  - '<#f58856>Fortschritt: <#FCD46F>{progress-bar} <#f58856>(<#FCD46F>{secrets-found}/{secrets-max}<#f58856>)'
+  - ''
+  - '<dark_gray><bold>------------------------------<reset>'
+  - ''
+
 secret:
   reload-success: '{grey}Alle Secrets wurden {primary}erfolgreich {grey}neu geladen'
   list-header: '{grey}Liste aller Secrets:'

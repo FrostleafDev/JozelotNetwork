@@ -33,8 +33,25 @@ public class RedisListener {
                                 //System.out.println("Spieler move empfangen");
                             }
                         }
+                        if (channel.equals("network:secrets")) {
+                            String[] parts = message.split(":");
+                            if (parts.length == 3) {
+                                if (parts[0].equals("GLOBAL_UPDATE")) {
+                                    int newMax = Integer.parseInt(parts[2]);
+                                    // Alle online Spieler im Tab updaten
+                                    plugin.getServerSwitchListener().updateAllPlayerStatsDynamically(newMax);
+                                } else {
+                                    // Normales Spieler-Update
+                                    UUID uuid = UUID.fromString(parts[0]);
+                                    int found = Integer.parseInt(parts[1]);
+                                    int max = Integer.parseInt(parts[2]);
+                                    plugin.getServerSwitchListener().updatePlayerSecrets(uuid, found, max);
+                                    plugin.getServerSwitchListener().updateAllTabs();
+                                }
+                            }
+                        }
                     }
-                }, "network:move");
+                }, "network:move", "network:secrets");
             } catch (Exception e) {
             }
         }, "Redis-Listener-Thread").start();

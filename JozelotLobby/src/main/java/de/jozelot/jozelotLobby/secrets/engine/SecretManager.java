@@ -6,17 +6,18 @@ import de.jozelot.jozelotLobby.JozelotLobby;
 import de.jozelot.jozelotLobby.player.LobbyPlayer;
 import de.jozelot.jozelotLobby.secrets.objects.Secret;
 import de.jozelot.jozelotLobby.secrets.objects.SecretRegion;
-import org.bukkit.Location;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class SecretManager {
 
     private final JozelotLobby plugin;
     private final SecretDatabase secretDb;
+    private final MiniMessage mm = MiniMessage.miniMessage();
+
 
     public SecretManager(JozelotLobby plugin) {
         this.plugin = plugin;
@@ -47,24 +48,38 @@ public class SecretManager {
         if (lp.hasFoundSecret(secret.getId())) return;
 
         lp.addFoundSecret(secret.getId());
+        int foundSecrets = lp.getFoundSecretIds().size();
+        int maxSecrets = secrets.size();
 
-        player.sendMessage("§a§lSecret gefunden!");
-        player.sendMessage("§7Du hast §e" + secret.getName() + " §7entdeckt.");
+        player.sendActionBar(mm.deserialize(plugin.getLang().format("secret-found-actionbar", Map.of("secret-name", secret.getName()))));
+        List<String> message = plugin.getLang().formatList("secret-found-message", Map.of("secret-name", secret.getName(), "secrets-found", String.valueOf(foundSecrets), "secrets-max", String.valueOf(maxSecrets), "progress-bar", createProgressBar(foundSecrets)));
+        player.sendMessage(mm.deserialize(String.join("<newline>", message)));
+        Bukkit.getOnlinePlayers().stream()
+                .filter(p -> p.getUniqueId() != player.getUniqueId())
+                .forEach(p ->
+                p.sendMessage(mm.deserialize(plugin.getLang().format("secret-found-message-other", Map.of("player-name", player.getName(), "current-secrets", String.valueOf(foundSecrets), "max-secrets", String.valueOf(maxSecrets))))));
 
-        lp.playSound("success");
+        player.playSound(player, Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.UI, 1, 1);
+
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            plugin.getRedisSetup().getJedis().publish("network:secrets", player.getUniqueId() + ":" + foundSecrets + ":" + maxSecrets);
+        });
     }
 
     public int addSecret(String name, String description, String materialName, Location loc1, Location loc2) {
         SecretRegion region = new SecretRegion(loc1.toVector(), loc2.toVector(), loc1.getWorld().getName());
         int id = secretDb.createSecret(name, description, materialName, region);
-        if (id != -1) reload();
+        if (id != -1) {
+            reload();
+            notifyProxyOfGlobalChange();
+        }
         return id;
     }
 
     public void removeSecret(int id) {
         secretDb.deleteSecret(id);
-
         reload();
+        notifyProxyOfGlobalChange();
         plugin.getLogger().info("Secret mit ID " + id + " wurde gelöscht.");
     }
 
@@ -88,4 +103,32 @@ public class SecretManager {
             return null;
         }
     }
+
+    private String createProgressBar(int secretsFound) {
+        StringBuilder bar = new StringBuilder("[");
+
+        int secretsMax = secrets.size();
+        int blocks = 10;
+
+        int filledBlocks = (int) Math.round((double) secretsFound / secretsMax * 10);
+
+        for (int i = 0; i < filledBlocks; i++) {
+            bar.append("■");
+        }
+        for (int i = filledBlocks; i < blocks; i++) {
+            bar.append("□");
+        }
+        bar.append("]");
+
+        return bar.toString();
+    }
+
+    private void notifyProxyOfGlobalChange() {
+        int maxSecrets = secrets.size();
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            plugin.getRedisSetup().getJedis().publish("network:secrets", "GLOBAL_UPDATE:0:" + maxSecrets);
+        });
+    }
+
+
 }

@@ -1209,4 +1209,28 @@ public class MySQLManager {
         return false;
     }
 
+    public int getFoundSecretsCount(UUID uuid) {
+        try (Connection conn = mySQLSetup.getConnection();
+             PreparedStatement ps = conn.prepareStatement("SELECT COUNT(*) FROM secret_found WHERE player_uuid = ?")) {
+            ps.setString(1, uuid.toString());
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public int getTotalSecretsCount() {
+        try (Connection conn = mySQLSetup.getConnection();
+             PreparedStatement ps = conn.prepareStatement("SELECT COUNT(*) FROM secret")) {
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
 }
