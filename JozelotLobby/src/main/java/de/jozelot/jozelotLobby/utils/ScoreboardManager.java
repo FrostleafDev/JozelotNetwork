@@ -22,24 +22,26 @@ public class ScoreboardManager {
     }
 
     public void createScoreboard(Player player) {
-        Scoreboard score = player.getScoreboard();
+        if (player == null) return;
 
-        Objective objective = score.getObjective("lobby");
-        if (objective != null) objective.unregister();
+        Scoreboard score = Bukkit.getScoreboardManager().getNewScoreboard();
+        player.setScoreboard(score);
 
-        objective = score.registerNewObjective("lobby", Criteria.DUMMY,
+        Objective objective = score.registerNewObjective("lobby", Criteria.DUMMY,
                 mm.deserialize(plugin.getLang().format("lobby-scoreboard-title", null)));
 
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-        objective.numberFormat(NumberFormat.blank());
+
+        try {
+            objective.numberFormat(NumberFormat.blank());
+        } catch (NoSuchMethodError ignored) {}
 
         for (int i = 0; i < 15; i++) {
             String teamName = "sb_line_" + i;
-            Team team = score.getTeam(teamName);
-            if (team == null) team = score.registerNewTeam(teamName);
+            Team team = score.registerNewTeam(teamName);
 
             String entry = ChatColor.values()[i].toString() + ChatColor.RESET;
-            if (!team.hasEntry(entry)) team.addEntry(entry);
+            team.addEntry(entry);
 
             objective.getScore(entry).setScore(i);
         }
@@ -64,7 +66,7 @@ public class ScoreboardManager {
         int foundSecrets = lobbyPlayer.getFoundSecretIds().size();
         int maxSecrets = plugin.getSecretMgr().getSecrets().size();
 
-        String secretColor = foundSecrets == maxSecrets ? "<#00FC00>" : "<#f90036>";
+        String secretColor = (foundSecrets >= maxSecrets && maxSecrets > 0) ? "<#00FC00>" : "<#f90036>";
 
         for (String line : rawLines) {
             String processed = line
@@ -72,7 +74,7 @@ public class ScoreboardManager {
                     .replace("{rank}", lobbyPlayer.getRank())
                     .replace("{color}", lobbyPlayer.getColor().toString())
                     .replace("{playtime}", lobbyPlayer.getFormattedPlaytime())
-                    .replace("{secrets}", secretColor +  foundSecrets + "<gray>/" + maxSecrets + secretColor)
+                    .replace("{secrets}", secretColor + foundSecrets + "<gray>/" + maxSecrets + secretColor)
                     .replace("{players}", String.valueOf(plugin.getNetworkStateManager().getServer("proxy").players()));
             formattedLines.add(processed);
         }
@@ -82,6 +84,8 @@ public class ScoreboardManager {
 
     private void render(Player player, List<String> lines) {
         Scoreboard score = player.getScoreboard();
+        if (score == Bukkit.getScoreboardManager().getMainScoreboard()) return;
+
         Objective objective = score.getObjective("lobby");
         if (objective == null) return;
 

@@ -57,48 +57,29 @@ public class PlayerNameTag implements Listener {
     public void updateNametag(Player player) {
         if (!config.isShowPlayerNameTags()) return;
 
-        Scoreboard board = Bukkit.getScoreboardManager().getMainScoreboard();
         LuckPerms api = LuckPermsProvider.get();
         User user = api.getUserManager().getUser(player.getUniqueId());
         if (user == null) return;
 
-        String prefix = user.getCachedData().getMetaData().getPrefix();
-        if (prefix == null) prefix = "";
-
-        int weight = 0;
-        if (api.getGroupManager().getGroup(user.getPrimaryGroup()) != null) {
-            weight = api.getGroupManager().getGroup(user.getPrimaryGroup()).getWeight().orElse(0);
-        }
+        // 1. Daten vorbereiten
+        String prefix = user.getCachedData().getMetaData().getPrefix() != null ? user.getCachedData().getMetaData().getPrefix() : "";
+        int weight = api.getGroupManager().getGroup(user.getPrimaryGroup()) != null ? api.getGroupManager().getGroup(user.getPrimaryGroup()).getWeight().orElse(0) : 0;
 
         String teamName = String.format("%03d_%s", (999 - weight), user.getPrimaryGroup());
         if (teamName.length() > 16) teamName = teamName.substring(0, 16);
 
-        Team team = board.getTeam(teamName);
-        if (team == null) {
-            team = board.registerNewTeam(teamName);
-        }
-
         Component prefixComponent = mm.deserialize(prefix);
-        team.prefix(prefixComponent);
-
         TextColor lastColor = findLastColor(prefixComponent);
         NamedTextColor teamColor = (lastColor != null) ? NamedTextColor.nearestTo(lastColor) : NamedTextColor.WHITE;
 
-        if (plugin.getVanishManager().isVanished(player.getUniqueId())) {
-            team.suffix(mm.deserialize(" <#00FC00>[V]"));
-
-            team.color(teamColor);
-        } else {
-            team.suffix(Component.empty());
-            team.color(teamColor);
+        // 2. Dieses Team in JEDES Scoreboard auf dem Server schreiben
+        for (Player online : Bukkit.getOnlinePlayers()) {
+            Scoreboard board = online.getScoreboard();
+            updateTeamInBoard(board, player, teamName, prefixComponent, teamColor);
         }
 
-        if (!team.hasEntry(player.getName())) {
-            board.getTeams().forEach(t -> {
-                if (t.hasEntry(player.getName())) t.removeEntry(player.getName());
-            });
-            team.addEntry(player.getName());
-        }
+        // Auch im MainScoreboard aktuell halten (für neue Spieler)
+        updateTeamInBoard(Bukkit.getScoreboardManager().getMainScoreboard(), player, teamName, prefixComponent, teamColor);
     }
 
     private TextColor findLastColor(Component component) {
@@ -110,5 +91,28 @@ public class PlayerNameTag implements Listener {
             }
         }
         return lastColor;
+    }
+
+    private void updateTeamInBoard(Scoreboard board, Player target, String teamName, Component prefix, NamedTextColor color) {
+        Team team = board.getTeam(teamName);
+        if (team == null) team = board.registerNewTeam(teamName);
+
+        team.prefix(prefix);
+        team.color(color);
+
+        if (plugin.getVanishManager().isVanished(target.getUniqueId())) {
+            team.suffix(mm.deserialize(" <#00FC00>[V]"));
+        } else {
+            team.suffix(Component.empty());
+        }
+
+        if (!team.hasEntry(target.getName())) {
+            board.getTeams().forEach(t -> {
+                if (t.getName().matches("^\\d{3}_.*") && t.hasEntry(target.getName())) {
+                    t.removeEntry(target.getName());
+                }
+            });
+            team.addEntry(target.getName());
+        }
     }
 }

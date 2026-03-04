@@ -39,12 +39,15 @@ public class LobbyPlayer {
         this.hiderState = hiderState;
         this.uuid = uuid;
         this.plugin = plugin;
-        loginTime = System.currentTimeMillis();
-        plugin.getScoreboardManager().createScoreboard(getPlayer());
+        this.loginTime = System.currentTimeMillis();
+
+        Player player = getPlayer();
+        if (player != null) {
+            plugin.getScoreboardManager().createScoreboard(player);
+        }
 
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             Set<Integer> foundIds = plugin.getSecretDb().getFoundSecretIds(uuid);
-
             Bukkit.getScheduler().runTask(plugin, () -> {
                 setFoundSecretIds(foundIds);
             });
