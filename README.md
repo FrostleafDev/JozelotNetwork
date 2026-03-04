@@ -27,7 +27,11 @@ _A more detailed breakdown will be added as the project evolves._
 >
 > **JozelotWebsite:** `Not started`
 > 
-> **JozelotLobby:** `Started`
+> **JozelotLobby:** `In Developement`
+>
+> **JozelotArchiv:** `In Developement`
+>
+> **JozelotDuels:** `In Developement`
 > 
 > **JozelotUtility:** `In Developement`
 
