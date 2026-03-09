@@ -67,6 +67,31 @@ public class VanishListener implements Listener {
         }
     }
 
+    @EventHandler
+    public void onChestOpen(PlayerInteractEvent event) {
+        Player player = event.getPlayer();
+
+        if (!plugin.getVanishManager().isVanished(player.getUniqueId())) return;
+
+        // Nur Rechtsklicks auf Blöcke prüfen
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+
+        Block block = event.getClickedBlock();
+        if (block == null) return;
+
+        if (block.getState() instanceof Container || block.getType() == Material.ENDER_CHEST) {
+
+            event.setCancelled(true);
+
+            if (block.getType() == Material.ENDER_CHEST) {
+                player.openInventory(player.getEnderChest());
+            } else {
+                Container container = (Container) block.getState();
+                player.openInventory(container.getInventory());
+            }
+        }
+    }
+
     /*@EventHandler
     public void onChestOpen(PlayerInteractEvent event) {
         Player player = event.getPlayer();

@@ -548,3 +548,12 @@ secret:
     edit: '{grey}• {primary}/secret edit <id> <addregion|setregion> {grey}Regionen anpassen'
     player-modify: '{grey}• {primary}/secret player <add|remove> <player> <id>'
     player-list: '{grey}• {primary}/secret player list <player>'
+
+command-worldreset-usage: '{tertiary}/worldreset <challenge-1|challenge-2|challenge-3>'
+command-worldreset-started: '{grey}Welt-Reset für {primary}{server-name} {grey}gestartet...'
+command-worldreset-stopping: '{grey}Schritt 1: Server wird {danger}gestoppt{grey}...'
+command-worldreset-deleting: '{grey}Schritt 2: Welt-Dateien werden {danger}gelöscht{grey}...'
+command-worldreset-starting: '{grey}Schritt 3: Server wird {primary}neu gestartet{grey}...'
+command-worldreset-complete: '{primary}Erfolg! {grey}Der Welt-Reset für {primary}{server-name} {grey}ist fertig.'
+
+world-reset-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat einen Welt-Reset auf {primary}{server-name} {grey}durchgeführt'

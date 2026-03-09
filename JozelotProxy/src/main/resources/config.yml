@@ -142,6 +142,7 @@ color-settings:
 # network.command.whitelist | network.whitelist.bypass
 # network.command.playtime | .admin
 # network.command.broadcast
+# network.command.world-reset
 # network.maxplayers.bypass.all | .<server>
 # network.command.msg | .gmsg | .global | .reply
 # network.chat.minimessage

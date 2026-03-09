@@ -99,6 +99,8 @@ public final class JozelotUtils extends JavaPlugin {
         getServer().getConsoleSender().sendMessage("§a[§6JoUtils§a]§a ----------------------------------------------");
         getServer().getConsoleSender().sendMessage("§a[§6JoUtils§a]§6    Version: §e" + getVersion());
         getServer().getConsoleSender().sendMessage("§a[§6JoUtils§a]§a ----------------------------------------------");
+
+        freezeGame(config.isTicksFreeze());
     }
 
     @Override

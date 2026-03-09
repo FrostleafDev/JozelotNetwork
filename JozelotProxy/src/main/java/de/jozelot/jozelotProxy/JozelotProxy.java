@@ -163,12 +163,11 @@ public class JozelotProxy {
         CommandMeta playerInfoMeta = cm.metaBuilder("playerinfo").build();
         CommandMeta spyMeta = cm.metaBuilder("spy").build();
         CommandMeta clientInfoMeta = cm.metaBuilder("client").aliases("version", "mods").build();
-
         CommandMeta vanishMeta = cm.metaBuilder("vanish").aliases("v").build();
-
         CommandMeta muteMeta = cm.metaBuilder("mute").aliases("shadowmute").build();
         CommandMeta mutelistMeta = cm.metaBuilder("mutelist").build();
         CommandMeta unmuteMeta = cm.metaBuilder("unmute").build();
+        CommandMeta worldresetMeta = cm.metaBuilder("world-reset").build();
 
         cm.register(hubMeta, new LobbyCommand(this));
         cm.register(networkMeta, new NetworkCommand(this));
@@ -198,6 +197,7 @@ public class JozelotProxy {
         cm.register(mutelistMeta, new MuteListCommand(this));
         cm.register(unmuteMeta, new UnmuteCommand(this));
         cm.register(vanishMeta, new VanishCommand(this));
+        cm.register(worldresetMeta, new WorldResetCommand(this));
 
         this.playtimeListener = new PlaytimeListener(this);
         consoleLogger.broadCastToConsole("Commands erstellt");

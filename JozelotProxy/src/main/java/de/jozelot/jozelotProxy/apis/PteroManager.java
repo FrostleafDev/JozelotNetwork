@@ -3,13 +3,24 @@ package de.jozelot.jozelotProxy.apis;
 import de.jozelot.jozelotProxy.JozelotProxy;
 import de.jozelot.jozelotProxy.storage.ConfigManager;
 
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.List;
+
 public class PteroManager {
     private final String url;
     private final String key;
     private final ConfigManager config;
+    private final JozelotProxy plugin;
 
     public PteroManager(JozelotProxy plugin) {
         this.config = plugin.getConfig();
+        this.plugin = plugin;
         this.url = config.getString("pterodactyl.url");
         this.key = config.getString("pterodactyl.api-key");
     }
@@ -55,6 +66,34 @@ public class PteroManager {
                         callback.accept(json.getAsJsonObject("attributes"));
                     } else {
                         callback.accept(null);
+                    }
+                });
+    }
+
+    public void deleteFiles(String pteroId, List<String> filesToDelete) {
+        StringBuilder jsonBuilder = new StringBuilder();
+        jsonBuilder.append("{\"root\": \"/\", \"files\": [");
+        for (int i = 0; i < filesToDelete.size(); i++) {
+            jsonBuilder.append("\"").append(filesToDelete.get(i)).append("\"");
+            if (i < filesToDelete.size() - 1) jsonBuilder.append(",");
+        }
+        jsonBuilder.append("]}");
+
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url + "/api/client/servers/" + pteroId + "/files/delete"))
+                .header("Authorization", "Bearer " + key)
+                .header("Content-Type", "application/json")
+                .header("Accept", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(jsonBuilder.toString()))
+                .build();
+
+        client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenAccept(res -> {
+                    if (res.statusCode() != 204) {
+                        plugin.getConsoleLogger().broadCastToConsole("<red>[PteroAPI] Fehler beim Loeschen: " + res.statusCode() + " - " + res.body());
+                    } else {
+                        plugin.getConsoleLogger().broadCastToConsole("<green>[PteroAPI] Dateien fuer " + pteroId + " geloescht.");
                     }
                 });
     }
