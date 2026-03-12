@@ -143,7 +143,7 @@ public final class JozelotUtils extends JavaPlugin {
 
             world.setGameRule(GameRule.MOB_GRIEFING, config.isMobGriefing());
             world.setGameRule(GameRule.DO_INSOMNIA, config.isDoInsomnia());
-            world.setGameRule(GameRule.DO_TILE_DROPS, !config.isBlockDrops());
+            world.setGameRule(GameRule.DO_TILE_DROPS, config.isBlockDrops());
             world.setGameRule(GameRule.PLAYERS_SLEEPING_PERCENTAGE, config.getPlayerSleepingPercentage());
             world.setGameRule(GameRule.DO_PATROL_SPAWNING, config.isSpawnPatrols());
             world.setGameRule(GameRule.DO_TRADER_SPAWNING, config.isSpawnWanderingTrader());
