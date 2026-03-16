@@ -18,7 +18,7 @@ public class UserManager {
     }
 
     public User registerUser(Player player) {
-        User user = new User();
+        User user = new User(player.getUniqueId(), plugin);
         users.put(player.getUniqueId(), user);
         return user;
     }
