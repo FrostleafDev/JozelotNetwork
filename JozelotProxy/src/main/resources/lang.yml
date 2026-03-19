@@ -557,3 +557,5 @@ command-worldreset-starting: '{grey}Schritt 3: Server wird {primary}neu gestarte
 command-worldreset-complete: '{primary}Erfolg! {grey}Der Welt-Reset für {primary}{server-name} {grey}ist fertig.'
 
 world-reset-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}{player-name} {grey}hat einen Welt-Reset auf {primary}{server-name} {grey}durchgeführt'
+
+archive-gamemode-hotkey-info: '{grey}Drücke {primary}<key:key.swapOffhand> {grey}um in den {primary}{gamemode} {grey}zu wechseln'

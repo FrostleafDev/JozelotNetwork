@@ -11,20 +11,20 @@ import java.sql.SQLException;
 public class SQLConnection {
 
     private HikariDataSource dataSource;
-    private final String url;
-    private final String user;
-    private final String password;
+    private final ConfigManager config;
+    private String url;
+    private String user;
+    private String password;
 
     public SQLConnection(JozelotArchive plugin) {
-        ConfigManager config = plugin.getServiceManager().getConfigManager();
-        this.url = "jdbc:mariadb://" + config.getMysqlHost() + ":" + config.getMysqlPort() + "/" + config.getMysqlDatabase();
-        this.user = config.getMysqlUser();
-        this.password = config.getMysqlPassword();
-        setup();
+        this.config = plugin.getServiceManager().getConfigManager();
     }
 
     public void setup() {
         HikariConfig hikariConfig = new HikariConfig();
+        this.url = "jdbc:mariadb://" + config.getMysqlHost() + ":" + config.getMysqlPort() + "/" + config.getMysqlDatabase();
+        this.user = config.getMysqlUser();
+        this.password = config.getMysqlPassword();
 
         hikariConfig.setDriverClassName("org.mariadb.jdbc.Driver");
         hikariConfig.setJdbcUrl(url);

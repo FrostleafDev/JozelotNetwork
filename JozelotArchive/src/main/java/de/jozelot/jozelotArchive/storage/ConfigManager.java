@@ -31,7 +31,6 @@ public class ConfigManager {
 
     public ConfigManager(JozelotArchive plugin) {
         this.plugin = plugin;
-        load();
     }
 
     public String getRedisHost() {

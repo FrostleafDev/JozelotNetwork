@@ -13,10 +13,9 @@ public class RedisListener {
 
     public RedisListener(JozelotArchive plugin) {
         this.plugin = plugin;
-        startListening();
     }
 
-    private void startListening() {
+    public void startListening() {
         new Thread(() -> {
             try {
                 plugin.getServiceManager().getRedisConnection().getJedis().subscribe(new JedisPubSub() {
@@ -36,7 +35,7 @@ public class RedisListener {
     private void handleReload() {
         plugin.getLogger().info("Redis: Globaler Reload empfangen!");
         Bukkit.getScheduler().runTask(plugin, () -> {
-            plugin.getServiceManager().reload();
+            plugin.getServiceManager().reloadAll();
             Map<String, String> data = plugin.getServiceManager().getRedisManager().fetchLanguageData();
             if (data != null) {
                 plugin.getServiceManager().getLangManager().integrateRedisData(data);

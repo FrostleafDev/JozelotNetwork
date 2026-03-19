@@ -2,9 +2,14 @@ package de.jozelot.jozelotArchive.player.user;
 
 import de.jozelot.jozelotArchive.JozelotArchive;
 import de.jozelot.jozelotArchive.inventory.InventoryType;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
+import java.util.Map;
 import java.util.UUID;
 
 public class User
@@ -12,21 +17,86 @@ public class User
     private final UUID uuid;
     private final JozelotArchive plugin;
     //Settings setting;
+    private long lastGameModeSwap = 0;
+    private final MiniMessage mm = MiniMessage.miniMessage();
 
     public User(UUID uuid, JozelotArchive plugin) {
         this.uuid = uuid;
         this.plugin = plugin;
     }
 
+
     public void openInventory(InventoryType inventory) {
 
     }
 
+    /**
+     * Cycles the players gamemode from survival to spectator
+     * @return the gamemode after the change
+     */
+    @Deprecated
+    public GameMode cycleGameMode() {
+        Player player = getPlayer();
+        GameMode nextGameMode = player.getGameMode() == GameMode.SPECTATOR ? GameMode.SURVIVAL : GameMode.SPECTATOR;
+
+        player.setGameMode(nextGameMode);
+        player.setAllowFlight(true);
+        player.setFlying(true);
+        playSound("pling");
+        lastGameModeSwap = System.currentTimeMillis();
+
+        sendGameModeActionBar();
+        return nextGameMode;
+    }
+
+    @Deprecated
+    public boolean canGameModeSwap() {
+        return lastGameModeSwap < System.currentTimeMillis() - 1000;
+    }
+
+    @Deprecated
+    public void sendGameModeActionBar() {
+        getPlayer().sendActionBar(mm.deserialize(plugin.getServiceManager().getLangManager().format("archive-gamemode-hotkey-info",
+                Map.of("gamemode", getPlayer().getGameMode() == GameMode.SPECTATOR ? "Survival" : "Specator")
+        )));
+    }
+
+    /**
+     * Spielt einen UI Sound aus der Lang der Proxy ab
+     * @param soundKey
+     */
+    public void playSound(String soundKey) {
+        Player player = getPlayer();
+
+        String path = plugin.getServiceManager().getLangManager().getRaw("sounds." + soundKey);
+
+        if (path != null && !path.isEmpty()) {
+            try {
+                String cleanedPath = path.trim().toLowerCase();
+
+                if (!cleanedPath.contains(":")) {
+                    cleanedPath = "minecraft:" + cleanedPath;
+                }
+
+                Sound sound = Sound.sound(
+                        Key.key(cleanedPath),
+                        Sound.Source.UI,
+                        1.0f,
+                        1.0f
+                );
+                player.playSound(sound, Sound.Emitter.self());
+            } catch (Exception e) {
+                Bukkit.getConsoleSender().sendMessage("§cUngültiger Sound-Key in lang.yml: " + path);
+            }
+        }
+    }
+
+    // GETTER AND SETTER STUFF
     public UUID getUniqueId() {
         return uuid;
     }
 
     public Player getPlayer() {
-        return Bukkit.getPlayer(this.uuid);
+        return Bukkit.getPlayer(uuid);
     }
 }

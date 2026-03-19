@@ -6,11 +6,13 @@ import de.jozelot.jozelotArchive.core.database.redis.RedisListener;
 import de.jozelot.jozelotArchive.core.database.redis.RedisManager;
 import de.jozelot.jozelotArchive.core.database.sql.SQLConnection;
 import de.jozelot.jozelotArchive.player.user.UserManager;
+import de.jozelot.jozelotArchive.registry.ListenerRegistry;
 import de.jozelot.jozelotArchive.storage.ConfigManager;
 import de.jozelot.jozelotArchive.storage.FileSystemManager;
 import de.jozelot.jozelotArchive.storage.LangManager;
 import org.bukkit.Bukkit;
 
+import java.util.Map;
 import java.util.logging.Level;
 
 public class ServiceManager {
@@ -23,10 +25,11 @@ public class ServiceManager {
     private RedisConnection redisConnection;
     private RedisManager redisManager;
     private RedisListener redisListener;
-    private PluginReload pluginReload;
     private FileSystemManager fileSystemManager;
 
     private UserManager userManager;
+    private GlobalTask globalTask;
+    private ListenerRegistry listenerRegistry;
 
     public ServiceManager(JozelotArchive plugin) {
         this.plugin = plugin;
@@ -60,19 +63,49 @@ public class ServiceManager {
         this.sqlConnection = new SQLConnection(plugin);
         this.redisConnection = new RedisConnection(plugin);
         this.redisManager = new RedisManager(plugin);
-        this.pluginReload = new PluginReload(plugin, this);
         this.fileSystemManager = new FileSystemManager(plugin);
         this.userManager = new UserManager(plugin);
         this.redisListener = new RedisListener(plugin);
+        this.globalTask = new GlobalTask(plugin);
+        this.listenerRegistry = new ListenerRegistry(plugin);
+    }
+
+    public void enable() {
+        configManager.load();
+        langManager.load();
+        sqlConnection.setup();
+        redisConnection.setup();
+        redisListener.startListening();
+        // globalTask.start();
+        listenerRegistry.register();
+
+        fileSystemManager.archivePlayerFiles();
     }
 
     public void shutdown() {
         this.sqlConnection.close();
         this.redisConnection.close();
+        this.globalTask.stop();
     }
 
-    public void reload() {
-        pluginReload.reload();
+    public void reloadAll() {
+        plugin.reloadConfig();
+        configManager.load();
+        langManager.load();
+
+        sqlConnection.close();
+        sqlConnection.setup();
+
+        redisConnection.close();
+        redisConnection.setup();
+
+        Map<String, String> redisData = redisManager.fetchLanguageData();
+        if (redisData != null) {
+            langManager.integrateRedisData(redisData);
+        }
+
+        userManager.removeAllUsers();
+        userManager.registerAllUsers();
     }
 
     public ConfigManager getConfigManager() {
@@ -95,11 +128,12 @@ public class ServiceManager {
         return redisManager;
     }
 
-    public PluginReload getPluginReload() {
-        return pluginReload;
-    }
-
     public UserManager getUserManager() {
         return userManager;
     }
+
+    public GlobalTask getGlobalTask() {
+        return globalTask;
+    }
+
 }

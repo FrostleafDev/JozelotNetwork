@@ -11,7 +11,6 @@ public class RedisConnection {
 
     public RedisConnection(JozelotArchive plugin) {
         this.config = plugin.getServiceManager().getConfigManager();
-        setup();
     }
 
     public void setup() {

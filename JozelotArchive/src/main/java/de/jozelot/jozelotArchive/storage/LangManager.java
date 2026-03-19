@@ -19,7 +19,6 @@ public class LangManager {
     public LangManager(JozelotArchive plugin) {
         this.plugin = plugin;
         this.config = plugin.getServiceManager().getConfigManager();
-        load();
     }
 
     public void load() {

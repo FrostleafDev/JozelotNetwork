@@ -4,14 +4,12 @@ import de.jozelot.jozelotArchive.JozelotArchive;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class UserManager {
 
     private final JozelotArchive plugin;
-    private Map<UUID, User> users = new HashMap<>();
+    private final Map<UUID, User> users = new HashMap<>();
 
     public UserManager(JozelotArchive plugin) {
         this.plugin = plugin;
@@ -24,10 +22,12 @@ public class UserManager {
     }
 
     public void removeAllUsers() {
+        // TODO: Save to Database
         users.clear();
     }
 
     public void registerAllUsers() {
+        // TODO: Load from Database
         Bukkit.getOnlinePlayers().forEach(p -> registerUser(p));
     }
 
@@ -38,7 +38,20 @@ public class UserManager {
     public void removeUser(User user) {
         removeUser(user.getUniqueId());
     }
+
     public void removeUser(Player player) {
         removeUser(player.getUniqueId());
+    }
+
+    public User getUser(UUID uuid) {
+        return users.get(uuid);
+    }
+
+    public User getUser(Player player) {
+        return getUser(player.getUniqueId());
+    }
+
+    public Map<UUID, User> getUsers() {
+        return Collections.unmodifiableMap(users);
     }
 }

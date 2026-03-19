@@ -11,7 +11,6 @@ public class FileSystemManager {
 
     public FileSystemManager(JozelotArchive plugin) {
         this.plugin = plugin;
-        archivePlayerFiles();
     }
 
     public void archivePlayerFiles() {
