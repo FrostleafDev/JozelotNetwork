@@ -18,3 +18,39 @@ color_settings:
   tertiary: '#FCE300'
   danger: '#f90036'
   grey: '#A8A8A8'
+
+
+items:
+  navigator:
+    name: '<!italic><gold>Navigator'
+    item: COMPASS
+    slot: 4
+    description:
+      - ''
+      - '<!italic><gray>Hier kannst du auswählen'
+      - '<!italic><gray>auf welchen Server du spielen möchtest'
+
+  player_hider:
+    visible_name: '<!italic><green>Spieler sichtbar'
+    hidden_name: '<!italic><red>Spieler versteckt'
+    team_name: '<!italic><dark_purple>Server Team sichtbar'
+    visible_item: LEATHER_HELMET
+    hidden_item: LEATHER_HELMET
+    team_item: LEATHER_HELMET
+    slot: 7
+    description:
+      - ''
+      - '<!italic><gray>Verstecke andere Spieler'
+
+  back_arrow:
+    name: '<!italic><gray>Zurück'
+
+  spawn_button:
+    name: '<!italic><gold>Spawn'
+    item: MAGMA_CREAM
+
+
+inventories:
+  navigator:
+    title: "Navigator"
+    size: 45

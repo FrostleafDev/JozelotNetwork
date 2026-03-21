@@ -86,6 +86,26 @@ public class ConfigManager {
         return mysqlHost;
     }
 
+    public String getString(String path) {
+        return plugin.getConfig().getString(path);
+    }
+
+    public int getInt(String path) {
+        return plugin.getConfig().getInt(path);
+    }
+
+    public boolean getBoolean(String path) {
+        return plugin.getConfig().getBoolean(path);
+    }
+
+    public List<String> getStringList(String path) {
+        return plugin.getConfig().getStringList(path);
+    }
+
+    public long getLong(String path) {
+        return plugin.getConfig().getLong(path);
+    }
+
     public void load() {
         plugin.saveDefaultConfig();
 

@@ -2,6 +2,11 @@ package de.jozelot.jozelotArchive.player.user;
 
 import de.jozelot.jozelotArchive.JozelotArchive;
 import de.jozelot.jozelotArchive.inventory.InventoryType;
+import de.jozelot.jozelotArchive.inventory.Menu;
+import de.jozelot.jozelotArchive.inventory.MenuManager;
+import de.jozelot.jozelotArchive.player.user.settings.ColorPreference;
+import de.jozelot.jozelotArchive.player.user.settings.Setting;
+import de.jozelot.jozelotArchive.utility.LuckPermsUtils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -9,6 +14,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -19,15 +25,29 @@ public class User
     //Settings setting;
     private long lastGameModeSwap = 0;
     private final MiniMessage mm = MiniMessage.miniMessage();
+    private final Map<Setting, String> settings = new HashMap<>();
 
     public User(UUID uuid, JozelotArchive plugin) {
         this.uuid = uuid;
         this.plugin = plugin;
+        setSettings(plugin.getServiceManager().getUserDatabase().getAllSettings(this));
     }
 
 
-    public void openInventory(InventoryType inventory) {
+    public void openInventory(InventoryType type) {
+        openInventory(type, null, null);
+    }
 
+    public void openInventory(InventoryType type, InventoryType previousType, Object data) {
+        MenuManager mm = plugin.getServiceManager().getMenuManager();
+
+        Menu menu = mm.createMenu(type, getPlayer(), data);
+
+        if (menu != null) {
+            Menu previousMenu = (previousType != null) ? mm.createMenu(previousType, getPlayer(), null) : null;
+
+            menu.open(this);
+        }
     }
 
     /**
@@ -91,6 +111,36 @@ public class User
         }
     }
 
+    public String getRawSetting(Setting setting) {
+        return settings.getOrDefault(setting, setting.getDefaultValue());
+    }
+
+    public boolean getBoolean(Setting setting) {
+        return Boolean.parseBoolean(getRawSetting(setting));
+    }
+
+    public int getInt(Setting setting) {
+        return Integer.parseInt(getRawSetting(setting));
+    }
+
+    public ColorPreference getColor() {
+        String colorValue = getRawSetting(Setting.COLOR_PREFERENCE);
+        ColorPreference pref = ColorPreference.getByName(colorValue);
+        return (pref != null) ? pref : ColorPreference.WHITE;
+    }
+
+    public void setSetting(Setting setting, String value) {
+        this.settings.put(setting, value);
+    }
+
+    public void setSettings(Map<Setting, String> settingStringMap) {
+        settings.putAll(settingStringMap);
+    }
+
+    public Map<Setting, String> getSettings() {
+        return settings;
+    }
+
     // GETTER AND SETTER STUFF
     public UUID getUniqueId() {
         return uuid;
@@ -98,5 +148,9 @@ public class User
 
     public Player getPlayer() {
         return Bukkit.getPlayer(uuid);
+    }
+
+    public String getRank() {
+        return LuckPermsUtils.getPlayerRankAsString(getPlayer());
     }
 }

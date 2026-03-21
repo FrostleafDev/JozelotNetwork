@@ -5,7 +5,10 @@ import de.jozelot.jozelotArchive.core.database.redis.RedisConnection;
 import de.jozelot.jozelotArchive.core.database.redis.RedisListener;
 import de.jozelot.jozelotArchive.core.database.redis.RedisManager;
 import de.jozelot.jozelotArchive.core.database.sql.SQLConnection;
+import de.jozelot.jozelotArchive.inventory.MenuManager;
 import de.jozelot.jozelotArchive.player.user.UserManager;
+import de.jozelot.jozelotArchive.player.user.settings.UserDatabase;
+import de.jozelot.jozelotArchive.registry.CommandRegistry;
 import de.jozelot.jozelotArchive.registry.ListenerRegistry;
 import de.jozelot.jozelotArchive.storage.ConfigManager;
 import de.jozelot.jozelotArchive.storage.FileSystemManager;
@@ -30,6 +33,9 @@ public class ServiceManager {
     private UserManager userManager;
     private GlobalTask globalTask;
     private ListenerRegistry listenerRegistry;
+    private CommandRegistry commandRegistry;
+    private MenuManager menuManager;
+    private UserDatabase userDatabase;
 
     public ServiceManager(JozelotArchive plugin) {
         this.plugin = plugin;
@@ -68,6 +74,9 @@ public class ServiceManager {
         this.redisListener = new RedisListener(plugin);
         this.globalTask = new GlobalTask(plugin);
         this.listenerRegistry = new ListenerRegistry(plugin);
+        this.commandRegistry = new CommandRegistry(plugin);
+        this.menuManager = new MenuManager(plugin);
+        this.userDatabase = new UserDatabase(plugin);
     }
 
     public void enable() {
@@ -78,6 +87,8 @@ public class ServiceManager {
         redisListener.startListening();
         // globalTask.start();
         listenerRegistry.register();
+        commandRegistry.register();
+        menuManager.registerMenus();
 
         fileSystemManager.archivePlayerFiles();
     }
@@ -98,6 +109,8 @@ public class ServiceManager {
 
         redisConnection.close();
         redisConnection.setup();
+
+        menuManager.registerMenus();
 
         Map<String, String> redisData = redisManager.fetchLanguageData();
         if (redisData != null) {
@@ -136,4 +149,11 @@ public class ServiceManager {
         return globalTask;
     }
 
+    public MenuManager getMenuManager() {
+        return menuManager;
+    }
+
+    public UserDatabase getUserDatabase() {
+        return userDatabase;
+    }
 }

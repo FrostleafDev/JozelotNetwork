@@ -24,6 +24,7 @@ import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -57,6 +58,7 @@ public class SecretMenu extends LobbyInventory {
         filler.editMeta(meta -> {
             meta.displayName(Component.empty());
             meta.getPersistentDataContainer().set(HotbarItems.IS_PROTECTED, PersistentDataType.BOOLEAN, true);
+            meta.setHideTooltip(true);
         });
 
         int size = inventory.getSize();
@@ -77,6 +79,8 @@ public class SecretMenu extends LobbyInventory {
             meta.displayName(mm.deserialize(plugin.getConfig().getString("items.back_arrow.name", "<red>Zurück")));
             meta.getPersistentDataContainer().set(HotbarItems.ITEM_ID, PersistentDataType.STRING, "back_button");
             meta.getPersistentDataContainer().set(HotbarItems.IS_PROTECTED, PersistentDataType.BOOLEAN, true);
+            meta.lore(Collections.emptyList());
+            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
         });
 
         ItemStack info = new ItemStack(Material.PLAYER_HEAD);

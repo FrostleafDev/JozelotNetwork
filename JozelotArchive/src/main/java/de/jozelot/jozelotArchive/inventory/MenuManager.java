@@ -1,6 +1,7 @@
 package de.jozelot.jozelotArchive.inventory;
 
 import de.jozelot.jozelotArchive.JozelotArchive;
+import de.jozelot.jozelotArchive.inventory.navigator.NavigatorMenu;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -16,5 +17,25 @@ public class MenuManager {
 
     public MenuManager(JozelotArchive plugin) {
         this.plugin = plugin;
+    }
+
+    public void registerMenus() {
+        menuFactory.clear();
+        menuFactory.put(InventoryType.NAVIGATOR, (player, data) -> new NavigatorMenu(plugin));
+
+        /*menuFactory.put(InventoryType.SERVER_INFO, (player, data) -> new NavigatorMenu(plugin));
+
+        menuFactory.put(InventoryType.PLAYER_INFO, (player, data) -> {
+            Player target = (Player) data; // Wir casten das Objekt zum Spieler
+            return new PlayerInfoMenu(plugin, target);
+        });*/
+    }
+
+    public Menu createMenu(InventoryType type, Player player, Object data) {
+        if (!menuFactory.containsKey(type)) return null;
+
+        BiFunction<Player, Object, Menu> factory = menuFactory.get(type);
+        if (factory == null) return null;
+        return factory.apply(player, data);
     }
 }

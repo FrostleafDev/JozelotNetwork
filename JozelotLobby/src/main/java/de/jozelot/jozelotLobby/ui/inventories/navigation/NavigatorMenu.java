@@ -19,6 +19,7 @@ import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -47,6 +48,7 @@ public class NavigatorMenu extends LobbyInventory {
         filler.editMeta(meta -> {
             meta.displayName(Component.empty());
             meta.getPersistentDataContainer().set(HotbarItems.IS_PROTECTED, PersistentDataType.BOOLEAN, true);
+            meta.setHideTooltip(true);
         });
 
         for (int i : new int[]{0,1,2,3,4,5,6,7,8,28,29,30,32,33,34,35}) {
@@ -62,6 +64,8 @@ public class NavigatorMenu extends LobbyInventory {
             meta.displayName(mm.deserialize(plugin.getConfig().getString("items.back_arrow.name", "<red>Zurück")));
             meta.getPersistentDataContainer().set(HotbarItems.ITEM_ID, PersistentDataType.STRING, "back_button");
             meta.getPersistentDataContainer().set(HotbarItems.IS_PROTECTED, PersistentDataType.BOOLEAN, true);
+            meta.lore(Collections.emptyList());
+            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
         });
         inventory.setItem(27, backArrow);
 
