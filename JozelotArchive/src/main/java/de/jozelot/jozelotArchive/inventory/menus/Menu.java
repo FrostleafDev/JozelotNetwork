@@ -1,4 +1,4 @@
-package de.jozelot.jozelotArchive.inventory;
+package de.jozelot.jozelotArchive.inventory.menus;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
@@ -7,29 +7,27 @@ import de.jozelot.jozelotArchive.player.user.User;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.profile.PlayerTextures;
 import org.jetbrains.annotations.NotNull;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 public abstract class Menu implements InventoryHolder {
 
     protected JozelotArchive plugin;
     protected Inventory inventory;
     private final Map<Integer, BiConsumer<User, InventoryClickEvent>> actions = new HashMap<>();
+    public static final NamespacedKey MENU_ITEM_KEY = new NamespacedKey("jozelotarchive", "menu_item_key");
     protected MiniMessage mm = MiniMessage.miniMessage();
 
     public Menu(JozelotArchive plugin, int size, String title) {

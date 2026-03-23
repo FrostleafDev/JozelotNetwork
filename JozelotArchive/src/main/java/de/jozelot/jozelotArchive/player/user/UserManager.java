@@ -18,6 +18,10 @@ public class UserManager {
     public User registerUser(Player player) {
         User user = new User(player.getUniqueId(), plugin);
         users.put(player.getUniqueId(), user);
+
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            user.setSettings(plugin.getServiceManager().getUserDatabase().getAllSettings(user));
+        });
         return user;
     }
 
@@ -51,7 +55,11 @@ public class UserManager {
         return getUser(player.getUniqueId());
     }
 
-    public Map<UUID, User> getUsers() {
+    public Map<UUID, User> getUsersAsMap() {
         return Collections.unmodifiableMap(users);
+    }
+
+    public Collection<User> getUsersAsCollection() {
+        return Collections.unmodifiableCollection(users.values());
     }
 }

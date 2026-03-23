@@ -1,10 +1,7 @@
 package de.jozelot.jozelotArchive.registry;
 
 import de.jozelot.jozelotArchive.JozelotArchive;
-import de.jozelot.jozelotArchive.listener.ConnectionListener;
-import de.jozelot.jozelotArchive.listener.GameModeChange;
-import de.jozelot.jozelotArchive.listener.MenuClickListener;
-import de.jozelot.jozelotArchive.listener.OffhandListener;
+import de.jozelot.jozelotArchive.listener.*;
 
 public class ListenerRegistry {
 
@@ -18,8 +15,11 @@ public class ListenerRegistry {
         var pm = plugin.getServer().getPluginManager();
 
         pm.registerEvents(new ConnectionListener(plugin), plugin);
-        pm.registerEvents(new GameModeChange(), plugin);
+        pm.registerEvents(new GameModeChange(plugin), plugin);
         pm.registerEvents(new MenuClickListener(plugin), plugin);
+        pm.registerEvents(new CommandHiderListener(plugin), plugin);
+        pm.registerEvents(new ContainerOpenListener(), plugin);
+        pm.registerEvents(new HotbarItemClickListener(plugin), plugin);
 
         // pm.registerEvents(new OffhandListener(plugin), plugin);
     }

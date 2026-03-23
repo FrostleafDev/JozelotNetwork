@@ -177,7 +177,7 @@ items:
       - '<!italic><dark_gray>» <gray>Spieler: <#00A4FC>{online_players} 👤'
 
   secret_info:
-    name: '<!italic><white>Information'
+    name: '<!italic><gold>Information'
     lore:
       - ''
       - '<!italic><gray>Die Secrets sind findbare Orte'

@@ -30,6 +30,16 @@ items:
       - '<!italic><gray>Hier kannst du auswählen'
       - '<!italic><gray>auf welchen Server du spielen möchtest'
 
+  gamemode_changer:
+    name_s: '<!italic><dark_purple>Survival'
+    name_sp: '<!italic><blue>Spectator'
+    item: ENDER_EYE
+    slot: 1
+    description:
+      - ''
+      - '<!italic><gray>Wechle schnell zwischen'
+      - '<!italic><gray>Survival und Spectator'
+
   player_hider:
     visible_name: '<!italic><green>Spieler sichtbar'
     hidden_name: '<!italic><red>Spieler versteckt'
@@ -48,6 +58,17 @@ items:
   spawn_button:
     name: '<!italic><gold>Spawn'
     item: MAGMA_CREAM
+
+  world_change:
+    overworld_item: GRASS_BLOCK
+    nether_item: NETHERRACK
+    end_item: ENDSTONE
+    overworld_name: "<!italic><white>Overworld"
+    nether_name: "<!italic><white>Nether"
+    end_name: "<!italic><white>End"
+    lore:
+      - "<!italic><gray>Klicke um dich in diese"
+      - "<!italic><gray>Welt zu teleportieren"
 
 
 inventories:

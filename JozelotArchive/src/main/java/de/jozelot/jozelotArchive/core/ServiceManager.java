@@ -5,15 +5,17 @@ import de.jozelot.jozelotArchive.core.database.redis.RedisConnection;
 import de.jozelot.jozelotArchive.core.database.redis.RedisListener;
 import de.jozelot.jozelotArchive.core.database.redis.RedisManager;
 import de.jozelot.jozelotArchive.core.database.sql.SQLConnection;
-import de.jozelot.jozelotArchive.inventory.MenuManager;
+import de.jozelot.jozelotArchive.inventory.hotbar.HotbarManager;
+import de.jozelot.jozelotArchive.inventory.menus.MenuManager;
 import de.jozelot.jozelotArchive.player.user.UserManager;
-import de.jozelot.jozelotArchive.player.user.settings.UserDatabase;
+import de.jozelot.jozelotArchive.player.user.UserDatabase;
 import de.jozelot.jozelotArchive.registry.CommandRegistry;
 import de.jozelot.jozelotArchive.registry.ListenerRegistry;
 import de.jozelot.jozelotArchive.storage.ConfigManager;
 import de.jozelot.jozelotArchive.storage.FileSystemManager;
 import de.jozelot.jozelotArchive.storage.LangManager;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 import java.util.Map;
 import java.util.logging.Level;
@@ -36,6 +38,7 @@ public class ServiceManager {
     private CommandRegistry commandRegistry;
     private MenuManager menuManager;
     private UserDatabase userDatabase;
+    private HotbarManager hotbarManager;
 
     public ServiceManager(JozelotArchive plugin) {
         this.plugin = plugin;
@@ -77,6 +80,7 @@ public class ServiceManager {
         this.commandRegistry = new CommandRegistry(plugin);
         this.menuManager = new MenuManager(plugin);
         this.userDatabase = new UserDatabase(plugin);
+        this.hotbarManager = new HotbarManager(plugin);
     }
 
     public void enable() {
@@ -85,10 +89,12 @@ public class ServiceManager {
         sqlConnection.setup();
         redisConnection.setup();
         redisListener.startListening();
+        integrateLangFromProxy();
         // globalTask.start();
         listenerRegistry.register();
         commandRegistry.register();
         menuManager.registerMenus();
+        hotbarManager.registerItems();
 
         fileSystemManager.archivePlayerFiles();
     }
@@ -100,6 +106,8 @@ public class ServiceManager {
     }
 
     public void reloadAll() {
+        userManager.removeAllUsers();
+
         plugin.reloadConfig();
         configManager.load();
         langManager.load();
@@ -110,15 +118,19 @@ public class ServiceManager {
         redisConnection.close();
         redisConnection.setup();
 
-        menuManager.registerMenus();
+        integrateLangFromProxy();
 
+        menuManager.handleReload();
+        hotbarManager.handleReload();
+
+        userManager.registerAllUsers();
+    }
+
+    private void integrateLangFromProxy() {
         Map<String, String> redisData = redisManager.fetchLanguageData();
         if (redisData != null) {
             langManager.integrateRedisData(redisData);
         }
-
-        userManager.removeAllUsers();
-        userManager.registerAllUsers();
     }
 
     public ConfigManager getConfigManager() {
@@ -155,5 +167,9 @@ public class ServiceManager {
 
     public UserDatabase getUserDatabase() {
         return userDatabase;
+    }
+
+    public HotbarManager getHotbarManager() {
+        return hotbarManager;
     }
 }

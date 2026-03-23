@@ -1,7 +1,8 @@
-package de.jozelot.jozelotArchive.inventory;
+package de.jozelot.jozelotArchive.inventory.menus;
 
 import de.jozelot.jozelotArchive.JozelotArchive;
-import de.jozelot.jozelotArchive.inventory.navigator.NavigatorMenu;
+import de.jozelot.jozelotArchive.inventory.menus.navigator.NavigatorMenu;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -37,5 +38,12 @@ public class MenuManager {
         BiFunction<Player, Object, Menu> factory = menuFactory.get(type);
         if (factory == null) return null;
         return factory.apply(player, data);
+    }
+
+    public void handleReload() {
+        registerMenus();
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            player.closeInventory();
+        }
     }
 }

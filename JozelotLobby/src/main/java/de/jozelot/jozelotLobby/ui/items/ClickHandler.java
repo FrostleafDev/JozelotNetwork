@@ -230,6 +230,8 @@ public class ClickHandler implements Listener {
             menu.stopUpdateTask();
         } else if (inventory.getHolder() instanceof ArchivMenu menu) {
             menu.stopUpdateTask();
+        }else if (inventory.getHolder() instanceof SpielerinfoMenu menu) {
+            menu.stopUpdateTask();
         }
     }
 }

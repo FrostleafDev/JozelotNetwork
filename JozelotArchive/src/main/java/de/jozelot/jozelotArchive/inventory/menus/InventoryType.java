@@ -1,4 +1,4 @@
-package de.jozelot.jozelotArchive.inventory;
+package de.jozelot.jozelotArchive.inventory.menus;
 
 public enum InventoryType {
     NAVIGATOR,

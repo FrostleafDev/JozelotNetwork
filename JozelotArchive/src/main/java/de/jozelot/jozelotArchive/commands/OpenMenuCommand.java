@@ -1,7 +1,7 @@
 package de.jozelot.jozelotArchive.commands;
 
 import de.jozelot.jozelotArchive.JozelotArchive;
-import de.jozelot.jozelotArchive.inventory.InventoryType;
+import de.jozelot.jozelotArchive.inventory.menus.InventoryType;
 import de.jozelot.jozelotArchive.player.user.User;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.Command;
@@ -33,9 +33,11 @@ public class OpenMenuCommand implements CommandExecutor {
         }
 
         String menuTitle = args[0].toUpperCase();
+        InventoryType type;
 
-        InventoryType type = InventoryType.valueOf(menuTitle);
-        if (type == null) {
+        try {
+            type = InventoryType.valueOf(menuTitle);
+        } catch (IllegalArgumentException e) {
             sendBlocked(player, fullCommand);
             return true;
         }

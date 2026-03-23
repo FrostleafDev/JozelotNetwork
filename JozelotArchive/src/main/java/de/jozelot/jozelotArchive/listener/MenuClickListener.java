@@ -1,9 +1,8 @@
 package de.jozelot.jozelotArchive.listener;
 
 import de.jozelot.jozelotArchive.JozelotArchive;
-import de.jozelot.jozelotArchive.inventory.Menu;
+import de.jozelot.jozelotArchive.inventory.menus.Menu;
 import de.jozelot.jozelotArchive.player.user.User;
-import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;

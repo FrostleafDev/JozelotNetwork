@@ -2,7 +2,6 @@ package de.jozelot.jozelotArchive.listener;
 
 import de.jozelot.jozelotArchive.JozelotArchive;
 import de.jozelot.jozelotArchive.core.ServiceManager;
-import de.jozelot.jozelotArchive.inventory.InventoryType;
 import de.jozelot.jozelotArchive.player.user.User;
 import de.jozelot.jozelotArchive.player.user.UserManager;
 import org.bukkit.entity.Player;
@@ -26,7 +25,16 @@ public class ConnectionListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        userManager.registerUser(player);
+        User user = userManager.registerUser(player);
+
+        user.updateVisibility();
+        user.clearInventory();
+        user.giveHotbarItems();
+
+        for (User onlineUser : plugin.getServiceManager().getUserManager().getUsersAsCollection()) {
+            if (onlineUser.equals(user)) continue;
+            onlineUser.updateVisibility();
+        }
     }
 
     @EventHandler

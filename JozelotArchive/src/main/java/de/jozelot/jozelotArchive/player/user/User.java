@@ -1,9 +1,11 @@
 package de.jozelot.jozelotArchive.player.user;
 
 import de.jozelot.jozelotArchive.JozelotArchive;
-import de.jozelot.jozelotArchive.inventory.InventoryType;
-import de.jozelot.jozelotArchive.inventory.Menu;
-import de.jozelot.jozelotArchive.inventory.MenuManager;
+import de.jozelot.jozelotArchive.inventory.hotbar.HotbarItemType;
+import de.jozelot.jozelotArchive.inventory.hotbar.items.HiderState;
+import de.jozelot.jozelotArchive.inventory.menus.InventoryType;
+import de.jozelot.jozelotArchive.inventory.menus.Menu;
+import de.jozelot.jozelotArchive.inventory.menus.MenuManager;
 import de.jozelot.jozelotArchive.player.user.settings.ColorPreference;
 import de.jozelot.jozelotArchive.player.user.settings.Setting;
 import de.jozelot.jozelotArchive.utility.LuckPermsUtils;
@@ -22,17 +24,70 @@ public class User
 {
     private final UUID uuid;
     private final JozelotArchive plugin;
-    //Settings setting;
     private long lastGameModeSwap = 0;
+    private HiderState hiderState;
     private final MiniMessage mm = MiniMessage.miniMessage();
     private final Map<Setting, String> settings = new HashMap<>();
 
     public User(UUID uuid, JozelotArchive plugin) {
         this.uuid = uuid;
         this.plugin = plugin;
-        setSettings(plugin.getServiceManager().getUserDatabase().getAllSettings(this));
+        this.hiderState = plugin.getServiceManager().getUserDatabase().getHiderState(uuid);
     }
 
+    public void giveHotbarItems() {
+        var hm = plugin.getServiceManager().getHotbarManager();
+
+        hm.giveItem(this, HotbarItemType.NAVIGATOR);
+        hm.giveItem(this, HotbarItemType.GAMEMODE_CHANGER);
+        hm.giveItem(this, HotbarItemType.PLAYER_HIDER);
+    }
+
+    public void clearInventory() {
+        getPlayer().getInventory().clear();
+    }
+
+    public void updateItem(HotbarItemType type) {
+        var hm = plugin.getServiceManager().getHotbarManager();
+        hm.giveItem(this, type);
+    }
+
+    public void setHiderState(HiderState hiderState) {
+        this.hiderState = hiderState;
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            plugin.getServiceManager().getUserDatabase().setHiderState(this, hiderState);
+        });
+    }
+
+    public HiderState getHiderState() {
+        return hiderState;
+    }
+
+    public void toggleHider() {
+        setHiderState(getHiderState().next());
+        updateVisibility();
+    }
+
+    public void updateVisibility() {
+        Player player = getPlayer();
+        if (player == null) return;
+
+        Bukkit.getOnlinePlayers().stream()
+                .filter(target -> !target.equals(player))
+                .forEach(target -> {
+                    switch (hiderState) {
+                        case VISIBLE -> player.showPlayer(plugin, target);
+                        case HIDDEN -> player.hidePlayer(plugin, target);
+                        case TEAM -> {
+                            if (target.hasPermission("network.lobby.player_hider.team")) {
+                                player.showPlayer(plugin, target);
+                            } else {
+                                player.hidePlayer(plugin, target);
+                            }
+                        }
+                    }
+                });
+    }
 
     public void openInventory(InventoryType type) {
         openInventory(type, null, null);
