@@ -39,12 +39,12 @@ public abstract class Menu implements InventoryHolder {
         open(user, null);
     }
 
-    public void open(User user, Menu previousInventory) {
+    public void open(User user, InventoryType previousInventory) {
         setupItems(user, previousInventory);
         user.getPlayer().openInventory(getInventory());
     }
 
-    public abstract void setupItems(User user, Menu previousInventory);
+    public abstract void setupItems(User user, InventoryType previousInventory);
 
     public void setItem(int slot, ItemStack item, BiConsumer<User, InventoryClickEvent> action) {
         inventory.setItem(slot, item);
@@ -59,7 +59,7 @@ public abstract class Menu implements InventoryHolder {
         }
     }
 
-    public void setBackButton(int slot, User rawUser, Menu previousMenu) {
+    public void setBackButton(int slot, User rawUser, InventoryType previousMenu) {
         ItemStack arrow = new ItemStack(Material.PLAYER_HEAD);
 
         arrow.editMeta(SkullMeta.class, meta -> {
@@ -77,7 +77,7 @@ public abstract class Menu implements InventoryHolder {
 
         setItem(slot, arrow, (user, event) -> {
             if (previousMenu != null) {
-                user.getPlayer().openInventory(previousMenu.getInventory());
+                user.openInventory(previousMenu);
             } else {
                 user.getPlayer().closeInventory();
             }

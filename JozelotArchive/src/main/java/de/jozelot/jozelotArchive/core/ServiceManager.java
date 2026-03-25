@@ -120,10 +120,10 @@ public class ServiceManager {
 
         integrateLangFromProxy();
 
+        userManager.registerAllUsers();
+
         menuManager.handleReload();
         hotbarManager.handleReload();
-
-        userManager.registerAllUsers();
     }
 
     private void integrateLangFromProxy() {

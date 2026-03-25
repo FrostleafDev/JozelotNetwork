@@ -2,6 +2,7 @@ package de.jozelot.jozelotArchive.inventory.menus.navigator;
 
 import de.jozelot.jozelotArchive.JozelotArchive;
 import de.jozelot.jozelotArchive.inventory.hotbar.HotbarItem;
+import de.jozelot.jozelotArchive.inventory.menus.InventoryType;
 import de.jozelot.jozelotArchive.inventory.menus.Menu;
 import de.jozelot.jozelotArchive.player.user.User;
 import org.bukkit.Bukkit;
@@ -19,7 +20,8 @@ public class NavigatorMenu extends Menu {
     }
 
     @Override
-    public void setupItems(User user, Menu previousInventory) {
+    public void setupItems(User user, InventoryType previousInventory) {
+        var cm = plugin.getServiceManager().getConfigManager();
         int size = getInventory().getSize();
         WorldType type = WorldType.fromWorld(user.getPlayer().getWorld());
 
@@ -29,6 +31,10 @@ public class NavigatorMenu extends Menu {
         setWorldChangeButton(9, WorldType.OVERWORLD, type);
         setWorldChangeButton(18, WorldType.NETHER, type);
         setWorldChangeButton(27, WorldType.END, type);
+
+        setLocationOverview(cm.getInt("items.location_overview.slot"));
+        setPlayerOverview(cm.getInt("items.player_overview.slot"));
+        setProjectOverview(cm.getInt("items.project_overview.slot"));
     }
 
     private void setSpawnButton(int slot) {
@@ -58,19 +64,20 @@ public class NavigatorMenu extends Menu {
 
         Material material;
         String name;
+        String current = " <dark_gray>[Aktuell]";
 
         switch (type) {
             case OVERWORLD -> {
                 material = Material.getMaterial(cm.getString("items.world_change.overworld_item"));
-                name = isInWorld ? cm.getString("items.world_change.overworld_name") + "<dark_gray>[Aktuell]" : cm.getString("items.world_change.overworld_name");
+                name = isInWorld ? cm.getString("items.world_change.overworld_name") + current : cm.getString("items.world_change.overworld_name");
             }
             case NETHER -> {
                 material = Material.getMaterial(cm.getString("items.world_change.nether_item"));
-                name = isInWorld ? cm.getString("items.world_change.nether_name") + "<dark_gray>[Aktuell]" : cm.getString("items.world_change.nether_name");
+                name = isInWorld ? cm.getString("items.world_change.nether_name") + current : cm.getString("items.world_change.nether_name");
             }
             case END -> {
                 material = Material.getMaterial(cm.getString("items.world_change.end_item"));
-                name = isInWorld ? cm.getString("items.world_change.endd_name") + "<dark_gray>[Aktuell]" : cm.getString("items.world_change.end_name");
+                name = isInWorld ? cm.getString("items.world_change.endd_name") + current : cm.getString("items.world_change.end_name");
             }
             case null, default -> {
                 material = Material.BARRIER;
@@ -104,6 +111,84 @@ public class NavigatorMenu extends Menu {
             player.teleport(targetLoc);
             player.closeInventory();
             user.playSound("success");
+        }));
+    }
+
+    private void setLocationOverview(int slot) {
+        var cm = plugin.getServiceManager().getConfigManager();
+        Material material = Material.getMaterial(plugin.getServiceManager().getConfigManager().getString("items.location_overview.item"));
+
+        if (material == null) {
+            material = Material.BARRIER;
+        }
+
+        ItemStack item = new ItemStack(material);
+
+        // TODO: Implement location objects
+        int location_count = 23;
+
+        item.editMeta(meta -> {
+            meta.displayName(mm.deserialize(plugin.getServiceManager().getConfigManager().getString("items.location_overview.name")));
+            meta.lore(cm.getStringList("items.location_overview.description").stream()
+                    .map(line -> line.replace("{location_count}", location_count > 0 ? "<white>" + location_count : "<#f90036>" + location_count))
+                    .map(mm::deserialize)
+                    .toList());
+        });
+
+        setItem(slot, item, ((user, event) -> {
+            user.playSound("pling");
+            user.openInventory(InventoryType.LOCATION_OVERVIEW, InventoryType.NAVIGATOR);
+        }));
+    }
+
+    private void setPlayerOverview(int slot) {
+        var cm = plugin.getServiceManager().getConfigManager();
+        Material material = Material.getMaterial(plugin.getServiceManager().getConfigManager().getString("items.player_overview.item"));
+
+        if (material == null) {
+            material = Material.BARRIER;
+        }
+
+        ItemStack item = new ItemStack(material);
+
+        // TODO: Implement player objects
+        int player_count = 46;
+
+        item.editMeta(meta -> {
+            meta.displayName(mm.deserialize(plugin.getServiceManager().getConfigManager().getString("items.player_overview.name")));
+            meta.lore(cm.getStringList("items.player_overview.description").stream()
+                    .map(line -> line.replace("{player_count}", player_count > 0 ? "<white>" + player_count : "<#f90036>" + player_count))
+                    .map(mm::deserialize)
+                    .toList());
+        });
+
+        setItem(slot, item, ((user, event) -> {
+            user.playSound("pling");
+            user.openInventory(InventoryType.PLAYER_OVERVIEW, InventoryType.NAVIGATOR);
+        }));
+    }
+
+    private void setProjectOverview(int slot) {
+        var cm = plugin.getServiceManager().getConfigManager();
+        Material material = Material.getMaterial(plugin.getServiceManager().getConfigManager().getString("items.project_overview.item"));
+
+        if (material == null) {
+            material = Material.BARRIER;
+        }
+
+        ItemStack item = new ItemStack(material);
+
+
+        item.editMeta(meta -> {
+            meta.displayName(mm.deserialize(plugin.getServiceManager().getConfigManager().getString("items.project_overview.name")));
+            meta.lore(cm.getStringList("items.project_overview.description").stream()
+                    .map(mm::deserialize)
+                    .toList());
+        });
+
+        setItem(slot, item, ((user, event) -> {
+            user.playSound("pling");
+            user.openInventory(InventoryType.PROJECT_INFO, InventoryType.NAVIGATOR);
         }));
     }
 

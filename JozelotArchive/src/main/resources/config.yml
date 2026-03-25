@@ -55,6 +55,15 @@ items:
   back_arrow:
     name: '<!italic><gray>Zurück'
 
+  previous_page:
+    name: '<!italic><gray>Letzte Seite'
+
+  next_page:
+    name: '<!italic><gray>Nächste Seite'
+
+  current_page:
+    name: '<!italic><gray>Seite '
+
   spawn_button:
     name: '<!italic><gold>Spawn'
     item: MAGMA_CREAM
@@ -67,9 +76,49 @@ items:
     nether_name: "<!italic><white>Nether"
     end_name: "<!italic><white>End"
     lore:
+      - ""
       - "<!italic><gray>Klicke um dich in diese"
       - "<!italic><gray>Welt zu teleportieren"
 
+  location_overview:
+    name: '<!italic><blue>Locations'
+    item: DECORATED_POT
+    slot: 21
+    description:
+      - ""
+      - "<!italic><gray>Hier siehst du eine"
+      - "<!italic><gray>Übersicht über alle wichtigen"
+      - "<!italic><gray>Orte dieses Projektes"
+      - ""
+      - "<!italic><dark_gray>» <gray>Anzahl: <white>{location_count}"
+
+  player_overview:
+    name: '<!italic><red>Spieler'
+    item: ARMOR_STAND
+    slot: 23
+    description:
+      - ""
+      - "<!italic><gray>Hier siehst du eine"
+      - "<!italic><gray>Übersicht über alle Spieler"
+      - "<!italic><gray>dieses Projektes"
+      - ""
+      - "<!italic><dark_gray>» <gray>Anzahl: <white>{player_count}"
+
+
+  project_overview:
+    name: '<!italic><gold>Projekt Informationen'
+    item: LECTERN
+    slot: 13
+    description:
+      - ""
+      - "<!italic><gray>Hier siehst du alle"
+      - "<!italic><gray>wichtigen Informationen"
+      - "<!italic><gray>zu diesem Projekt"
+      - ""
+      - "<!italic><dark_gray>» <gray>Name: <white>EventAttack"
+      - "<!italic><dark_gray>» <gray>Jahr: <white>Winter 2024"
+      - "<!italic><dark_gray>» <gray>Owner: <white>TFJ"
+      - "<!italic><dark_gray>» <gray>Hoster: <white>RedWolf"
 
 inventories:
   navigator:

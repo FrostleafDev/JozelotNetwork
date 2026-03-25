@@ -8,8 +8,8 @@ public enum InventoryType {
     PLAYER_INFO,
     PLAYER_OVERVIEW,
 
-    POI_INFO,
-    POI_OVERVIEW,
+    LOCATION_INFO,
+    LOCATION_OVERVIEW,
 
-    SERVER_INFO,
+    PROJECT_INFO;
 }

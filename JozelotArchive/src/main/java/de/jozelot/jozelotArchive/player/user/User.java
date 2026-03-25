@@ -93,15 +93,17 @@ public class User
         openInventory(type, null, null);
     }
 
+    public void openInventory(InventoryType type, InventoryType previousType) {
+        openInventory(type, previousType, null);
+    }
+
     public void openInventory(InventoryType type, InventoryType previousType, Object data) {
         MenuManager mm = plugin.getServiceManager().getMenuManager();
 
         Menu menu = mm.createMenu(type, getPlayer(), data);
 
         if (menu != null) {
-            Menu previousMenu = (previousType != null) ? mm.createMenu(previousType, getPlayer(), null) : null;
-
-            menu.open(this);
+            menu.open(this, previousType);
         }
     }
 
