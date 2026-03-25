@@ -23,17 +23,17 @@ This repository acts as the central place for all parts of the network, includin
 _A more detailed breakdown will be added as the project evolves._
 
 ## Project Status
-> **JozelotProxy:** `In Development`
+> **JozelotProxy:** `Mostly finished`
 >
 > **JozelotWebsite:** `Not started`
 > 
-> **JozelotLobby:** `In Developement`
+> **JozelotLobby:** `Finished`
 >
 > **JozelotArchiv:** `In Developement`
 >
 > **JozelotDuels:** `In Developement`
 > 
-> **JozelotUtility:** `In Developement`
+> **JozelotUtility:** `Finished`
 
 ## Details
 > Proxy: Velocity `3.4.0-SNAPSHOT`  
