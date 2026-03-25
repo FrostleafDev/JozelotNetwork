@@ -21,13 +21,14 @@ public class NavigatorMenu extends Menu {
     @Override
     public void setupItems(User user, Menu previousInventory) {
         int size = getInventory().getSize();
+        WorldType type = WorldType.fromWorld(user.getPlayer().getWorld());
 
         setFiller(user, size);
         setBackButton(size - 9, user, previousInventory);
         setSpawnButton(size - 5);
-        setWorldChangeButton(9, WorldType.OVERWORLD);
-        setWorldChangeButton(18, WorldType.NETHER);
-        setWorldChangeButton(27, WorldType.END);
+        setWorldChangeButton(9, WorldType.OVERWORLD, type);
+        setWorldChangeButton(18, WorldType.NETHER, type);
+        setWorldChangeButton(27, WorldType.END, type);
     }
 
     private void setSpawnButton(int slot) {
@@ -51,8 +52,9 @@ public class NavigatorMenu extends Menu {
         }));
     }
 
-    private void setWorldChangeButton(int slot, WorldType type) {
+    private void setWorldChangeButton(int slot, WorldType type, WorldType currentType) {
         var cm = plugin.getServiceManager().getConfigManager();
+        boolean isInWorld = type == currentType;
 
         Material material;
         String name;
@@ -60,15 +62,15 @@ public class NavigatorMenu extends Menu {
         switch (type) {
             case OVERWORLD -> {
                 material = Material.getMaterial(cm.getString("items.world_change.overworld_item"));
-                name = cm.getString("items.world_change.overworld_name");
+                name = isInWorld ? cm.getString("items.world_change.overworld_name") + "<dark_gray>[Aktuell]" : cm.getString("items.world_change.overworld_name");
             }
             case NETHER -> {
                 material = Material.getMaterial(cm.getString("items.world_change.nether_item"));
-                name = cm.getString("items.world_change.nether_name");
+                name = isInWorld ? cm.getString("items.world_change.nether_name") + "<dark_gray>[Aktuell]" : cm.getString("items.world_change.nether_name");
             }
             case END -> {
                 material = Material.getMaterial(cm.getString("items.world_change.end_item"));
-                name = cm.getString("items.world_change.end_name");
+                name = isInWorld ? cm.getString("items.world_change.endd_name") + "<dark_gray>[Aktuell]" : cm.getString("items.world_change.end_name");
             }
             case null, default -> {
                 material = Material.BARRIER;
@@ -146,4 +148,13 @@ enum WorldType {
     OVERWORLD,
     NETHER,
     END;
+
+    public static WorldType fromWorld(World world) {
+        return switch (world.getEnvironment()) {
+            case NORMAL -> OVERWORLD;
+            case NETHER -> NETHER;
+            case THE_END -> END;
+            default -> null;
+        };
+    }
 }

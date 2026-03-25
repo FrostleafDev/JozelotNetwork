@@ -1,0 +1,12 @@
+name: JozelotArchive
+version: '1.0.0'
+main: de.jozelot.jozelotArchive.JozelotArchive
+api-version: '1.21'
+authors: [ jozelot_, Ultraplayer_1239]
+description: Archiv Plugin für jozelot.de - Bereitgestellt von jozelot_
+website: https://jozelot.de
+depend: [LuckPerms]
+softdepend: [WorldEdit, FastAsyncWorldEdit]
+
+commands:
+  openmenu:

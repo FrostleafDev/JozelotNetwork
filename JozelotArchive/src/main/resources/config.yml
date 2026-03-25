@@ -62,7 +62,7 @@ items:
   world_change:
     overworld_item: GRASS_BLOCK
     nether_item: NETHERRACK
-    end_item: ENDSTONE
+    end_item: END_STONE
     overworld_name: "<!italic><white>Overworld"
     nether_name: "<!italic><white>Nether"
     end_name: "<!italic><white>End"
