@@ -171,6 +171,28 @@ public class MySQLManager {
                         "PRIMARY KEY (player_uuid, server_id)," +
                         "FOREIGN KEY (player_uuid) REFERENCES player(uuid) ON DELETE CASCADE," +
                         "FOREIGN KEY (server_id) REFERENCES server(id) ON DELETE CASCADE" +
+                        ");",
+
+                "CREATE TABLE IF NOT EXISTS archive_locations (" +
+                        "id INT AUTO_INCREMENT PRIMARY KEY," +
+                        "server_id INT," +
+                        "type VARCHAR(32)," +
+                        "name VARCHAR(64)," +
+                        "description TEXT," +
+                        "owner_uuid CHAR(36)," +
+                        "world_name VARCHAR(32)," +
+                        "min_x DOUBLE, min_y DOUBLE, min_z DOUBLE," +
+                        "max_x DOUBLE, max_y DOUBLE, max_z DOUBLE," +
+                        "INDEX (server_id)," +
+                        "FOREIGN KEY (server_id) REFERENCES server(id) ON DELETE CASCADE" +
+                        ");",
+
+                "CREATE TABLE IF NOT EXISTS archive_location_members (" +
+                        "location_id INT," +
+                        "player_uuid CHAR(36)," +
+                        "PRIMARY KEY (location_id, player_uuid)," +
+                        "FOREIGN KEY (location_id) REFERENCES archive_locations(id) ON DELETE CASCADE," +
+                        "FOREIGN KEY (player_uuid) REFERENCES player(uuid) ON DELETE CASCADE" +
                         ");"
         };
 

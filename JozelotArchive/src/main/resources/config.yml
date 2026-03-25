@@ -124,3 +124,10 @@ inventories:
   navigator:
     title: "Navigator"
     size: 45
+  location_overview:
+    title: "Location Übersicht"
+    size: 45
+
+  player_overview:
+    title: "Spieler Übersicht"
+    size: 45

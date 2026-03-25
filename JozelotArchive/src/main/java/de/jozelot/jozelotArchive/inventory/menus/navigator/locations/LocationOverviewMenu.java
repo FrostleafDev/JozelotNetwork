@@ -19,7 +19,7 @@ public class LocationOverviewMenu extends Menu {
     private int maxPage;
 
     public LocationOverviewMenu(JozelotArchive plugin) {
-        super(plugin, plugin.getServiceManager().getConfigManager().getInt("inventories.navigator.size"), plugin.getServiceManager().getConfigManager().getString("inventories.navigator.title"));
+        super(plugin, plugin.getServiceManager().getConfigManager().getInt("inventories.location_overview.size"), plugin.getServiceManager().getConfigManager().getString("inventories.location_overview.title"));
         currentPage = 0;
         maxPage = 5;
     }
@@ -31,12 +31,12 @@ public class LocationOverviewMenu extends Menu {
 
         setFiller(user, size);
         setBackButton(size - 9, user, previousInventory);
-        updatePage(user);
+        setNavigationItems(user, size - 6, size - 5, size - 4);
     }
 
     private void updatePage(User user) {
         int size = getInventory().getSize();
-        setNavigationItems(user, size - 6, size - 5, size - 4);
+        setCurrentArrow(user, size - 5);
     }
 
     private void setNavigationItems(User user, int backSlot, int currentSlot, int nextSlot) {
