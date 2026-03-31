@@ -3,6 +3,7 @@ package de.jozelot.jozelotArchive.inventory.menus;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
 import de.jozelot.jozelotArchive.JozelotArchive;
+import de.jozelot.jozelotArchive.player.user.Sound;
 import de.jozelot.jozelotArchive.player.user.User;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
@@ -81,7 +82,7 @@ public abstract class Menu implements InventoryHolder {
             } else {
                 user.getPlayer().closeInventory();
             }
-            user.playSound("pling");
+            user.playSound(Sound.PLING);
         });
     }
 

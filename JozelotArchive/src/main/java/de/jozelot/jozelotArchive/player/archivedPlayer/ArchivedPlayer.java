@@ -22,7 +22,7 @@ public class ArchivedPlayer {
     private final double x, y, z;
     private final float yaw, pitch;
 
-    public ArchivedPlayer(UUID uuid, String name, String skinValue, String skinSignature,
+    protected ArchivedPlayer(UUID uuid, String name, String skinValue, String skinSignature,
                           ItemStack[] inventory, ItemStack[] armor, ItemStack[] enderChest,
                           String worldName, double x, double y, double z, float yaw, float pitch) {
         this.uuid = uuid;
@@ -47,5 +47,49 @@ public class ArchivedPlayer {
 
     private void despawn() {
 
+    }
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public ItemStack[] getInventory() {
+        return inventory;
+    }
+
+    public ItemStack[] getArmor() {
+        return armor;
+    }
+
+    public ItemStack[] getEnderChest() {
+        return enderChest;
+    }
+
+    public String getWorldName() {
+        return worldName;
+    }
+
+    public double getX() {
+        return x;
+    }
+
+    public double getZ() {
+        return z;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    public float getYaw() {
+        return yaw;
+    }
+
+    public float getPitch() {
+        return pitch;
     }
 }

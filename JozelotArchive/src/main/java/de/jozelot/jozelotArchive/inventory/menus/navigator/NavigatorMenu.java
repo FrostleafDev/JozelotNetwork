@@ -4,6 +4,7 @@ import de.jozelot.jozelotArchive.JozelotArchive;
 import de.jozelot.jozelotArchive.inventory.hotbar.HotbarItem;
 import de.jozelot.jozelotArchive.inventory.menus.InventoryType;
 import de.jozelot.jozelotArchive.inventory.menus.Menu;
+import de.jozelot.jozelotArchive.player.user.Sound;
 import de.jozelot.jozelotArchive.player.user.User;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -54,7 +55,7 @@ public class NavigatorMenu extends Menu {
             Player player = user.getPlayer();
             player.closeInventory();
             player.performCommand("spawn");
-            user.playSound("success");
+            user.playSound(Sound.SUCCESS);
         }));
     }
 
@@ -99,7 +100,7 @@ public class NavigatorMenu extends Menu {
             World.Environment currentEnv = currentWorld.getEnvironment();
 
             if (isSameDimension(currentEnv, type)) {
-                user.playSound("error");
+                user.playSound(Sound.ERROR);
                 return;
             }
 
@@ -110,7 +111,7 @@ public class NavigatorMenu extends Menu {
 
             player.teleport(targetLoc);
             player.closeInventory();
-            user.playSound("success");
+            user.playSound(Sound.SUCCESS);
         }));
     }
 
@@ -124,8 +125,7 @@ public class NavigatorMenu extends Menu {
 
         ItemStack item = new ItemStack(material);
 
-        // TODO: Implement location objects
-        int location_count = 23;
+        int location_count = plugin.getServiceManager().getLocationManager().getLocationCount();
 
         item.editMeta(meta -> {
             meta.displayName(mm.deserialize(plugin.getServiceManager().getConfigManager().getString("items.location_overview.name")));
@@ -136,7 +136,7 @@ public class NavigatorMenu extends Menu {
         });
 
         setItem(slot, item, ((user, event) -> {
-            user.playSound("pling");
+            user.playSound(Sound.PLING);
             user.openInventory(InventoryType.LOCATION_OVERVIEW, InventoryType.NAVIGATOR);
         }));
     }
@@ -163,7 +163,7 @@ public class NavigatorMenu extends Menu {
         });
 
         setItem(slot, item, ((user, event) -> {
-            user.playSound("pling");
+            user.playSound(Sound.PLING);
             user.openInventory(InventoryType.PLAYER_OVERVIEW, InventoryType.NAVIGATOR);
         }));
     }
@@ -187,7 +187,7 @@ public class NavigatorMenu extends Menu {
         });
 
         setItem(slot, item, ((user, event) -> {
-            user.playSound("pling");
+            user.playSound(Sound.PLING);
             user.openInventory(InventoryType.PROJECT_INFO, InventoryType.NAVIGATOR);
         }));
     }

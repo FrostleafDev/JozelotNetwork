@@ -105,13 +105,17 @@ public class LobbyPlayerDatabase {
 
     public void setSetting(LobbyPlayer player, Setting setting, String value) {
         UUID uuid = player.getUuid();
+
+        // Uppercase Key
+        String key = setting.getKey().toUpperCase();
+
         if (setting.getDefaultValue().equalsIgnoreCase(value)) {
             String sql = "DELETE FROM player_settings WHERE uuid = ? AND setting_key = ?;";
 
             try (Connection conn = plugin.getMySQLSetup().getConnection();
                  PreparedStatement deleteStmt = conn.prepareStatement(sql)) {
                 deleteStmt.setString(1, uuid.toString());
-                deleteStmt.setString(2, setting.getKey());
+                deleteStmt.setString(2, key); // Nutzen des Uppercase Keys
                 deleteStmt.executeUpdate();
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -120,13 +124,13 @@ public class LobbyPlayerDatabase {
         }
 
         String sql = "INSERT INTO player_settings (uuid, setting_key, setting_value) VALUES (?, ?, ?) " +
-                "ON DUPLICATE KEY UPDATE settings_value = VALUES(setting_value);";
+                "ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value);";
 
         try (Connection conn = plugin.getMySQLSetup().getConnection();
              PreparedStatement insertStmt = conn.prepareStatement(sql)) {
 
             insertStmt.setString(1, uuid.toString());
-            insertStmt.setString(2, setting.getKey());
+            insertStmt.setString(2, key); // Uppercase
             insertStmt.setString(3, value);
 
             insertStmt.executeUpdate();
@@ -153,24 +157,21 @@ public class LobbyPlayerDatabase {
                 for (Map.Entry<Setting, String> entry : settingStringMap.entrySet()) {
                     Setting setting = entry.getKey();
                     String value = entry.getValue();
+                    String key = setting.getKey().toUpperCase(); // Uppercase
 
                     if (setting.getDefaultValue().equalsIgnoreCase(value)) {
-                        // Zum Löschen vormerken
                         deleteStmt.setString(1, uuidStr);
-                        deleteStmt.setString(2, setting.getKey());
+                        deleteStmt.setString(2, key);
                         deleteStmt.addBatch();
                     } else {
-                        // Zum Speichern vormerken
                         insertStmt.setString(1, uuidStr);
-                        insertStmt.setString(2, setting.getKey());
+                        insertStmt.setString(2, key);
                         insertStmt.setString(3, value);
                         insertStmt.addBatch();
                     }
                 }
-
                 insertStmt.executeBatch();
                 deleteStmt.executeBatch();
-
                 conn.commit();
             } catch (SQLException e) {
                 conn.rollback();
@@ -200,7 +201,7 @@ public class LobbyPlayerDatabase {
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    String key = rs.getString("setting_key");
+                    String key = rs.getString("setting_key").toUpperCase();
                     String value = rs.getString("setting_value");
 
                     Setting setting = Setting.fromKey(key);
@@ -228,42 +229,36 @@ public class LobbyPlayerDatabase {
 
         try (Connection conn = plugin.getMySQLSetup().getConnection()) {
             conn.setAutoCommit(false);
-
             try (PreparedStatement hiderStmt = conn.prepareStatement(sqlHider);
                  PreparedStatement insertSetStmt = conn.prepareStatement(sqlInsertSetting);
                  PreparedStatement deleteSetStmt = conn.prepareStatement(sqlDeleteSetting)) {
 
                 for (LobbyPlayer lp : players) {
                     String uuidStr = lp.getUuid().toString();
-
-                    // 1. Hider State zum Batch hinzufügen
                     hiderStmt.setString(1, uuidStr);
                     hiderStmt.setString(2, lp.getHiderState().name());
                     hiderStmt.addBatch();
 
-                    // 2. Alle Settings des Spielers durchgehen
                     for (Map.Entry<Setting, String> entry : lp.getSettings().entrySet()) {
                         Setting setting = entry.getKey();
                         String value = entry.getValue();
+                        String key = setting.getKey().toUpperCase(); // Uppercase
 
                         if (setting.getDefaultValue().equalsIgnoreCase(value)) {
                             deleteSetStmt.setString(1, uuidStr);
-                            deleteSetStmt.setString(2, setting.getKey());
+                            deleteSetStmt.setString(2, key);
                             deleteSetStmt.addBatch();
                         } else {
                             insertSetStmt.setString(1, uuidStr);
-                            insertSetStmt.setString(2, setting.getKey());
+                            insertSetStmt.setString(2, key);
                             insertSetStmt.setString(3, value);
                             insertSetStmt.addBatch();
                         }
                     }
                 }
-
-                // Alles abschicken
                 hiderStmt.executeBatch();
                 insertSetStmt.executeBatch();
                 deleteSetStmt.executeBatch();
-
                 conn.commit();
             } catch (SQLException e) {
                 conn.rollback();

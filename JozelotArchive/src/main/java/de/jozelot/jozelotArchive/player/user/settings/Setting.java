@@ -1,8 +1,12 @@
 package de.jozelot.jozelotArchive.player.user.settings;
 
+import de.jozelot.jozelotArchive.inventory.menus.navigator.player.PlayerSort;
+
 public enum Setting {
 
-    COLOR_PREFERENCE("color_preference", "WHITE");
+    COLOR_PREFERENCE("color_preference", "WHITE"),
+    PLAYER_SORT("player_sort", "NAME"),
+    LOCATION_SORT("location_sort", "NAME");
 
     private final String key;
     private final String defaultValue;

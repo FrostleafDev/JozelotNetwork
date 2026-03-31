@@ -7,6 +7,7 @@ import de.jozelot.jozelotArchive.core.database.redis.RedisManager;
 import de.jozelot.jozelotArchive.core.database.sql.SQLConnection;
 import de.jozelot.jozelotArchive.inventory.hotbar.HotbarManager;
 import de.jozelot.jozelotArchive.inventory.menus.MenuManager;
+import de.jozelot.jozelotArchive.location.LocationManager;
 import de.jozelot.jozelotArchive.player.user.UserManager;
 import de.jozelot.jozelotArchive.player.user.UserDatabase;
 import de.jozelot.jozelotArchive.registry.CommandRegistry;
@@ -39,6 +40,7 @@ public class ServiceManager {
     private MenuManager menuManager;
     private UserDatabase userDatabase;
     private HotbarManager hotbarManager;
+    private LocationManager locationManager;
 
     public ServiceManager(JozelotArchive plugin) {
         this.plugin = plugin;
@@ -81,6 +83,7 @@ public class ServiceManager {
         this.menuManager = new MenuManager(plugin);
         this.userDatabase = new UserDatabase(plugin);
         this.hotbarManager = new HotbarManager(plugin);
+        this.locationManager = new LocationManager(plugin);
     }
 
     public void enable() {
@@ -95,6 +98,7 @@ public class ServiceManager {
         commandRegistry.register();
         menuManager.registerMenus();
         hotbarManager.registerItems();
+        locationManager.loadLocations();
 
         fileSystemManager.archivePlayerFiles();
     }
@@ -171,5 +175,9 @@ public class ServiceManager {
 
     public HotbarManager getHotbarManager() {
         return hotbarManager;
+    }
+
+    public LocationManager getLocationManager() {
+        return locationManager;
     }
 }

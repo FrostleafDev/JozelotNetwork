@@ -5,6 +5,7 @@ import com.destroystokyo.paper.profile.ProfileProperty;
 import de.jozelot.jozelotArchive.JozelotArchive;
 import de.jozelot.jozelotArchive.inventory.menus.InventoryType;
 import de.jozelot.jozelotArchive.inventory.menus.Menu;
+import de.jozelot.jozelotArchive.player.user.Sound;
 import de.jozelot.jozelotArchive.player.user.User;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -17,6 +18,7 @@ public class PlayerOverviewMenu extends Menu {
 
     private int currentPage;
     private int maxPage;
+    private PlayerSort sort;
 
     public PlayerOverviewMenu(JozelotArchive plugin) {
         super(plugin, plugin.getServiceManager().getConfigManager().getInt("inventories.player_overview.size"), plugin.getServiceManager().getConfigManager().getString("inventories.player_overview.title"));
@@ -61,10 +63,10 @@ public class PlayerOverviewMenu extends Menu {
 
         setItem(slot, item, ((user, event) -> {
             if (currentPage == 0) {
-                user.playSound("error");
+                user.playSound(Sound.ERROR);
                 return;
             }
-            user.playSound("pling");
+            user.playSound(Sound.PLING);
             currentPage -= 1;
             updatePage(user);
         }));
@@ -86,10 +88,10 @@ public class PlayerOverviewMenu extends Menu {
 
         setItem(slot, item, ((user, event) -> {
             if (currentPage == maxPage) {
-                user.playSound("error");
+                user.playSound(Sound.ERROR);
                 return;
             }
-            user.playSound("pling");
+            user.playSound(Sound.PLING);
             currentPage += 1;
             updatePage(user);
         }));

@@ -3,6 +3,7 @@ package de.jozelot.jozelotArchive.inventory.hotbar.items;
 import de.jozelot.jozelotArchive.JozelotArchive;
 import de.jozelot.jozelotArchive.inventory.hotbar.HotbarItem;
 import de.jozelot.jozelotArchive.inventory.hotbar.HotbarItemType;
+import de.jozelot.jozelotArchive.player.user.Sound;
 import de.jozelot.jozelotArchive.player.user.User;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -51,7 +52,7 @@ public class GameModeChangerItem extends HotbarItem {
 
         Material material = event.getItem().getType();
         user.getPlayer().setCooldown(material, 20);
-        user.playSound("pling");
+        user.playSound(Sound.PLING);
         user.updateItem(HotbarItemType.GAMEMODE_CHANGER);
     }
 

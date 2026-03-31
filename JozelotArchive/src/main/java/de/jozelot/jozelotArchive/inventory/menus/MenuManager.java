@@ -2,9 +2,11 @@ package de.jozelot.jozelotArchive.inventory.menus;
 
 import de.jozelot.jozelotArchive.JozelotArchive;
 import de.jozelot.jozelotArchive.inventory.menus.navigator.NavigatorMenu;
+import de.jozelot.jozelotArchive.inventory.menus.navigator.locations.LocationMenu;
 import de.jozelot.jozelotArchive.inventory.menus.navigator.locations.LocationOverviewMenu;
 import de.jozelot.jozelotArchive.inventory.menus.navigator.player.PlayerOverviewMenu;
 import de.jozelot.jozelotArchive.inventory.menus.navigator.project.ProjectMenu;
+import de.jozelot.jozelotArchive.location.Location;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -27,6 +29,10 @@ public class MenuManager {
         menuFactory.clear();
         menuFactory.put(InventoryType.NAVIGATOR, (player, data) -> new NavigatorMenu(plugin));
         menuFactory.put(InventoryType.LOCATION_OVERVIEW, (player, data) -> new LocationOverviewMenu(plugin));
+        menuFactory.put(InventoryType.LOCATION_INFO, (player, data) -> {
+            Location location = (Location) data;
+            return new LocationMenu(plugin, location);
+        });
         menuFactory.put(InventoryType.PLAYER_OVERVIEW, (player, data) -> new PlayerOverviewMenu(plugin));
         menuFactory.put(InventoryType.PROJECT_INFO, (player, data) -> new ProjectMenu(plugin));
 

@@ -17,7 +17,7 @@ public class Location {
 
     private final int id;
 
-    public Location(int id, @NotNull LocationType type, @NotNull String name, String description, ArchivedPlayer owner, Set<ArchivedPlayer> members, @NotNull LocationArea area) {
+    protected Location(int id, @NotNull LocationType type, @NotNull String name, String description, ArchivedPlayer owner, Set<ArchivedPlayer> members, @NotNull LocationArea area) {
         this.id = id;
         this.type = type;
         this.name = name;
@@ -90,5 +90,10 @@ public class Location {
 
     public int getId() {
         return id;
+    }
+
+    public double getSize() {
+        if (area == null) return 0;
+        return area.getVolume();
     }
 }

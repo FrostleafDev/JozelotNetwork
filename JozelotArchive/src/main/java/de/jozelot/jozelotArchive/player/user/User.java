@@ -6,6 +6,8 @@ import de.jozelot.jozelotArchive.inventory.hotbar.items.HiderState;
 import de.jozelot.jozelotArchive.inventory.menus.InventoryType;
 import de.jozelot.jozelotArchive.inventory.menus.Menu;
 import de.jozelot.jozelotArchive.inventory.menus.MenuManager;
+import de.jozelot.jozelotArchive.inventory.menus.navigator.locations.LocationSort;
+import de.jozelot.jozelotArchive.inventory.menus.navigator.player.PlayerSort;
 import de.jozelot.jozelotArchive.player.user.settings.ColorPreference;
 import de.jozelot.jozelotArchive.player.user.settings.Setting;
 import de.jozelot.jozelotArchive.utility.LuckPermsUtils;
@@ -16,6 +18,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
+import javax.swing.plaf.PanelUI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -111,7 +114,9 @@ public class User
      * Cycles the players gamemode from survival to spectator
      * @return the gamemode after the change
      */
-    @Deprecated
+    @Deprecated(
+            forRemoval = true
+    )
     public GameMode cycleGameMode() {
         Player player = getPlayer();
         GameMode nextGameMode = player.getGameMode() == GameMode.SPECTATOR ? GameMode.SURVIVAL : GameMode.SPECTATOR;
@@ -119,19 +124,23 @@ public class User
         player.setGameMode(nextGameMode);
         player.setAllowFlight(true);
         player.setFlying(true);
-        playSound("pling");
+        playSound(de.jozelot.jozelotArchive.player.user.Sound.PLING);
         lastGameModeSwap = System.currentTimeMillis();
 
         sendGameModeActionBar();
         return nextGameMode;
     }
 
-    @Deprecated
+    @Deprecated(
+            forRemoval = true
+    )
     public boolean canGameModeSwap() {
         return lastGameModeSwap < System.currentTimeMillis() - 1000;
     }
 
-    @Deprecated
+    @Deprecated(
+            forRemoval = true
+    )
     public void sendGameModeActionBar() {
         getPlayer().sendActionBar(mm.deserialize(plugin.getServiceManager().getLangManager().format("archive-gamemode-hotkey-info",
                 Map.of("gamemode", getPlayer().getGameMode() == GameMode.SPECTATOR ? "Survival" : "Specator")
@@ -168,6 +177,55 @@ public class User
         }
     }
 
+    public void playSound(de.jozelot.jozelotArchive.player.user.Sound sound) {
+        String soundKey = sound.name().toLowerCase();
+        playSound(soundKey);
+    }
+
+    public ColorPreference getColor() {
+        String colorValue = getRawSetting(Setting.COLOR_PREFERENCE);
+        ColorPreference pref = ColorPreference.getByName(colorValue);
+        return (pref != null) ? pref : ColorPreference.WHITE;
+    }
+
+    public LocationSort getLocationSort() {
+        String sortValue = getRawSetting(Setting.LOCATION_SORT);
+        LocationSort pref = LocationSort.getByName(sortValue);
+        return (pref != null) ? pref : LocationSort.NAME;
+    }
+
+    public PlayerSort getPlayerSort() {
+        String sortValue = getRawSetting(Setting.PLAYER_SORT);
+        PlayerSort pref = PlayerSort.getByName(sortValue);
+        return (pref != null) ? pref : PlayerSort.NAME;
+    }
+
+    public void toggleLocationSort() {
+        LocationSort current = getLocationSort();
+        LocationSort next = current.next();
+
+        setSetting(Setting.LOCATION_SORT, next.name());
+
+        saveSettingAsync(Setting.LOCATION_SORT, next.name());
+    }
+
+    public void togglePlayerSort() {
+        PlayerSort current = getPlayerSort();
+        PlayerSort next = current.next();
+
+        setSetting(Setting.PLAYER_SORT, next.name());
+
+        saveSettingAsync(Setting.PLAYER_SORT, next.name());
+    }
+
+    private void saveSettingAsync(Setting setting, String value) {
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            plugin.getServiceManager().getUserDatabase().updateSetting(uuid, setting, value);
+        });
+    }
+
+
+
     public String getRawSetting(Setting setting) {
         return settings.getOrDefault(setting, setting.getDefaultValue());
     }
@@ -178,12 +236,6 @@ public class User
 
     public int getInt(Setting setting) {
         return Integer.parseInt(getRawSetting(setting));
-    }
-
-    public ColorPreference getColor() {
-        String colorValue = getRawSetting(Setting.COLOR_PREFERENCE);
-        ColorPreference pref = ColorPreference.getByName(colorValue);
-        return (pref != null) ? pref : ColorPreference.WHITE;
     }
 
     public void setSetting(Setting setting, String value) {
@@ -198,7 +250,6 @@ public class User
         return settings;
     }
 
-    // GETTER AND SETTER STUFF
     public UUID getUniqueId() {
         return uuid;
     }

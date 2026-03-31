@@ -3,6 +3,7 @@ package de.jozelot.jozelotArchive.inventory.hotbar.items;
 import de.jozelot.jozelotArchive.JozelotArchive;
 import de.jozelot.jozelotArchive.inventory.hotbar.HotbarItem;
 import de.jozelot.jozelotArchive.inventory.hotbar.HotbarItemType;
+import de.jozelot.jozelotArchive.player.user.Sound;
 import de.jozelot.jozelotArchive.player.user.User;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -82,7 +83,7 @@ public class PlayerHiderItem extends HotbarItem {
     @Override
     public void onInteract(User user, PlayerInteractEvent event) {
         event.setCancelled(true);
-        user.playSound("pling");
+        user.playSound(Sound.PLING);
 
         user.getPlayer().setCooldown(event.getMaterial(), 20);
         user.toggleHider();

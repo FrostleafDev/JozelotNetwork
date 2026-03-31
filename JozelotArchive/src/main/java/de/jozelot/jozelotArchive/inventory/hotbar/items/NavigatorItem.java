@@ -3,6 +3,7 @@ package de.jozelot.jozelotArchive.inventory.hotbar.items;
 import de.jozelot.jozelotArchive.JozelotArchive;
 import de.jozelot.jozelotArchive.inventory.hotbar.HotbarItem;
 import de.jozelot.jozelotArchive.inventory.menus.InventoryType;
+import de.jozelot.jozelotArchive.player.user.Sound;
 import de.jozelot.jozelotArchive.player.user.User;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -42,7 +43,7 @@ public class NavigatorItem extends HotbarItem {
     @Override
     public void onInteract(User user, PlayerInteractEvent event) {
         user.openInventory(InventoryType.NAVIGATOR);
-        user.playSound("pling");
+        user.playSound(Sound.PLING);
         event.setCancelled(true);
     }
 

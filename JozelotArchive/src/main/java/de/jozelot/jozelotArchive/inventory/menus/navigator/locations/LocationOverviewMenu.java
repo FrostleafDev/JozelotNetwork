@@ -5,23 +5,48 @@ import com.destroystokyo.paper.profile.ProfileProperty;
 import de.jozelot.jozelotArchive.JozelotArchive;
 import de.jozelot.jozelotArchive.inventory.menus.InventoryType;
 import de.jozelot.jozelotArchive.inventory.menus.Menu;
+import de.jozelot.jozelotArchive.location.Location;
+import de.jozelot.jozelotArchive.player.archivedPlayer.ArchivedPlayer;
+import de.jozelot.jozelotArchive.player.user.Sound;
 import de.jozelot.jozelotArchive.player.user.User;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.UUID;
 
 public class LocationOverviewMenu extends Menu {
 
     private int currentPage;
     private int maxPage;
+    private LocationSort sort;
+    private long lastClickPage = 0;
+    private long lastClickSort = 0;
+
+    private final long PAGE_COOLDOWN = 100;
+    private final long SORT_COOLDOWN = 100;
 
     public LocationOverviewMenu(JozelotArchive plugin) {
-        super(plugin, plugin.getServiceManager().getConfigManager().getInt("inventories.location_overview.size"), plugin.getServiceManager().getConfigManager().getString("inventories.location_overview.title"));
+        super(plugin, calculateSize(plugin), plugin.getServiceManager().getConfigManager().getString("inventories.location_overview.title"));
         currentPage = 0;
-        maxPage = 5;
+
+        int locations = plugin.getServiceManager().getLocationManager().getLocationCount();
+        this.maxPage = Math.max(0, (locations - 1) / 36);
+    }
+
+    private static int calculateSize(JozelotArchive plugin) {
+        int locations = plugin.getServiceManager().getLocationManager().getLocationCount();
+
+        int neededSlots = locations + 18;
+
+        int rows = (int) Math.ceil(neededSlots / 9.0);
+
+        return Math.min(6, Math.max(3, rows)) * 9;
     }
 
     @Override
@@ -31,18 +56,82 @@ public class LocationOverviewMenu extends Menu {
 
         setFiller(user, size);
         setBackButton(size - 9, user, previousInventory);
-        setNavigationItems(user, size - 6, size - 5, size - 4);
+        setNavigationItems(user, size - 6, size - 5, size - 4, size - 1);
+        setLocationItems(user);
     }
 
     private void updatePage(User user) {
         int size = getInventory().getSize();
         setCurrentArrow(user, size - 5);
+        setSortItem(user, size - 1);
+        setLocationItems(user);
     }
 
-    private void setNavigationItems(User user, int backSlot, int currentSlot, int nextSlot) {
+    private void setLocationItems(User rawUser) {
+        List<Location> locations = new ArrayList<>(plugin.getServiceManager().getLocationManager().getLocationsAsCollection());
+
+        sortLocations(locations, rawUser.getLocationSort());
+
+        int itemsPerPage = 36;
+        int start = currentPage * itemsPerPage;
+        int end = Math.min(start + itemsPerPage, locations.size());
+
+        int slot = 9;
+        for (int i = start; i < end; i++) {
+            Location loc = locations.get(i);
+
+            ItemStack item = createLocationItem(loc);
+
+            setItem(slot++, item, (user, event) -> {
+                user.openInventory(InventoryType.LOCATION_INFO, InventoryType.LOCATION_OVERVIEW, loc);
+                user.playSound(Sound.PLING);
+            });
+        }
+    }
+
+    private void sortLocations(List<Location> locations, LocationSort sort) {
+        switch (sort) {
+            case NAME -> locations.sort(Comparator.comparing(Location::getName, String.CASE_INSENSITIVE_ORDER));
+            case MEMBERS -> locations.sort(Comparator.comparingInt(loc -> loc.getMembers().size()));
+            case TYPE -> locations.sort(Comparator.comparing(loc -> loc.getType().name()));
+            case SIZE -> locations.sort(Comparator.comparingDouble(Location::getSize).reversed());
+        }
+    }
+
+    private ItemStack createLocationItem(Location loc) {
+        Material mat = loc.getType().getMaterial();
+
+        ItemStack item = new ItemStack(mat);
+
+        item.editMeta(meta -> {
+            meta.displayName(mm.deserialize("<!italic><#00A4FC>" + loc.getName()));
+            meta.removeItemFlags(ItemFlag.values());
+
+            ArchivedPlayer owner = loc.getOwner();
+            String ownerName = (owner != null) ? owner.getName() : "Keiner";
+
+            List<String> lines = List.of(
+                    "",
+                    "<dark_gray>» <gray>Typ: <white>" + loc.getType().getName(),
+                    "<dark_gray>» <gray>Besitzer: <white>" + ownerName,
+                    "<dark_gray>» <gray>Mitglieder: <white>" + loc.getMembers().size(),
+                    "",
+                    "<#00A4FC>Klicke für weitere Informationen"
+            );
+
+            meta.lore(lines.stream()
+                    .map(line -> mm.deserialize("<!italic>" + line))
+                    .toList());
+        });
+
+        return item;
+    }
+
+    private void setNavigationItems(User user, int backSlot, int currentSlot, int nextSlot, int sortSlot) {
         setBackArrow(user, backSlot);
         setNextArrow(user, nextSlot);
         setCurrentArrow(user, currentSlot);
+        setSortItem(user, sortSlot);
     }
 
     private void setBackArrow(User rawUser, int slot) {
@@ -60,11 +149,16 @@ public class LocationOverviewMenu extends Menu {
         });
 
         setItem(slot, item, ((user, event) -> {
-            if (currentPage == 0) {
-                user.playSound("error");
+            if (!(lastClickPage < System.currentTimeMillis() - PAGE_COOLDOWN)) {
+                //user.playSound(Sound.ERROR);
                 return;
             }
-            user.playSound("pling");
+            lastClickPage = System.currentTimeMillis();
+            if (currentPage == 0) {
+                user.playSound(Sound.ERROR);
+                return;
+            }
+            user.playSound(Sound.PLING);
             currentPage -= 1;
             updatePage(user);
         }));
@@ -85,11 +179,16 @@ public class LocationOverviewMenu extends Menu {
         });
 
         setItem(slot, item, ((user, event) -> {
-            if (currentPage == maxPage) {
-                user.playSound("error");
+            if (!(lastClickPage < System.currentTimeMillis() - PAGE_COOLDOWN)) {
+                //user.playSound(Sound.ERROR);
                 return;
             }
-            user.playSound("pling");
+            lastClickPage = System.currentTimeMillis();
+            if (currentPage == maxPage) {
+                user.playSound(Sound.ERROR);
+                return;
+            }
+            user.playSound(Sound.PLING);
             currentPage += 1;
             updatePage(user);
         }));
@@ -110,5 +209,45 @@ public class LocationOverviewMenu extends Menu {
         });
 
         setItem(slot, item, null);
+    }
+
+    private void setSortItem(User rawUser, int slot) {
+        var cm = plugin.getServiceManager().getConfigManager();
+
+        ItemStack item = new ItemStack(Material.PLAYER_HEAD);
+        LocationSort[] sorts = LocationSort.values();
+
+        List<String> rawLore = new ArrayList<>();
+        rawLore.add("");
+
+        for (LocationSort sort : sorts) {
+            if (sort == rawUser.getLocationSort()) {
+                rawLore.add("<!italic><#00A4FC>» <#00A4FC>" + sort.getName());
+                continue;
+            }
+            rawLore.add("<!italic><dark_gray>» <white>" + sort.getName());
+        }
+
+        item.editMeta(SkullMeta.class,meta -> {
+            meta.displayName(mm.deserialize(plugin.getServiceManager().getConfigManager().getString("items.sort_button.name")));
+            meta.lore(rawLore.stream().map(mm::deserialize).toList());
+
+            PlayerProfile profile = Bukkit.createProfile(UUID.randomUUID());
+            profile.setProperty(new ProfileProperty("textures", rawUser.getColor().getInfoIcon()));
+
+            meta.setPlayerProfile(profile);
+        });
+
+        setItem(slot, item, ((user, event) -> {
+            if (!(lastClickSort < System.currentTimeMillis() - SORT_COOLDOWN)) {
+               // user.playSound(Sound.ERROR);
+                return;
+            }
+
+            user.toggleLocationSort();
+            user.playSound(Sound.PLING);
+            updatePage(user);
+            lastClickSort = System.currentTimeMillis();
+        }));
     }
 }

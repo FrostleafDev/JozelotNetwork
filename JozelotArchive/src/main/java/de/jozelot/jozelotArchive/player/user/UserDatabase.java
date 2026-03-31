@@ -30,7 +30,7 @@ public class UserDatabase {
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    String key = rs.getString("setting_key");
+                    String key = rs.getString("setting_key").toUpperCase();
                     String value = rs.getString("setting_value");
 
                     Setting setting = Setting.fromKey(key);
@@ -120,5 +120,37 @@ public class UserDatabase {
             e.printStackTrace();
         }
         return HiderState.VISIBLE;
+    }
+
+    public void updateSetting(UUID uuid, Setting setting, String value) {
+        // Wenn der neue Wert dem Standard entspricht -> Eintrag aus DB löschen
+        if (setting.getDefaultValue().equalsIgnoreCase(value)) {
+            String sql = "DELETE FROM player_settings WHERE uuid = ? AND setting_key = ?;";
+            try (Connection conn = plugin.getServiceManager().getSQLConnection().getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setString(1, uuid.toString());
+                pstmt.setString(2, setting.name().toUpperCase());
+                pstmt.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return;
+        }
+
+        String sql = "INSERT INTO player_settings (uuid, setting_key, setting_value) VALUES (?, ?, ?) " +
+                "ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value);";
+
+        try (Connection conn = plugin.getServiceManager().getSQLConnection().getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, uuid.toString());
+            pstmt.setString(2, setting.name().toUpperCase());
+            pstmt.setString(3, value);
+
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            plugin.getLogger().severe("Fehler beim Speichern des Settings " + setting.name() + " für " + uuid);
+            e.printStackTrace();
+        }
     }
 }
