@@ -560,3 +560,4 @@ world-reset-admin: '{grey}[<gradient:#f90036:#f90011><b>LOG</b>{grey}] {primary}
 
 archive-gamemode-hotkey-info: '{grey}Drücke {primary}<key:key.swapOffhand> {grey}um in den {primary}{gamemode} {grey}zu wechseln'
 archive-cant-use-command: '{grey}Du darfst diesen {danger}Command {grey}auf einem {danger}Archiv Server {grey}nicht nutzen!'
+archive-no-locations: '{danger}Es gibt aktuell noch keine Locations!'

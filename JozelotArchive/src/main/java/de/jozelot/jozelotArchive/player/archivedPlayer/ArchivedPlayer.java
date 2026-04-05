@@ -49,7 +49,7 @@ public class ArchivedPlayer {
 
     }
 
-    public UUID getUuid() {
+    public UUID getUniqueId() {
         return uuid;
     }
 

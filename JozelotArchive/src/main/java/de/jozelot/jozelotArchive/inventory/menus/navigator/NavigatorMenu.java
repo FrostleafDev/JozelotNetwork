@@ -136,8 +136,14 @@ public class NavigatorMenu extends Menu {
         });
 
         setItem(slot, item, ((user, event) -> {
+            if (plugin.getServiceManager().getLocationManager().getLocationCount() == 0) {
+                user.getPlayer().sendMessage(mm.deserialize(plugin.getServiceManager().getLangManager().format("archive-no-locations", null)));
+                user.playSound(Sound.ERROR);
+                return;
+            }
+
             user.playSound(Sound.PLING);
-            user.openInventory(InventoryType.LOCATION_OVERVIEW, InventoryType.NAVIGATOR);
+            user.openInventory(InventoryType.LOCATION_OVERVIEW, InventoryType.NAVIGATOR, plugin.getServiceManager().getLocationManager().getLocationsAsCollection());
         }));
     }
 

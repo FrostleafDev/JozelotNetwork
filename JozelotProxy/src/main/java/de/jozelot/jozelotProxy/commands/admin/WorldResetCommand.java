@@ -116,4 +116,9 @@ public class WorldResetCommand implements SimpleCommand {
         }
         return List.of();
     }
+
+    @Override
+    public boolean hasPermission(Invocation invocation) {
+        return invocation.source().hasPermission("network.command.world-reset");
+    }
 }

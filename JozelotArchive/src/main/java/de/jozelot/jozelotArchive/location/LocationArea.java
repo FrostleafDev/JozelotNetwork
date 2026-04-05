@@ -8,7 +8,7 @@ public class LocationArea {
     private double maxX, maxY, maxZ;
     private World world;
 
-    protected LocationArea(double x1, double y1, double z1, double x2, double y2, double z2, World world) {
+    public LocationArea(double x1, double y1, double z1, double x2, double y2, double z2, World world) {
         this.minX = Math.min(x1, x2);
         this.minY = Math.min(y1, y2);
         this.minZ = Math.min(z1, z2);
@@ -45,4 +45,12 @@ public class LocationArea {
     public double getVolume() {
         return getWidthX() * getHeightY() * getDepthZ();
     }
+
+    public double getMinX() { return minX; }
+    public double getMinY() { return minY; }
+    public double getMinZ() { return minZ; }
+    public double getMaxX() { return maxX; }
+    public double getMaxY() { return maxY; }
+    public double getMaxZ() { return maxZ; }
+    public World getWorld() { return world; }
 }

@@ -7,7 +7,10 @@ import de.jozelot.jozelotArchive.core.database.redis.RedisManager;
 import de.jozelot.jozelotArchive.core.database.sql.SQLConnection;
 import de.jozelot.jozelotArchive.inventory.hotbar.HotbarManager;
 import de.jozelot.jozelotArchive.inventory.menus.MenuManager;
+import de.jozelot.jozelotArchive.location.LocationArea;
+import de.jozelot.jozelotArchive.location.LocationDatabase;
 import de.jozelot.jozelotArchive.location.LocationManager;
+import de.jozelot.jozelotArchive.location.LocationType;
 import de.jozelot.jozelotArchive.player.user.UserManager;
 import de.jozelot.jozelotArchive.player.user.UserDatabase;
 import de.jozelot.jozelotArchive.registry.CommandRegistry;
@@ -16,6 +19,7 @@ import de.jozelot.jozelotArchive.storage.ConfigManager;
 import de.jozelot.jozelotArchive.storage.FileSystemManager;
 import de.jozelot.jozelotArchive.storage.LangManager;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.Map;
@@ -41,6 +45,7 @@ public class ServiceManager {
     private UserDatabase userDatabase;
     private HotbarManager hotbarManager;
     private LocationManager locationManager;
+    private LocationDatabase locationDatabase;
 
     public ServiceManager(JozelotArchive plugin) {
         this.plugin = plugin;
@@ -84,6 +89,7 @@ public class ServiceManager {
         this.userDatabase = new UserDatabase(plugin);
         this.hotbarManager = new HotbarManager(plugin);
         this.locationManager = new LocationManager(plugin);
+        this.locationDatabase = new LocationDatabase(plugin);
     }
 
     public void enable() {
@@ -121,6 +127,9 @@ public class ServiceManager {
 
         redisConnection.close();
         redisConnection.setup();
+
+        locationManager.saveLocations();
+        locationManager.loadLocations();
 
         integrateLangFromProxy();
 
@@ -179,5 +188,9 @@ public class ServiceManager {
 
     public LocationManager getLocationManager() {
         return locationManager;
+    }
+
+    public LocationDatabase getLocationDatabase() {
+        return locationDatabase;
     }
 }

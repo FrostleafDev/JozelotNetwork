@@ -184,15 +184,14 @@ public class MySQLManager {
                         "min_x DOUBLE, min_y DOUBLE, min_z DOUBLE," +
                         "max_x DOUBLE, max_y DOUBLE, max_z DOUBLE," +
                         "INDEX (server_id)," +
-                        "FOREIGN KEY (server_id) REFERENCES server(id) ON DELETE CASCADE" +
+                        "INDEX (owner_uuid)" +
                         ");",
 
                 "CREATE TABLE IF NOT EXISTS archive_location_members (" +
                         "location_id INT," +
                         "player_uuid CHAR(36)," +
                         "PRIMARY KEY (location_id, player_uuid)," +
-                        "FOREIGN KEY (location_id) REFERENCES archive_locations(id) ON DELETE CASCADE," +
-                        "FOREIGN KEY (player_uuid) REFERENCES player(uuid) ON DELETE CASCADE" +
+                        "FOREIGN KEY (location_id) REFERENCES archive_locations(id) ON DELETE CASCADE" +
                         ");"
         };
 

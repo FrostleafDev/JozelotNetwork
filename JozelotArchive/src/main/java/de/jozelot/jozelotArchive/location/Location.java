@@ -15,7 +15,7 @@ public class Location {
     private Set<ArchivedPlayer> members;
     private LocationArea area;
 
-    private final int id;
+    private int id;
 
     protected Location(int id, @NotNull LocationType type, @NotNull String name, String description, ArchivedPlayer owner, Set<ArchivedPlayer> members, @NotNull LocationArea area) {
         this.id = id;
@@ -26,10 +26,6 @@ public class Location {
         this.area = area;
 
         this.members = (members == null) ? new HashSet<>() : new HashSet<>(members);
-
-        if (owner != null) {
-            this.members.remove(owner);
-        }
     }
 
     public LocationType getType() {
@@ -91,6 +87,8 @@ public class Location {
     public int getId() {
         return id;
     }
+
+    public void setId(int id) {this.id = id; }
 
     public double getSize() {
         if (area == null) return 0;

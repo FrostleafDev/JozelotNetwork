@@ -10,6 +10,7 @@ import de.jozelot.jozelotArchive.location.Location;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -28,7 +29,10 @@ public class MenuManager {
     public void registerMenus() {
         menuFactory.clear();
         menuFactory.put(InventoryType.NAVIGATOR, (player, data) -> new NavigatorMenu(plugin));
-        menuFactory.put(InventoryType.LOCATION_OVERVIEW, (player, data) -> new LocationOverviewMenu(plugin));
+        menuFactory.put(InventoryType.LOCATION_OVERVIEW, (player, data) -> {
+            Collection<Location> locations = (Collection<Location>) data;
+            return new LocationOverviewMenu(plugin, locations);
+        });
         menuFactory.put(InventoryType.LOCATION_INFO, (player, data) -> {
             Location location = (Location) data;
             return new LocationMenu(plugin, location);

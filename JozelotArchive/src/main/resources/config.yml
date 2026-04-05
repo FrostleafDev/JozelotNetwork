@@ -5,6 +5,8 @@ mysql:
   user: ''
   password: ''
 
+server-id: 4
+
 # CACHE
 redis:
   host: 'localhost'

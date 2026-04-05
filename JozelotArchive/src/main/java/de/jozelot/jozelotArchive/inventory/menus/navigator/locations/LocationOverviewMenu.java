@@ -15,10 +15,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class LocationOverviewMenu extends Menu {
 
@@ -27,22 +24,24 @@ public class LocationOverviewMenu extends Menu {
     private LocationSort sort;
     private long lastClickPage = 0;
     private long lastClickSort = 0;
+    private Collection<Location> locations;
 
     private final long PAGE_COOLDOWN = 100;
     private final long SORT_COOLDOWN = 100;
 
-    public LocationOverviewMenu(JozelotArchive plugin) {
-        super(plugin, calculateSize(plugin), plugin.getServiceManager().getConfigManager().getString("inventories.location_overview.title"));
+    public LocationOverviewMenu(JozelotArchive plugin, Collection<Location> locations) {
+        super(plugin, calculateSize(locations), plugin.getServiceManager().getConfigManager().getString("inventories.location_overview.title"));
         currentPage = 0;
+        this.locations = locations;
 
-        int locations = plugin.getServiceManager().getLocationManager().getLocationCount();
-        this.maxPage = Math.max(0, (locations - 1) / 36);
+        int locationCount = locations.size();
+        this.maxPage = Math.max(0, (locationCount - 1) / 36);
     }
 
-    private static int calculateSize(JozelotArchive plugin) {
-        int locations = plugin.getServiceManager().getLocationManager().getLocationCount();
+    private static int calculateSize(Collection<Location> locations) {
+        int locationCount = locations.size();
 
-        int neededSlots = locations + 18;
+        int neededSlots = locationCount + 18;
 
         int rows = (int) Math.ceil(neededSlots / 9.0);
 
@@ -68,18 +67,22 @@ public class LocationOverviewMenu extends Menu {
     }
 
     private void setLocationItems(User rawUser) {
-        List<Location> locations = new ArrayList<>(plugin.getServiceManager().getLocationManager().getLocationsAsCollection());
+        int size = getInventory().getSize();
 
-        sortLocations(locations, rawUser.getLocationSort());
+        for (int slot = 9; slot < size - 9; slot++) {
+            getInventory().setItem(slot, null);
+        }
 
-        int itemsPerPage = 36;
+        List<Location> displayList = new ArrayList<>(this.locations);
+        sortLocations(displayList, rawUser.getLocationSort());
+
+        int itemsPerPage = size - 18;
         int start = currentPage * itemsPerPage;
-        int end = Math.min(start + itemsPerPage, locations.size());
+        int end = Math.min(start + itemsPerPage, displayList.size());
 
         int slot = 9;
         for (int i = start; i < end; i++) {
-            Location loc = locations.get(i);
-
+            Location loc = displayList.get(i);
             ItemStack item = createLocationItem(loc);
 
             setItem(slot++, item, (user, event) -> {
