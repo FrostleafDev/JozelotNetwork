@@ -33,6 +33,10 @@ This repository acts as the central place for all parts of the network, includin
 > Backends: Paper / Purpur `1.21.11`  
 > Java: `22-lts`
 
+## Technical Note
+Throughout the development of my network, my coding standards and architectural techniques have evolved significantly. 
+As a result, the Archive Plugin represents my most current and advanced work, reflecting improved structuring and more efficient logic compared to earlier projects.
+
 ## Credits
 > Currently developed by me alone (`jozelot_`).  
 > Please don’t steal
