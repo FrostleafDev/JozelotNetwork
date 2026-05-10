@@ -355,13 +355,10 @@ protocol-to-old:
 protocol-to-new:
   - "<red><b>ZUTRITT VERWEIGERT</b>"
   - ""
-  - "{grey}Deine Minecraft-Version ist zu <danger>neu{grey}."
+  - "{grey}Deine Minecraft-Version ist zu {danger}neu{grey}."
   - "{grey}Aktuelle Version: {danger}{current-version}"
   - ""
   - "{grey}Bitte nutze maximal die Version: {primary}{max-version}"
-  - "{grey}Empfohlene Version: {primary}{reco-version}"
-  - ""
-  - "{grey}Du kannst mit der {primary}{max-version}{grey} problemlos joinen."
 
 protocol-recomment:
   - ''

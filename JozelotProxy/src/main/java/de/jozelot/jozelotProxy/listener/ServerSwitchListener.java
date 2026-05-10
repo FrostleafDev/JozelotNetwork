@@ -122,7 +122,7 @@ public class ServerSwitchListener {
         }
         if (protocolVersion > protocolMax) {
             event.setResult(ResultedEvent.ComponentResult.denied(mm.deserialize(
-                    String.join("<newline>", lang.formatList("protocol-to-new", Map.of("ax-version", versionMax, "current-version", versionPlayer)))
+                    String.join("<newline>", lang.formatList("protocol-to-new", Map.of("max-version", versionMax, "current-version", versionPlayer)))
             )));
             return;
         }
