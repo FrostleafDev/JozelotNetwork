@@ -17,8 +17,6 @@ This repository acts as the central place for all parts of the network, includin
 
 ## Project Status
 > **JozelotProxy:** `Mostly finished`
->
-> **JozelotWebsite:** `Not started`
 > 
 > **JozelotLobby:** `Finished`
 >
