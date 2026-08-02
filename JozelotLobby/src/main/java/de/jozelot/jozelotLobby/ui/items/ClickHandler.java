@@ -169,7 +169,7 @@ public class ClickHandler implements Listener {
                 break;
             case "event_server":
                 if (plugin.getConfigManager().isEventServerActive()) {
-                    connectButton(lobbyPlayer,"event_server");
+                    connectButton(lobbyPlayer,plugin.getConfig().getString("items.event_server.server"));
                     return;
                 }
 
