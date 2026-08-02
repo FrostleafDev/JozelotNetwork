@@ -1,0 +1,61 @@
+name: JozelotUtils
+version: '1.0.0'
+main: de.jozelot.jozelotUtils.JozelotUtils
+api-version: '1.21'
+authors: [ jozelot_ ]
+description: Utils Plugin für jozelot.de - Bereitgestellt von jozelot_
+website: https://jozelot.de
+
+commands:
+  fly:
+    description: Lässt dich im Überlebensmodus fliegen
+    permission: network.utils.command.fly
+
+  flyspeed:
+    description: Ändert die Fluggeschwindigkeit
+    permission: network.utils.command.flyspeed
+
+  spec:
+    description: Ändert den Gamemode in den Spec
+    permission: network.utils.command.spec
+
+  heal:
+    description: Heale dich oder andere Spieler
+    permission: network.utils.command.heal
+
+permissions:
+  network.utils.command.fly:
+    description: Permission für den /fly command
+    default: op
+
+  network.utils.command.fly.others:
+    description: Permission für den /fly <Spieler> command
+    default: op
+
+  network.utils.command.fly.all:
+    description: Permission für den /fly all command
+    default: op
+
+  network.utils.join.fly:
+    description: Permission damit man als Admin nach join fliegen kann
+    default: op
+
+  network.utils.command.flyspeed:
+    description: Permission für den /flyspeed command
+    default: op
+
+  network.utils.admin.build:
+    description: Permission um Bauen zu können im Creative
+    default: op
+
+  network.utils.admin.inventory:
+    description: Permission um Bauen zu können im Creative
+    default: op
+
+  network.utils.command.spec:
+    description: Permission für den /spec command
+    default: op
+
+  network.utils.command.heal:
+    description: Permission für den /heal command
+    default: op

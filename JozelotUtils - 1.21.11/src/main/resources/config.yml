@@ -1,0 +1,95 @@
+# +-------------------------------------------------------+
+# |                                                       |
+# |                    JOZELOT UTILS                      |
+# |             Netzwerk Management System                |
+# |                                                       |
+# +-------------------------------------------------------+
+
+# AUTOMATION
+automatic-flight-for-admins: false
+automatic-flight-for-player: false
+
+# WORLD SETTINGS
+default-gamemode: survival
+can-build: true
+inventory-locked: false
+can-take-damage: true
+can-hunger: true
+entities-focus-player: true
+entity-grief: true
+can-mob-spawn: true
+
+# GAMEPLAY & MECHANICS
+drop-items-on-death: true
+keep-inventory: false
+fire-spread: true
+leaf-decay: true
+natural-regeneration: true
+daylight-cycle: true
+weather-cycle: true
+announce-advancements: true
+advancements-enabled: true
+block-portals: false
+
+# MOB & ENTITY CONTROL
+mob-griefing: true
+do-insomia: true
+block-drops: true
+player-sleeping-percentage: 100
+spawn-phantoms: true
+spawn-wandering-trader: true
+spawn-patrols: true
+
+# LEVELS & BARS
+custom-experience-level: false
+experience-level-set: 2026
+custom-bar-level: false
+bar-level-set: 100
+locator-bar: true
+
+# CHAT & VISUALS
+disable-default-chat: false
+enable-player-name-tag: false
+join-messages: default # default, disabled, custom
+leave-messages: default
+
+# SERVER PERFORMANCE
+tick-freeze: false
+tick-speed: 3
+
+# SPAWN SYSTEM
+spawn-command: false
+spawn-on-join: false
+spawn-on-fall-off: false
+fall-off-height: -10
+spawn-position:
+  - 0.0f
+  - 65.0f
+  - 0.0f
+  - 0.0f
+  - 0.0f
+
+# HOTBAR
+default-hotbar-slot: -1 # -1 to disable
+
+# COLORS
+color-settings:
+  primary: '#00A4FC'
+  secondary: '#00FC00'
+  tertiary: '#FCE300'
+  danger: '#f90036'
+  grey: '#A8A8A8'
+
+# DATABASE
+mysql:
+  host: 'localhost'
+  port: 3306
+  database: 'jozelot_network'
+  user: ''
+  password: ''
+
+# CACHE
+redis:
+  host: 'localhost'
+  port: 6379
+  password: ''

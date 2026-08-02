@@ -168,7 +168,11 @@ public class ClickHandler implements Listener {
                 connectButton(lobbyPlayer,"archiv-2");
                 break;
             case "event_server":
-                //connectButton(player,"event_server");
+                if (plugin.getConfigManager().isEventServerActive()) {
+                    connectButton(lobbyPlayer,"event_server");
+                    return;
+                }
+
                 player.sendMessage(MiniMessage.miniMessage().deserialize(plugin.getLang().format("event-server-no-event", null)));
                 lobbyPlayer.playSound("error");
                 return;

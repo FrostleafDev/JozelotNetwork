@@ -111,6 +111,7 @@ items:
     item: NETHER_STAR
     name: '<!italic><gradient:#03fc30:#03e3fc><bold>AwesomeSMP</gradient> <dark_gray>[Event-Server]'
     server: ''
+    active: false
     lore:
       - ''
       - '<!italic><gray>Hier finden die aktuellen Events'

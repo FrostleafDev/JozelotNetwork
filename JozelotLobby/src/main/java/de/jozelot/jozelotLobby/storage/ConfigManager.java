@@ -29,6 +29,8 @@ public class ConfigManager {
     private String mysqlDatabase;
     private int mysqlPort;
 
+    private boolean eventServerActive;
+
     public ConfigManager(JozelotLobby plugin) {
         this.plugin = plugin;
         loadConfig();
@@ -87,6 +89,10 @@ public class ConfigManager {
         return mysqlHost;
     }
 
+    public boolean isEventServerActive() {
+        return eventServerActive;
+    }
+
     public void loadConfig() {
         plugin.saveDefaultConfig();
 
@@ -106,5 +112,6 @@ public class ConfigManager {
         mysqlHost = plugin.getConfig().getString("mysql.host");
         mysqlPort = plugin.getConfig().getInt("mysql.port");
 
+        eventServerActive = plugin.getConfig().getBoolean("items.event_server.active", false);
     }
 }
