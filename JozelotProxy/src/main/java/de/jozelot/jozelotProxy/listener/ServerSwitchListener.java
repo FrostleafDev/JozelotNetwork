@@ -285,11 +285,12 @@ public class ServerSwitchListener {
         Player player = event.getPlayer();
         String serverName = event.getServer().getServerInfo().getName();
 
+        int groupId = plugin.getGroupManager().getGroupId(serverName);
+
         if (event.getPreviousServer().isPresent()) {
-            removeFromAllTabs(player);
+            removeFromManagedTabs(player);
         }
 
-        int groupId = plugin.getGroupManager().getGroupId(serverName);
         if (groupId != -1) {
             updateTabHeaderForPlayer(player, groupId);
         }
@@ -306,14 +307,27 @@ public class ServerSwitchListener {
 
         server.getScheduler().buildTask(plugin, () -> {
             plugin.getMySQLManager().updatePlayerServer(player.getUniqueId(), serverName);
-            refreshGroupTab(serverName);
+            if (groupId != -1) {
+                refreshGroupTab(serverName);
+            }
         }).delay(Duration.ofMillis(200)).schedule();
+    }
+
+    private void removeFromManagedTabs(Player playerToRemove) {
+        for (Player viewer : server.getAllPlayers()) {
+            viewer.getCurrentServer().ifPresent(conn -> {
+                int groupId = plugin.getGroupManager().getGroupId(conn.getServerInfo().getName());
+                if (groupId != -1 && plugin.getGroupManager().isTabEnabled(groupId)) {
+                    viewer.getTabList().removeEntry(playerToRemove.getUniqueId());
+                }
+            });
+        }
     }
 
     @Subscribe
     public void onDisconnect(DisconnectEvent event) {
         Player p = event.getPlayer();
-        removeFromAllTabs(p);
+        removeFromManagedTabs(p);
         plugin.getReplyMap().remove(p.getUniqueId());
         plugin.getReplyMap().values().removeIf(data -> data.partnerId().equals(p.getUniqueId()));
         plugin.getLoginTimes().remove(p.getUniqueId());
